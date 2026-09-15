@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>教材索引</title>
+<style>
+  :root{
+    --paper:#EFEDE4;
+    --paper-alt:#E6E2D3;
+    --ink:#1F2A37;
+    --ink-soft:#5B6560;
+    --line:#C9C2AC;
+    --g10:#4C6B52;
+    --g11:#3F5F73;
+    --g12:#B98530;
+    --basic:#A45C46;
+    --font-serif:"Noto Serif TC","PMingLiU",serif;
+    --font-sans:"Noto Sans TC","Microsoft JhengHei",system-ui,-apple-system,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--font-sans);
+    line-height:1.6;
+  }
+  .wrap{max-width:920px;margin:0 auto;padding:48px 24px 96px;}
+  header h1{
+    font-family:var(--font-serif);
+    font-size:2rem;
+    font-weight:600;
+    margin:0 0 4px;
+    letter-spacing:.02em;
+  }
+  header .subtitle{
+    color:var(--ink-soft);
+    font-size:.95rem;
+    margin:0 0 32px;
+  }
+  .controls{
+    display:flex;
+    flex-wrap:wrap;
+    gap:12px;
+    align-items:center;
+    justify-content:space-between;
+    border-bottom:1px solid var(--line);
+    padding-bottom:16px;
+    margin-bottom:28px;
+  }
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;}
+  .tab{
+    font-family:var(--font-sans);
+    font-size:.9rem;
+    padding:7px 16px;
+    border:1px solid var(--line);
+    background:transparent;
+    color:var(--ink);
+    cursor:pointer;
+    border-radius:2px;
+    transition:background .15s ease, color .15s ease, border-color .15s ease;
+  }
+  .tab[data-cat="g10"].active{background:var(--g10);border-color:var(--g10);color:#fff;}
+  .tab[data-cat="g11"].active{background:var(--g11);border-color:var(--g11);color:#fff;}
+  .tab[data-cat="g12"].active{background:var(--g12);border-color:var(--g12);color:#fff;}
+  .tab[data-cat="basic"].active{background:var(--basic);border-color:var(--basic);color:#fff;}
+  .tab[data-cat="all"].active{background:var(--ink);border-color:var(--ink);color:#fff;}
+  .tab:focus, #searchInput:focus{outline:2px solid var(--ink);outline-offset:1px;}
+  #searchInput{
+    font-family:var(--font-sans);
+    font-size:.9rem;
+    padding:8px 12px;
+    border:1px solid var(--line);
+    border-radius:2px;
+    background:#fff;
+    color:var(--ink);
+    min-width:220px;
+  }
+  .card-list{display:flex;flex-direction:column;gap:10px;}
+  .card{
+    display:flex;
+    align-items:center;
+    gap:16px;
+    background:#fff;
+    border:1px solid var(--line);
+    border-left-width:5px;
+    padding:14px 18px;
+  }
+  .card[data-cat="g10"]{border-left-color:var(--g10);}
+  .card[data-cat="g11"]{border-left-color:var(--g11);}
+  .card[data-cat="g12"]{border-left-color:var(--g12);}
+  .card[data-cat="basic"]{border-left-color:var(--basic);}
+  .card-main{flex:1;min-width:0;}
+  .card-title{
+    font-family:var(--font-serif);
+    font-size:1.05rem;
+    margin:0 0 6px;
+  }
+  .card-meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center;}
+  .chip{
+    font-size:.75rem;
+    padding:2px 8px;
+    border-radius:2px;
+    background:var(--paper-alt);
+    color:var(--ink-soft);
+  }
+  .card-action a{
+    font-family:var(--font-sans);
+    font-size:.85rem;
+    color:var(--ink);
+    text-decoration:none;
+    border:1px solid var(--ink);
+    padding:6px 14px;
+    white-space:nowrap;
+    display:inline-block;
+    transition:background .15s ease,color .15s ease;
+  }
+  .card-action a:hover, .card-action a:focus{background:var(--ink);color:var(--paper);}
+  .empty{
+    text-align:center;
+    color:var(--ink-soft);
+    padding:48px 0;
+    font-size:.95rem;
+  }
+  details{
+    margin-top:40px;
+    border-top:1px solid var(--line);
+    padding-top:16px;
+    font-size:.85rem;
+    color:var(--ink-soft);
+  }
+  summary{cursor:pointer;color:var(--ink);font-weight:600;}
+  pre{
+    background:var(--paper-alt);
+    padding:12px;
+    overflow-x:auto;
+    font-size:.78rem;
+    line-height:1.5;
+  }
+  @media (max-width:600px){
+    .card{flex-direction:column;align-items:flex-start;}
+    .card-action a{width:100%;text-align:center;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>教材索引</h1>
+    <p class="subtitle">高一・高二・高三英文互動練習,加上基礎練習 —— 用來快速找到要用的教材(學習單目前另外放在 Google Drive)</p>
+    <div class="controls">
+      <div class="tabs" id="tabs"></div>
+      <input type="search" id="searchInput" placeholder="搜尋名稱、單元或標籤">
+    </div>
+  </header>
+  <main class="card-list" id="cardList"></main>
+
+  <details>
+    <summary>如何新增教材</summary>
+    <p>在下方 &lt;script&gt; 裡的 <code>materialsData</code> 陣列新增一筆資料即可,格式如下:</p>
+    <pre>{
+  grade: 'g10',        // g10 / g11 / g12 / basic
+  title: '教材名稱',
+  unit: 'Unit 3',      // 單元或課次,沒有可留空字串
+  tags: ['文法','時態'], // 標籤,用於搜尋
+  url: '連結網址'       // CodePen 的 Preview Only 連結(網址帶 show=preview)
+}</pre>
+    <p>目前清單裡的項目是範例,請替換成你實際的 CodePen 連結。建議用 Preview Only 模式產生的連結(Copy Link with Layout),學生點開才是乾淨的畫面,不會看到程式碼。</p>
+  </details>
+</div>
+
+<script>
+// ------- 資料區(在這裡新增/修改教材) -------
+const materialsData = [
+  { grade:'g11', title:'高二第三冊 L1 片語文法', unit:'L1', tags:['文法','片語'], url:'https://codepen.io/editor/mmdybhbk-the-lessful/pen/01a0576f-f3c5-7605-a5cc-f816c7852964?orientation=left&panel=false&show=preview' },
+  { grade:'g11', title:'高二第三冊 L1 單字', unit:'L1', tags:['單字'], url:'https://codepen.io/editor/mmdybhbk-the-lessful/pen/01a0574a-9e17-7d8c-bc0f-3807ec09931e?orientation=left&panel=false&show=preview' },
+  { grade:'g12', title:'高三第五冊 L1 單字(The Road Not Taken)', unit:'L1', tags:['單字'], url:'https://codepen.io/editor/mmdybhbk-the-lessful/pen/01a05796-7432-70ab-a809-b906b6b8dbf1?orientation=left&panel=false&show=preview' },
+  { grade:'basic', title:'基礎文法練習', unit:'', tags:['文法','基礎'], url:'https://codepen.io/editor/mmdybhbk-the-lessful/pen/01a05cb5-844b-7c40-9926-5e8e0d72d3e1?orientation=left&panel=false&show=preview' },
+  { grade:'basic', title:'Be動詞 is/am 練習', unit:'', tags:['文法','be動詞'], url:'https://codepen.io/mmdybhbk-the-lessful/full/myVGOxM' },
+  { grade:'basic', title:'Be動詞 are 練習', unit:'', tags:['文法','be動詞'], url:'https://codepen.io/mmdybhbk-the-lessful/full/EaPOrGJ' },
+  { grade:'basic', title:'Be動詞綜合練習(all)', unit:'', tags:['文法','be動詞'], url:'https://codepen.io/mmdybhbk-the-lessful/full/XJXyoMM' },
+  { grade:'basic', title:'Be動詞句子重組', unit:'', tags:['文法','be動詞','句型'], url:'https://codepen.io/mmdybhbk-the-lessful/full/JoGZLqw' },
+  { grade:'basic', title:'Be動詞問句練習', unit:'', tags:['文法','be動詞','問句'], url:'https://codepen.io/mmdybhbk-the-lessful/full/azdrWaW' }
+];
+// -------------------------------------------
+
+const gradeLabels = { g10:'高一英文', g11:'高二英文', g12:'高三英文', basic:'基礎練習' };
+
+const tabsEl = document.getElementById('tabs');
+const cardListEl = document.getElementById('cardList');
+const searchInput = document.getElementById('searchInput');
+
+const tabDefs = [
+  { key:'all', label:'全部' },
+  { key:'g10', label:'高一英文' },
+  { key:'g11', label:'高二英文' },
+  { key:'g12', label:'高三英文' },
+  { key:'basic', label:'基礎練習' }
+];
+
+let activeTab = localStorage.getItem('materialsActiveTab') || 'all';
+
+function renderTabs(){
+  tabsEl.innerHTML = '';
+  tabDefs.forEach(t => {
+    const btn = document.createElement('button');
+    btn.className = 'tab' + (t.key === activeTab ? ' active' : '');
+    btn.dataset.cat = t.key;
+    btn.textContent = t.label;
+    btn.addEventListener('click', () => {
+      activeTab = t.key;
+      localStorage.setItem('materialsActiveTab', activeTab);
+      renderTabs();
+      renderCards();
+    });
+    tabsEl.appendChild(btn);
+  });
+}
+
+function renderCards(){
+  const query = searchInput.value.trim().toLowerCase();
+  const filtered = materialsData.filter(m => {
+    const matchesTab = activeTab === 'all' || m.grade === activeTab;
+    const haystack = (m.title + ' ' + m.unit + ' ' + m.tags.join(' ')).toLowerCase();
+    const matchesQuery = query === '' || haystack.includes(query);
+    return matchesTab && matchesQuery;
+  });
+
+  cardListEl.innerHTML = '';
+
+  if (filtered.length === 0){
+    const empty = document.createElement('div');
+    empty.className = 'empty';
+    empty.textContent = '沒有符合的教材,換個關鍵字或切換分類試試。';
+    cardListEl.appendChild(empty);
+    return;
+  }
+
+  filtered.forEach(m => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.dataset.cat = m.grade;
+
+    const main = document.createElement('div');
+    main.className = 'card-main';
+
+    const title = document.createElement('p');
+    title.className = 'card-title';
+    title.textContent = m.title;
+
+    const meta = document.createElement('div');
+    meta.className = 'card-meta';
+
+    const gradeChip = document.createElement('span');
+    gradeChip.className = 'chip';
+    gradeChip.textContent = gradeLabels[m.grade] || m.grade;
+    meta.appendChild(gradeChip);
+
+    if (m.unit){
+      const unitChip = document.createElement('span');
+      unitChip.className = 'chip';
+      unitChip.textContent = m.unit;
+      meta.appendChild(unitChip);
+    }
+
+    m.tags.forEach(tag => {
+      const tagChip = document.createElement('span');
+      tagChip.className = 'chip';
+      tagChip.textContent = tag;
+      meta.appendChild(tagChip);
+    });
+
+    main.appendChild(title);
+    main.appendChild(meta);
+
+    const action = document.createElement('div');
+    action.className = 'card-action';
+    const link = document.createElement('a');
+    link.href = m.url;
+    link.target = '_blank';
+    link.rel = 'noopener';
+    link.textContent = '開啟教材';
+    action.appendChild(link);
+
+    card.appendChild(main);
+    card.appendChild(action);
+    cardListEl.appendChild(card);
+  });
+}
+
+searchInput.addEventListener('input', renderCards);
+
+renderTabs();
+renderCards();
+</script>
+</body>
+</html>
