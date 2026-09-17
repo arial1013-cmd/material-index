@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>直角三角形比值教具 — Level 0</title>
+<style>
+:root{
+  --bg:#F7F6F2; --panel:#FFFFFF; --text:#2C2C2A; --text-sub:#5F5E5A; --border:#D3D1C7;
+  --accent:#534AB7; --track:#B4B2A9;
+  --opp:#185FA5; --adj:#0F6E56; --hyp:#993C1D;
+  --active-row:#EEEDFE; --match:#639922;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#1C1C1A; --panel:#262624; --text:#EDEBE3; --text-sub:#B4B2A9; --border:#444441;
+    --accent:#AFA9EC; --track:#5F5E5A;
+    --opp:#85B7EB; --adj:#5DCAA5; --hyp:#F0997B;
+    --active-row:#3C3489; --match:#97C459;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#1C1C1A; --panel:#262624; --text:#EDEBE3; --text-sub:#B4B2A9; --border:#444441;
+  --accent:#AFA9EC; --track:#5F5E5A;
+  --opp:#85B7EB; --adj:#5DCAA5; --hyp:#F0997B;
+  --active-row:#3C3489; --match:#97C459;
+}
+*{box-sizing:border-box;}
+body{margin:0;background:var(--bg);color:var(--text);font-family:"PingFang TC","Microsoft JhengHei",-apple-system,sans-serif;padding:16px;}
+.app{max-width:980px;margin:0 auto;}
+h1{font-size:20px;font-weight:500;text-align:center;margin:4px 0 6px;}
+.subtitle{text-align:center;color:var(--text-sub);font-size:14px;margin:0 0 18px;}
+.slider-row{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:18px;}
+.slider-row input[type=range]{flex:1;min-width:200px;height:26px;}
+.slider-row .angle-readout{font-size:22px;font-weight:500;min-width:70px;text-align:center;}
+.pair-grid{display:flex;gap:16px;flex-wrap:wrap;}
+.tri-card{flex:1 1 300px;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:14px;}
+.tri-card h2{font-size:15px;font-weight:500;text-align:center;margin:0 0 8px;color:var(--text-sub);}
+svg{width:100%;height:auto;}
+.ratio-list{font-size:14px;line-height:2;margin-top:8px;}
+.ratio-list b{color:var(--text);}
+.match-banner{text-align:center;background:var(--active-row);border-radius:10px;padding:14px;margin:16px 0;font-size:16px;color:var(--match);font-weight:500;}
+.legend{display:flex;gap:16px;justify-content:center;font-size:13px;color:var(--text-sub);margin-top:6px;flex-wrap:wrap;}
+.legend-dot{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px;vertical-align:middle;}
+.table-panel{margin-top:20px;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:16px;}
+table{border-collapse:collapse;width:100%;font-size:14px;}
+th,td{padding:8px 6px;text-align:center;border-bottom:1px solid var(--border);}
+th{color:var(--text-sub);font-weight:500;}
+tr.clickable{cursor:pointer;}
+tr.clickable:hover td{background:var(--active-row);}
+.next-note{text-align:center;font-size:13px;color:var(--text-sub);margin-top:18px;}
+</style>
+</head>
+<body>
+<div class="app">
+  <h1>直角三角形比值教具 — Level 0</h1>
+  <p class="subtitle">拖動下面的角度,看兩個大小不同的三角形——比值到底變不變</p>
+
+  <div class="slider-row">
+    <span>角度 θ</span>
+    <input type="range" id="angleSlider" min="10" max="80" value="30" step="1">
+    <span class="angle-readout" id="angleReadout">30°</span>
+  </div>
+
+  <div class="pair-grid">
+    <div class="tri-card">
+      <h2>小三角形</h2>
+      <svg id="svgSmall" viewBox="0 0 300 260"></svg>
+      <div class="ratio-list" id="ratioSmall"></div>
+    </div>
+    <div class="tri-card">
+      <h2>大三角形</h2>
+      <svg id="svgLarge" viewBox="0 0 300 260"></svg>
+      <div class="ratio-list" id="ratioLarge"></div>
+    </div>
+  </div>
+
+  <div class="match-banner" id="matchBanner"></div>
+  <div class="legend">
+    <span><span class="legend-dot" style="background:var(--opp)"></span>對邊(跟角度正對面)</span>
+    <span><span class="legend-dot" style="background:var(--adj)"></span>鄰邊(跟角度貼在一起)</span>
+    <span><span class="legend-dot" style="background:var(--hyp)"></span>斜邊(最長、斜斜的那條)</span>
+  </div>
+
+  <div class="table-panel">
+    <table>
+      <thead><tr><th>角度</th><th>sin θ</th><th>cos θ</th><th>tan θ</th></tr></thead>
+      <tbody id="quickTable"></tbody>
+    </table>
+  </div>
+  <p class="next-note">熟悉這裡的比值概念後,可以接著使用「單位圓探索工具」(Level 1),看同樣的比值怎麼延伸到超過90°的角。</p>
+  <p style="text-align:center;margin-top:14px;">
+    <a href="trig-explorer.html" style="color:var(--accent);font-size:15px;text-decoration:none;font-weight:500;">下一步:單位圓探索工具(Level 1)→</a>
+  </p>
+</div>
+<footer style="text-align:center;font-size:12px;color:var(--text-sub);margin:24px 0 4px;">新竹市立成德高中 資源班 · 杜昀蓁 製作</footer>
+
+<script>
+const A_ANCHOR = {x:40, y:220};
+const SCALE_SMALL = 1.3;
+const SCALE_LARGE = 2.3;
+const BASE_HYP_CM = 10;
+
+function trianglePoints(scalePxPerCm, angleDeg){
+  const hyp = BASE_HYP_CM * scalePxPerCm;
+  const rad = angleDeg * Math.PI/180;
+  const adj = hyp*Math.cos(rad);
+  const opp = hyp*Math.sin(rad);
+  const A = {x:A_ANCHOR.x, y:A_ANCHOR.y};
+  const C = {x:A.x+adj, y:A.y};
+  const B = {x:C.x, y:A.y-opp};
+  return {A,C,B, adjLenCm: adj/scalePxPerCm, oppLenCm: opp/scalePxPerCm, hypLenCm: hyp/scalePxPerCm};
+}
+
+function angleArcPath(A, angleDeg){
+  const arcR = 26;
+  const rad = angleDeg*Math.PI/180;
+  const x1 = A.x+arcR, y1 = A.y;
+  const x2 = A.x+arcR*Math.cos(rad), y2 = A.y-arcR*Math.sin(rad);
+  return `M ${x1} ${y1} A ${arcR} ${arcR} 0 0 0 ${x2} ${y2}`;
+}
+
+function renderTriangle(svgId, scalePxPerCm, angleDeg){
+  const pts = trianglePoints(scalePxPerCm, angleDeg);
+  const {A,C,B} = pts;
+  const rightAngleSize = 12;
+  const rSq = `M ${C.x-rightAngleSize} ${C.y} L ${C.x-rightAngleSize} ${C.y-rightAngleSize} L ${C.x} ${C.y-rightAngleSize}`;
+
+  const midAdjX = (A.x+C.x)/2, midAdjY = A.y+18;
+  const midOppX = C.x+14, midOppY = (C.y+B.y)/2;
+  const midHypX = (A.x+B.x)/2-30, midHypY = (A.y+B.y)/2-8;
+
+  const svg = document.getElementById(svgId);
+  svg.innerHTML = `
+    <line x1="${A.x}" y1="${A.y}" x2="${C.x}" y2="${C.y}" stroke="var(--adj)" stroke-width="4"/>
+    <line x1="${C.x}" y1="${C.y}" x2="${B.x}" y2="${B.y}" stroke="var(--opp)" stroke-width="4"/>
+    <line x1="${A.x}" y1="${A.y}" x2="${B.x}" y2="${B.y}" stroke="var(--hyp)" stroke-width="4"/>
+    <path d="${rSq}" fill="none" stroke="var(--text-sub)" stroke-width="1"/>
+    <path d="${angleArcPath(A, angleDeg)}" fill="none" stroke="var(--accent)" stroke-width="1.5"/>
+    <text x="${A.x+34}" y="${A.y-8}" font-size="12" fill="var(--accent)">θ</text>
+    <text x="${midAdjX}" y="${midAdjY}" font-size="12" fill="var(--adj)" text-anchor="middle">${pts.adjLenCm.toFixed(1)} cm</text>
+    <text x="${midOppX}" y="${midOppY}" font-size="12" fill="var(--opp)">${pts.oppLenCm.toFixed(1)} cm</text>
+    <text x="${midHypX}" y="${midHypY}" font-size="12" fill="var(--hyp)">${pts.hypLenCm.toFixed(1)} cm</text>
+  `;
+  return pts;
+}
+
+function renderRatioBox(elId, pts){
+  const sin = pts.oppLenCm/pts.hypLenCm;
+  const cos = pts.adjLenCm/pts.hypLenCm;
+  const tan = pts.oppLenCm/pts.adjLenCm;
+  document.getElementById(elId).innerHTML = `
+    <div>sinθ = 對邊÷斜邊 = ${pts.oppLenCm.toFixed(1)}÷${pts.hypLenCm.toFixed(1)} = <b>${sin.toFixed(3)}</b></div>
+    <div>cosθ = 鄰邊÷斜邊 = ${pts.adjLenCm.toFixed(1)}÷${pts.hypLenCm.toFixed(1)} = <b>${cos.toFixed(3)}</b></div>
+    <div>tanθ = 對邊÷鄰邊 = ${pts.oppLenCm.toFixed(1)}÷${pts.adjLenCm.toFixed(1)} = <b>${tan.toFixed(3)}</b></div>
+  `;
+  return {sin,cos,tan};
+}
+
+function update(angleDeg){
+  document.getElementById("angleReadout").textContent = angleDeg + "°";
+  const ptsSmall = renderTriangle("svgSmall", SCALE_SMALL, angleDeg);
+  const ptsLarge = renderTriangle("svgLarge", SCALE_LARGE, angleDeg);
+  const rSmall = renderRatioBox("ratioSmall", ptsSmall);
+  const rLarge = renderRatioBox("ratioLarge", ptsLarge);
+  document.getElementById("matchBanner").textContent =
+    `小三角形跟大三角形大小差很多,但 sinθ 都是 ${rSmall.sin.toFixed(3)},cosθ 都是 ${rSmall.cos.toFixed(3)} — 角度一樣,比值就一樣!`;
+}
+
+const EXACT = {
+  30:{sin:"1/2",cos:"√3/2",tan:"√3/3"},
+  45:{sin:"√2/2",cos:"√2/2",tan:"1"},
+  60:{sin:"√3/2",cos:"1/2",tan:"√3"}
+};
+function buildQuickTable(){
+  const tbody = document.getElementById("quickTable");
+  let rows = "";
+  for(const a of [30,45,60]){
+    const v = EXACT[a];
+    rows += `<tr class="clickable" data-angle="${a}"><td>${a}°</td><td>${v.sin}</td><td>${v.cos}</td><td>${v.tan}</td></tr>`;
+  }
+  tbody.innerHTML = rows;
+  tbody.querySelectorAll("tr").forEach(row=>{
+    row.addEventListener("click", ()=>{
+      const a = Number(row.dataset.angle);
+      document.getElementById("angleSlider").value = a;
+      update(a);
+    });
+  });
+}
+
+document.getElementById("angleSlider").addEventListener("input", (e)=>{
+  update(Number(e.target.value));
+});
+
+buildQuickTable();
+update(30);
+</script>
+</body>
+</html>

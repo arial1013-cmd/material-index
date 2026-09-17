@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>三角函數探索工具</title>
+<style>
+:root{
+  --bg:#F7F6F2; --panel:#FFFFFF; --text:#2C2C2A; --text-sub:#5F5E5A; --border:#D3D1C7;
+  --accent:#534AB7; --track:#B4B2A9;
+  --cos-pos:#0F6E56; --cos-neg:#993C1D; --sin-pos:#185FA5; --sin-neg:#854F0B;
+  --visited:#DCEFC0; --active-row:#EEEDFE;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#1C1C1A; --panel:#262624; --text:#EDEBE3; --text-sub:#B4B2A9; --border:#444441;
+    --accent:#AFA9EC; --track:#5F5E5A;
+    --cos-pos:#5DCAA5; --cos-neg:#F0997B; --sin-pos:#85B7EB; --sin-neg:#FAC775;
+    --visited:#27500A; --active-row:#3C3489;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#1C1C1A; --panel:#262624; --text:#EDEBE3; --text-sub:#B4B2A9; --border:#444441;
+  --accent:#AFA9EC; --track:#5F5E5A;
+  --cos-pos:#5DCAA5; --cos-neg:#F0997B; --sin-pos:#85B7EB; --sin-neg:#FAC775;
+  --visited:#27500A; --active-row:#3C3489;
+}
+*{box-sizing:border-box;}
+body{margin:0;background:var(--bg);color:var(--text);font-family:"PingFang TC","Microsoft JhengHei",-apple-system,sans-serif;padding:16px;}
+.app{max-width:960px;margin:0 auto;}
+h1{font-size:20px;font-weight:500;text-align:center;margin:4px 0 16px;}
+.main-grid{display:flex;flex-wrap:wrap;gap:20px;}
+.circle-panel{flex:1 1 380px;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:16px;}
+.readout-panel{flex:1 1 280px;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px;}
+svg{width:100%;height:auto;touch-action:none;user-select:none;}
+.controls{display:flex;flex-wrap:wrap;gap:14px;margin-top:12px;font-size:15px;}
+.controls label{display:flex;align-items:center;gap:6px;cursor:pointer;}
+.controls input[type=checkbox]{width:18px;height:18px;}
+select{font-size:15px;padding:4px 6px;border-radius:6px;border:1px solid var(--border);background:var(--panel);color:var(--text);}
+.angle-display{font-size:26px;font-weight:500;text-align:center;}
+.quadrant-badge{align-self:center;font-size:15px;padding:4px 14px;border-radius:20px;background:var(--active-row);color:var(--accent);}
+.value-row{display:flex;justify-content:space-between;font-size:18px;padding:6px 4px;border-bottom:1px solid var(--border);}
+.value-row .decimal{color:var(--text-sub);font-size:14px;margin-left:6px;}
+.refangle-box{font-size:14px;line-height:1.7;background:var(--active-row);border-radius:8px;padding:10px 12px;}
+.sign-legend{display:flex;gap:14px;font-size:13px;color:var(--text-sub);flex-wrap:wrap;}
+.legend-dot{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px;vertical-align:middle;}
+.table-panel{margin-top:20px;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:16px;overflow-x:auto;}
+table{border-collapse:collapse;width:100%;font-size:14px;min-width:640px;}
+th,td{padding:8px 6px;text-align:center;border-bottom:1px solid var(--border);}
+th{color:var(--text-sub);font-weight:500;}
+tr.visited td{background:var(--visited);}
+tr.active-angle td{background:var(--active-row);font-weight:500;}
+.bottom-row{display:flex;justify-content:space-between;align-items:center;margin-top:16px;flex-wrap:wrap;gap:10px;}
+button{font-size:14px;padding:10px 16px;border-radius:8px;border:1px solid var(--border);background:var(--panel);color:var(--text);cursor:pointer;}
+button:active{background:var(--active-row);}
+.hint{font-size:13px;color:var(--text-sub);}
+</style>
+</head>
+<body>
+<div class="app">
+  <h1>三角函數探索工具 — 拖拉單位圓上的角度</h1>
+  <div class="main-grid">
+    <div class="circle-panel">
+      <svg id="circleSvg" viewBox="0 0 400 400">
+        <line x1="20" y1="200" x2="380" y2="200" stroke="var(--track)" stroke-width="1"/>
+        <line x1="200" y1="20" x2="200" y2="380" stroke="var(--track)" stroke-width="1"/>
+        <circle cx="200" cy="200" r="150" fill="none" stroke="var(--track)" stroke-width="1.5"/>
+        <g id="tickMarks"></g>
+        <text x="368" y="215" font-size="13" fill="var(--text-sub)">0°</text>
+        <text x="195" y="30" font-size="13" fill="var(--text-sub)" text-anchor="middle">90°</text>
+        <text x="32" y="215" font-size="13" fill="var(--text-sub)" text-anchor="end">180°</text>
+        <text x="195" y="378" font-size="13" fill="var(--text-sub)" text-anchor="middle">270°</text>
+        <g id="mirrorGroup" style="display:none">
+          <line id="mirrorRadius" x1="200" y1="200" x2="200" y2="200" stroke="var(--track)" stroke-width="1" stroke-dasharray="4 3"/>
+          <circle id="mirrorPoint" cx="200" cy="200" r="5" fill="var(--track)"/>
+        </g>
+        <line id="cosLine" x1="200" y1="200" x2="200" y2="200" stroke="var(--cos-pos)" stroke-width="4"/>
+        <line id="sinLine" x1="200" y1="200" x2="200" y2="200" stroke="var(--sin-pos)" stroke-width="4"/>
+        <line id="radiusLine" x1="200" y1="200" x2="350" y2="200" stroke="var(--text)" stroke-width="1"/>
+        <path id="angleArc" d="" fill="none" stroke="var(--accent)" stroke-width="1.5"/>
+        <circle id="handle" cx="350" cy="200" r="24" fill="var(--accent)" opacity="0.001" style="cursor:grab"/>
+        <circle id="handleDot" cx="350" cy="200" r="9" fill="var(--accent)" style="pointer-events:none"/>
+      </svg>
+      <div class="controls">
+        <label><input type="checkbox" id="snapToggle" checked>吸附到特殊角</label>
+        <label><input type="checkbox" id="mirrorToggle">顯示鏡射比較</label>
+        <label>單位:
+          <select id="unitSelect"><option value="deg">度</option><option value="rad">弧度</option></select>
+        </label>
+      </div>
+      <p class="hint">拖動藍紫色的點,或直接點選圓周上的位置。</p>
+    </div>
+
+    <div class="readout-panel">
+      <div class="angle-display" id="angleVal">0°</div>
+      <div class="quadrant-badge" id="quadrantBadge">在 x 軸正向上</div>
+      <div class="value-row"><span>sin θ</span><span><span id="sinVal">0</span></span></div>
+      <div class="value-row"><span>cos θ</span><span><span id="cosVal">1</span></span></div>
+      <div class="value-row"><span>tan θ</span><span><span id="tanVal">0</span></span></div>
+      <div class="refangle-box" id="refBox" style="display:none"></div>
+      <div class="sign-legend">
+        <span><span class="legend-dot" style="background:var(--cos-pos)"></span>cos 為正(向右)</span>
+        <span><span class="legend-dot" style="background:var(--cos-neg)"></span>cos 為負(向左)</span>
+        <span><span class="legend-dot" style="background:var(--sin-pos)"></span>sin 為正(向上)</span>
+        <span><span class="legend-dot" style="background:var(--sin-neg)"></span>sin 為負(向下)</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="table-panel">
+    <table>
+      <thead><tr><th>角度</th><th>sin θ</th><th>cos θ</th><th>tan θ</th></tr></thead>
+      <tbody id="specialTable"></tbody>
+    </table>
+    <div class="bottom-row">
+      <span class="hint" id="progressHint"></span>
+      <button id="resetBtn">清除本次紀錄(換學生使用前請按此)</button>
+    </div>
+  </div>
+  <p style="text-align:center;margin-top:14px;">
+    <a href="triangle-ratio-explorer.html" style="color:var(--accent);font-size:15px;text-decoration:none;font-weight:500;">← 回到 Level 0:直角三角形比值教具</a>
+  </p>
+</div>
+<footer style="text-align:center;font-size:12px;color:var(--text-sub);margin:24px 0 4px;">新竹市立成德高中 資源班 · 杜昀蓁 製作</footer>
+
+<script>
+const SPECIAL_ANGLES = [0,30,45,60,90,120,135,150,180,210,225,240,270,300,315,330,360];
+const BASE = {
+  0:{sin:"0",cos:"1",tan:"0", sinN:0, cosN:1, tanN:0},
+  30:{sin:"1/2",cos:"√3/2",tan:"√3/3", sinN:0.5, cosN:0.866, tanN:0.577},
+  45:{sin:"√2/2",cos:"√2/2",tan:"1", sinN:0.707, cosN:0.707, tanN:1},
+  60:{sin:"√3/2",cos:"1/2",tan:"√3", sinN:0.866, cosN:0.5, tanN:1.732},
+  90:{sin:"1",cos:"0",tan:"undef", sinN:1, cosN:0, tanN:NaN}
+};
+const STORAGE_KEY = "trig-explorer-state";
+
+let state = loadState();
+let currentAngle = state.angle ?? 0;
+let dragging = false;
+
+const svg = document.getElementById("circleSvg");
+const cx = 200, cy = 200, r = 150;
+const snapToggle = document.getElementById("snapToggle");
+const mirrorToggle = document.getElementById("mirrorToggle");
+const unitSelect = document.getElementById("unitSelect");
+
+snapToggle.checked = state.snap ?? true;
+mirrorToggle.checked = state.mirror ?? false;
+unitSelect.value = state.unit ?? "deg";
+
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return {visited:[]};
+    const parsed = JSON.parse(raw);
+    if(!parsed.visited) parsed.visited = [];
+    return parsed;
+  }catch(e){ return {visited:[]}; }
+}
+function saveState(){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
+}
+
+function refAngleOf(a){
+  a = ((a % 360) + 360) % 360;
+  if(a <= 90) return a;
+  if(a <= 180) return 180 - a;
+  if(a <= 270) return a - 180;
+  return 360 - a;
+}
+function quadrantOf(a){
+  a = ((a % 360) + 360) % 360;
+  if(a % 90 === 0) return "axis";
+  if(a < 90) return 1;
+  if(a < 180) return 2;
+  if(a < 270) return 3;
+  return 4;
+}
+function signsFor(q){
+  if(q===1) return {sin:1, cos:1, tan:1};
+  if(q===2) return {sin:1, cos:-1, tan:-1};
+  if(q===3) return {sin:-1, cos:-1, tan:1};
+  if(q===4) return {sin:-1, cos:1, tan:-1};
+  return {sin:1, cos:1, tan:1};
+}
+function fmtExact(sign, str){
+  if(str === "0") return "0";
+  if(str === "undef") return "未定義";
+  return (sign < 0 ? "-" : "") + str;
+}
+function buildTickMarks(){
+  const g = document.getElementById("tickMarks");
+  let html = "";
+  for(let deg=0; deg<360; deg+=15){
+    const rad = deg*Math.PI/180;
+    const isMajor = SPECIAL_ANGLES.includes(deg) && deg % 45 !== 999;
+    const outer = r+4, inner = isMajor ? r-10 : r-5;
+    const x1 = cx+outer*Math.cos(rad), y1 = cy-outer*Math.sin(rad);
+    const x2 = cx+inner*Math.cos(rad), y2 = cy-inner*Math.sin(rad);
+    html += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="var(--track)" stroke-width="${isMajor?1.5:0.75}"/>`;
+  }
+  g.innerHTML = html;
+}
+function nearestSpecial(a){
+  let best = SPECIAL_ANGLES[0], bestDiff = 999;
+  for(const s of SPECIAL_ANGLES){
+    const diff = Math.min(Math.abs(a-s), 360-Math.abs(a-s));
+    if(diff < bestDiff){ bestDiff = diff; best = s; }
+  }
+  return best === 360 ? 0 : best;
+}
+function angleArcPath(a){
+  const rad = a*Math.PI/180;
+  const arcR = 30;
+  const x1 = cx+arcR, y1 = cy;
+  const x2 = cx+arcR*Math.cos(rad), y2 = cy-arcR*Math.sin(rad);
+  const largeArc = a > 180 ? 1 : 0;
+  const sweep = 0;
+  return `M ${x1} ${y1} A ${arcR} ${arcR} 0 ${largeArc} ${sweep} ${x2} ${y2}`;
+}
+function buildSpecialTable(){
+  const tbody = document.getElementById("specialTable");
+  let rows = "";
+  for(const a of SPECIAL_ANGLES){
+    const ref = refAngleOf(a);
+    const base = BASE[ref];
+    const q = quadrantOf(a);
+    const s = signsFor(q);
+    const sinStr = fmtExact(s.sin, base.sin);
+    const cosStr = fmtExact(s.cos, base.cos);
+    const tanStr = base.tan === "undef" ? "未定義" : fmtExact(s.tan, base.tan);
+    rows += `<tr data-angle="${a}"><td>${a}°</td><td>${sinStr}</td><td>${cosStr}</td><td>${tanStr}</td></tr>`;
+  }
+  tbody.innerHTML = rows;
+}
+function markVisited(a){
+  if(!SPECIAL_ANGLES.includes(a)) return;
+  if(!state.visited.includes(a)){
+    state.visited.push(a);
+    saveState();
+  }
+}
+function refreshTableHighlight(activeAngle){
+  const rows = document.querySelectorAll("#specialTable tr");
+  rows.forEach(row=>{
+    const a = Number(row.dataset.angle);
+    row.classList.toggle("visited", state.visited.includes(a));
+    row.classList.toggle("active-angle", a === activeAngle);
+  });
+  const hint = document.getElementById("progressHint");
+  hint.textContent = `已探索 ${state.visited.length} / ${SPECIAL_ANGLES.length} 個特殊角`;
+}
+
+function mirrorExplain(angle, ref, q){
+  if(q === 1 || q === "axis") return "";
+  const s = signsFor(q);
+  const cosNote = s.cos < 0 ? `cos${angle}° = -cos${ref}°(方向相反,長度相同)` : `cos${angle}° = cos${ref}°(方向相同)`;
+  const sinNote = s.sin < 0 ? `sin${angle}° = -sin${ref}°(方向相反,長度相同)` : `sin${angle}° = sin${ref}°(方向相同)`;
+  return `${angle}° 的參考角是 ${ref}°。<br>${sinNote}<br>${cosNote}`;
+}
+
+function update(angleDeg, fromDrag){
+  let a = ((angleDeg % 360) + 360) % 360;
+  if(snapToggle.checked && fromDrag){
+    a = nearestSpecial(a);
+  }
+  currentAngle = a;
+  state.angle = a;
+
+  const rad = a*Math.PI/180;
+  const px = cx + r*Math.cos(rad);
+  const py = cy - r*Math.sin(rad);
+
+  document.getElementById("handle").setAttribute("cx", px);
+  document.getElementById("handle").setAttribute("cy", py);
+  document.getElementById("handleDot").setAttribute("cx", px);
+  document.getElementById("handleDot").setAttribute("cy", py);
+  document.getElementById("radiusLine").setAttribute("x2", px);
+  document.getElementById("radiusLine").setAttribute("y2", py);
+  document.getElementById("angleArc").setAttribute("d", angleArcPath(a));
+
+  const sinN = Math.sin(rad), cosN = Math.cos(rad), tanN = Math.abs(cosN) < 1e-9 ? NaN : Math.tan(rad);
+
+  const cosLine = document.getElementById("cosLine");
+  cosLine.setAttribute("x1", cx); cosLine.setAttribute("y1", cy);
+  cosLine.setAttribute("x2", px); cosLine.setAttribute("y2", cy);
+  cosLine.setAttribute("stroke", cosN >= 0 ? "var(--cos-pos)" : "var(--cos-neg)");
+
+  const sinLine = document.getElementById("sinLine");
+  sinLine.setAttribute("x1", px); sinLine.setAttribute("y1", cy);
+  sinLine.setAttribute("x2", px); sinLine.setAttribute("y2", py);
+  sinLine.setAttribute("stroke", sinN >= 0 ? "var(--sin-pos)" : "var(--sin-neg)");
+
+  const unit = unitSelect.value;
+  document.getElementById("angleVal").textContent = unit === "deg" ? `${a}°` : (a*Math.PI/180).toFixed(3) + " rad";
+
+  const q = quadrantOf(a);
+  const qLabel = q === "axis" ? "在座標軸上" : `第 ${["","一","二","三","四"][q]} 象限`;
+  document.getElementById("quadrantBadge").textContent = qLabel;
+
+  const ref = refAngleOf(a);
+  const isSpecial = SPECIAL_ANGLES.includes(a);
+  function valueHTML(numVal, exactStr, sign){
+    const dec = isNaN(numVal) ? "未定義" : numVal.toFixed(3);
+    if(isSpecial){
+      const exact = fmtExact(sign, exactStr);
+      return `${exact}<span class="decimal">(${dec})</span>`;
+    }
+    return dec;
+  }
+  const base = BASE[ref];
+  const s = signsFor(q === "axis" ? quadrantOf(a===0?1:a-1) : q);
+  document.getElementById("sinVal").innerHTML = valueHTML(sinN, isSpecial?base.sin:null, s.sin);
+  document.getElementById("cosVal").innerHTML = valueHTML(cosN, isSpecial?base.cos:null, s.cos);
+  document.getElementById("tanVal").innerHTML = valueHTML(tanN, isSpecial?base.tan:null, s.tan);
+
+  const refBox = document.getElementById("refBox");
+  if(mirrorToggle.checked && q !== "axis" && q !== 1){
+    refBox.style.display = "block";
+    refBox.innerHTML = mirrorExplain(a, ref, q);
+    const mg = document.getElementById("mirrorGroup");
+    mg.style.display = "block";
+    const refRad = ref*Math.PI/180;
+    const mx = cx + r*Math.cos(refRad), my = cy - r*Math.sin(refRad);
+    document.getElementById("mirrorRadius").setAttribute("x2", mx);
+    document.getElementById("mirrorRadius").setAttribute("y2", my);
+    document.getElementById("mirrorPoint").setAttribute("cx", mx);
+    document.getElementById("mirrorPoint").setAttribute("cy", my);
+  } else {
+    refBox.style.display = "none";
+    document.getElementById("mirrorGroup").style.display = "none";
+  }
+
+  if(isSpecial && snapToggle.checked){ markVisited(a); }
+  refreshTableHighlight(isSpecial ? a : -1);
+  saveState();
+}
+
+function angleFromEvent(evt){
+  const rect = svg.getBoundingClientRect();
+  const point = evt.touches ? evt.touches[0] : evt;
+  const px = (point.clientX - rect.left) / rect.width * 400;
+  const py = (point.clientY - rect.top) / rect.height * 400;
+  let rad = Math.atan2(-(py-cy), px-cx);
+  let deg = rad*180/Math.PI;
+  if(deg < 0) deg += 360;
+  return deg;
+}
+
+const handle = document.getElementById("handle");
+handle.addEventListener("pointerdown", (e)=>{ dragging = true; handle.setPointerCapture(e.pointerId); });
+svg.addEventListener("pointermove", (e)=>{ if(dragging){ update(angleFromEvent(e), true); } });
+svg.addEventListener("pointerup", ()=>{ dragging = false; });
+svg.addEventListener("pointercancel", ()=>{ dragging = false; });
+svg.addEventListener("click", (e)=>{ if(!dragging){ update(angleFromEvent(e), true); } });
+
+snapToggle.addEventListener("change", ()=>{ state.snap = snapToggle.checked; update(currentAngle, true); });
+mirrorToggle.addEventListener("change", ()=>{ state.mirror = mirrorToggle.checked; update(currentAngle, false); });
+unitSelect.addEventListener("change", ()=>{ state.unit = unitSelect.value; update(currentAngle, false); });
+
+document.getElementById("resetBtn").addEventListener("click", ()=>{
+  if(confirm("確定要清除目前的探索紀錄嗎?換下一位學生使用前建議清除。")){
+    localStorage.removeItem(STORAGE_KEY);
+    state = {visited:[]};
+    snapToggle.checked = true; mirrorToggle.checked = false; unitSelect.value = "deg";
+    update(0, true);
+  }
+});
+
+buildTickMarks();
+buildSpecialTable();
+update(currentAngle, false);
+</script>
+</body>
+</html>
