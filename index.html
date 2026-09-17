@@ -151,7 +151,7 @@ line-height:1.5;
 <div class="wrap">
 <header>
 <h1>教材索引</h1>
-<p class="subtitle">高一・高二・高三英文互動練習,加上基礎練習與數學單元 —— 用來快速找到要用的教材(學習單目前另外放在 Google Drive)</p>
+<p class="subtitle">高一・高二・高三英文互動練習,加上基礎練習與數學單元</p>
 <div class="controls">
 <div class="tabs" id="tabs"></div>
 <input type="search" id="searchInput" placeholder="搜尋名稱、單元或標籤">
@@ -160,18 +160,6 @@ line-height:1.5;
 
 <main class="card-list" id="cardList"></main>
 
-<details>
-<summary>如何新增教材</summary>
-<p>在下方 &lt;script&gt; 裡的 <code>materialsData</code> 陣列新增一筆資料即可,格式如下:</p>
-<pre>{
-  grade: 'g10', // g10 / g11 / g12 / basic / math
-  title: '教材名稱',
-  unit: 'Unit 3', // 單元或課次,沒有可留空字串
-  tags: ['文法','時態'], // 標籤,用於搜尋
-  url: '連結網址' // CodePen 的 Preview Only 連結,或本站內的相對路徑(例如 math/xxx.html)
-}</pre>
-<p>目前清單裡的項目是範例,請替換成你實際的 CodePen 連結。建議用 Preview Only 模式產生的連結(Copy Link with Layout),學生點開才是乾淨的畫面,不會看到程式碼。若教材是放在這個repo裡的獨立html檔(例如數學工具),url 直接填相對路徑即可,不用完整網址。</p>
-</details>
 <footer style="text-align:center;font-size:.78rem;color:var(--ink-soft);margin-top:24px;">新竹市立成德高中 資源班 · 杜昀蓁 製作</footer>
 </div>
 
