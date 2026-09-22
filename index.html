@@ -15,6 +15,7 @@
     --g11:#3F5F73;
     --g12:#B98530;
     --basic:#A45C46;
+    --math:#5B4F8A;
     --font-serif:"Noto Serif TC","PMingLiU",serif;
     --font-sans:"Noto Sans TC","Microsoft JhengHei",system-ui,-apple-system,sans-serif;
   }
@@ -65,6 +66,7 @@
   .tab[data-cat="g11"].active{background:var(--g11);border-color:var(--g11);color:#fff;}
   .tab[data-cat="g12"].active{background:var(--g12);border-color:var(--g12);color:#fff;}
   .tab[data-cat="basic"].active{background:var(--basic);border-color:var(--basic);color:#fff;}
+  .tab[data-cat="math"].active{background:var(--math);border-color:var(--math);color:#fff;}
   .tab[data-cat="all"].active{background:var(--ink);border-color:var(--ink);color:#fff;}
   .tab:focus, #searchInput:focus{outline:2px solid var(--ink);outline-offset:1px;}
   #searchInput{
@@ -91,6 +93,7 @@
   .card[data-cat="g11"]{border-left-color:var(--g11);}
   .card[data-cat="g12"]{border-left-color:var(--g12);}
   .card[data-cat="basic"]{border-left-color:var(--basic);}
+  .card[data-cat="math"]{border-left-color:var(--math);}
   .card-main{flex:1;min-width:0;}
   .card-title{
     font-family:var(--font-serif);
@@ -160,7 +163,7 @@
     <summary>如何新增教材</summary>
     <p>在下方 &lt;script&gt; 裡的 <code>materialsData</code> 陣列新增一筆資料即可,格式如下:</p>
     <pre>{
-  grade: 'g10',        // g10 / g11 / g12 / basic
+  grade: 'g10',        // g10 / g11 / g12 / basic / math
   title: '教材名稱',
   unit: 'Unit 3',      // 單元或課次,沒有可留空字串
   tags: ['文法','時態'], // 標籤,用於搜尋
@@ -179,11 +182,13 @@ const materialsData = [
   { grade:'g12', title:'高三第五冊 L1 片語文法(The Road Not Taken)', unit:'L1', tags:['文法','片語'], url:'materials/g12/g12-l1-road-not-taken-phrases-grammar.html' },
   { grade:'basic', title:'高中基礎文法總複習', unit:'', tags:['文法','基礎'], url:'materials/basic/high-school-grammar-review.html' },
   { grade:'basic', title:'Be動詞綜合練習(all)', unit:'', tags:['文法','be動詞'], url:'materials/basic/be-verb-comprehensive-practice.html' },
-  { grade:'basic', title:'Be動詞否定句練習', unit:'', tags:['文法','be動詞','否定句'], url:'materials/basic/be-verb-negative-practice.html' }
+  { grade:'basic', title:'Be動詞否定句練習', unit:'', tags:['文法','be動詞','否定句'], url:'materials/basic/be-verb-negative-practice.html' },
+  { grade:'math', title:'三角比探索(Level 0)', unit:'', tags:['三角函數','基礎'], url:'math/triangle-ratio-explorer.html' },
+  { grade:'math', title:'單位圓探索(Level 1)', unit:'', tags:['三角函數'], url:'math/trig-explorer.html' }
 ];
 // -------------------------------------------
 
-const gradeLabels = { g10:'高一英文', g11:'高二英文', g12:'高三英文', basic:'基礎練習' };
+const gradeLabels = { g10:'高一英文', g11:'高二英文', g12:'高三英文', basic:'基礎練習', math:'數學' };
 
 const tabsEl = document.getElementById('tabs');
 const cardListEl = document.getElementById('cardList');
@@ -194,7 +199,8 @@ const tabDefs = [
   { key:'g10', label:'高一英文' },
   { key:'g11', label:'高二英文' },
   { key:'g12', label:'高三英文' },
-  { key:'basic', label:'基礎練習' }
+  { key:'basic', label:'基礎練習' },
+  { key:'math', label:'數學' }
 ];
 
 let activeTab = localStorage.getItem('materialsActiveTab') || 'all';
