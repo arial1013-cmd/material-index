@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>G11 L1 · 片語・文法練習</title>
+<style>
+:root{
+  --teal:#1a6b5f;--teal-mid:#2a9d8f;--teal-light:#52c9bb;
+  --teal-pale:#e0f5f3;--teal-bg:#f0faf9;
+  --green:#57cc99;--amber:#c9a227;--amber-pale:#fff8e1;--amber-dark:#8a6000;
+  --purple:#5e4b8b;--purple-pale:#ede8f8;
+  --coral:#e76f51;--gray:#6b8f8c;
+  --dark:#1a2e2c;--mid:#3a5552;--light:#7a9896;--white:#ffffff;
+  --shadow:0 2px 10px rgba(26,107,95,0.10);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Noto Sans TC',system-ui,sans-serif;background:var(--teal-bg);color:var(--dark);min-height:100vh;}
+header{background:var(--teal);padding:20px 18px 16px;text-align:center;}
+header h1{color:#fff;font-size:20px;font-weight:700;margin-bottom:4px;}
+header p{color:rgba(255,255,255,0.75);font-size:13px;}
+.progress-wrap{background:var(--white);padding:12px 18px;border-bottom:1px solid var(--teal-pale);}
+.prog-label{font-size:12px;color:var(--light);margin-bottom:6px;display:flex;justify-content:space-between;}
+.prog-bar{height:6px;background:#d0ecea;border-radius:99px;overflow:hidden;}
+.prog-fill{height:100%;background:var(--teal-mid);border-radius:99px;transition:width 0.4s;}
+.group-tabs{display:flex;overflow-x:auto;background:var(--white);border-bottom:1px solid var(--teal-pale);}
+.group-tab{flex:0 0 auto;padding:10px 16px;border:none;background:transparent;font-family:inherit;font-size:13px;font-weight:600;color:var(--gray);cursor:pointer;border-bottom:3px solid transparent;transition:all 0.2s;white-space:nowrap;}
+.group-tab.active{color:var(--teal);border-bottom-color:var(--teal-mid);background:var(--teal-pale);}
+.group-tab.locked{color:#ccc;cursor:not-allowed;}
+main{padding:16px 14px 56px;max-width:700px;margin:0 auto;}
+.phase-bar{display:flex;gap:6px;margin-bottom:16px;}
+.phase-step{flex:1;padding:8px 4px;border-radius:8px;text-align:center;font-size:12px;font-weight:700;}
+.phase-step.done{background:var(--green);color:#fff;}
+.phase-step.current{background:var(--teal);color:#fff;}
+.phase-step.pending{background:#e8f5f4;color:var(--gray);}
+.learn-card{background:var(--white);border-radius:14px;padding:16px;margin-bottom:12px;box-shadow:var(--shadow);}
+.learn-card.phrase{border-left:4px solid var(--amber);}
+.learn-card.grammar{border-left:4px solid var(--purple);}
+.card-label{font-size:11px;font-weight:700;letter-spacing:1.5px;margin-bottom:8px;}
+.card-label.phrase{color:var(--amber-dark);}
+.card-label.grammar{color:var(--purple);}
+.card-en{font-size:18px;font-weight:700;font-family:'Courier New',monospace;margin-bottom:4px;}
+.card-en.phrase{color:var(--amber-dark);}
+.card-en.grammar{color:var(--purple);}
+.card-zh{font-size:17px;font-weight:700;margin-bottom:8px;color:var(--dark);}
+.card-note{font-size:13px;color:var(--mid);padding:8px 12px;border-radius:8px;margin-bottom:8px;line-height:1.7;}
+.card-note.phrase{background:var(--amber-pale);border-left:3px solid var(--amber);}
+.card-note.grammar{background:var(--purple-pale);border-left:3px solid var(--purple);}
+.formula-box{font-family:'Courier New',monospace;font-size:13px;background:var(--purple);color:#fff;padding:8px 14px;border-radius:8px;margin-bottom:10px;word-break:break-all;}
+.card-ex{font-size:13px;color:var(--light);font-style:italic;margin-top:4px;}
+.card-ex b{font-style:normal;color:var(--teal);}
+.step-list{list-style:none;margin:6px 0 8px;padding-left:4px;}
+.step-list li{font-size:13px;color:var(--mid);margin-bottom:3px;padding-left:20px;position:relative;}
+.step-list li::before{content:'→';position:absolute;left:0;color:var(--purple);}
+.ex-block{background:#f5fffe;border-radius:8px;padding:8px 12px;margin-top:6px;border:1px solid #cce8e5;}
+.ex-block .en{font-size:13px;color:var(--mid);margin-bottom:2px;font-style:italic;}
+.ex-block .en b{font-style:normal;color:var(--purple);}
+.ex-block .zh{font-size:12px;color:var(--light);}
+.mcq-block{margin-bottom:14px;}
+.mcq-q{background:var(--white);border-radius:12px;padding:14px 16px 10px;box-shadow:var(--shadow);}
+.mcq-qtext{font-size:14px;font-weight:600;margin-bottom:10px;line-height:1.7;}
+.mcq-options{display:flex;flex-direction:column;gap:7px;}
+.mcq-opt{padding:10px 14px;border:2px solid var(--teal-pale);border-radius:10px;background:var(--white);font-family:inherit;font-size:13px;color:var(--dark);cursor:pointer;transition:all 0.15s;text-align:left;line-height:1.5;}
+.mcq-opt:hover:not(:disabled){background:var(--teal-pale);border-color:var(--teal-light);}
+.mcq-opt.correct{background:#d4f5e5;border-color:#57cc99;color:#1a5c35;}
+.mcq-opt.wrong{background:#fde4de;border-color:var(--coral);color:#7a2000;}
+.mcq-opt:disabled{cursor:default;}
+.feedback{font-size:13px;margin-top:6px;padding:6px 10px;border-radius:7px;line-height:1.6;display:none;}
+.feedback.ok{background:#d4f5e5;color:#1a5c35;display:block;}
+.feedback.ng{background:#fde4de;color:#7a2000;display:block;}
+.match-wrap{background:var(--white);border-radius:14px;padding:16px;box-shadow:var(--shadow);margin-bottom:14px;}
+.match-instruct{font-size:13px;color:var(--light);margin-bottom:14px;text-align:center;}
+.match-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:start;}
+.match-col-label{font-size:12px;font-weight:700;color:var(--teal);text-align:center;padding:4px 0 8px;letter-spacing:1px;}
+.match-col{display:flex;flex-direction:column;gap:7px;}
+.match-item{padding:10px 12px;border:2px solid var(--teal-pale);border-radius:10px;background:var(--white);font-family:inherit;font-size:13px;color:var(--dark);cursor:pointer;transition:all 0.15s;text-align:center;user-select:none;line-height:1.4;}
+.match-item:hover:not(.matched):not(.locked){background:var(--teal-pale);border-color:var(--teal-light);}
+.match-item.selected{background:var(--teal);color:#fff;border-color:var(--teal);}
+.match-item.matched{background:#d4f5e5;border-color:#57cc99;color:#1a5c35;cursor:default;}
+.match-item.wrong-flash{background:#fde4de;border-color:var(--coral);}
+.match-item.locked{cursor:default;}
+.match-score{text-align:center;font-size:14px;font-weight:700;color:var(--teal);margin-top:12px;min-height:22px;}
+.next-btn,.unlock-btn{display:block;width:100%;padding:14px;margin-top:16px;border:none;border-radius:12px;background:var(--teal);color:#fff;font-family:inherit;font-size:16px;font-weight:700;cursor:pointer;transition:background 0.2s;}
+.next-btn:hover,.unlock-btn:hover{background:var(--teal-mid);}
+.next-btn:disabled{background:#ccc;cursor:not-allowed;}
+.score-wrap{text-align:center;padding:28px 0 12px;}
+.score-circle{width:90px;height:90px;border-radius:50%;border:5px solid var(--teal-mid);display:inline-flex;align-items:center;justify-content:center;font-size:30px;font-weight:700;color:var(--teal);margin-bottom:10px;}
+</style>
+</head>
+<body>
+<header>
+  <h1>G11 L1 · 片語・文法練習</h1>
+  <p>片語 1 組 · 句型 2 組 · 每組三關</p>
+</header>
+<div class="progress-wrap">
+  <div class="prog-label"><span>整體進度</span><span id="prog-text">0 / 3 組完成</span></div>
+  <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+</div>
+<div class="group-tabs">
+  <button class="group-tab active" id="tab-0">💬 片語</button>
+  <button class="group-tab locked"  id="tab-1">📐 句型一 🔒</button>
+  <button class="group-tab locked"  id="tab-2">📐 句型二 🔒</button>
+</div>
+<main id="main-area"></main>
+<script>
+const PHRASES=[
+  {type:'phrase',en:'pass on…to…',zh:'將……傳給；轉交給……',
+   note:'用法：pass on sth. to sb. 或 pass sth. on to sb.，表「把接收到的東西或訊息傳下去」。',
+   ex:'Sneezing without covering your mouth can <b>pass on</b> germs to others.',
+   mcq:[
+    {q:'This tradition will be ______ our children and grandchildren.',
+     opts:['(A) passed on to','(B) passed to on','(C) passed away to','(D) pass on to'],ans:0,
+     fb:'pass on sth. to sb. = pass sth. on to sb.。被動語態：be passed on to sb.。注意介系詞 to 不能省略。'},
+    {q:'"pass on" 在哪個句子中意思不同？',
+     opts:['(A) She passed on the message to her boss.','(B) He passed on after a long illness.','(C) Please pass on these documents to the team.','(D) The teacher passed on her knowledge to students.'],ans:1,
+     fb:'(B) 中 passed on = died（過世），是慣用語。其他三句的 pass on 都是「傳遞」的意思。'},
+   ],
+   match:{left:'pass on…to…',right:'將……傳給；轉交給……'}},
+
+  {type:'phrase',en:'cheer…up',zh:'使……振奮、高興',
+   note:'可分式片語：受詞若為代名詞，需放在 cheer 和 up 中間（cheer him/her/them up）。',
+   ex:'She needed a hug to <b>cheer</b> her <b>up</b>.',
+   mcq:[
+    {q:'Annie felt sad and needed a hug to ______.',
+     opts:['(A) cheer up her','(B) cheer her up','(C) cheering her up','(D) cheer up she'],ans:1,
+     fb:'代名詞（her）必須放在 cheer 和 up 的中間：cheer her up ✓。cheer up her ✗。'},
+    {q:'Let\'s do something to ______ Brian, who has been in a bad mood.',
+     opts:['(A) cheer him up','(B) cheer up him','(C) cheered him up','(D) cheering him up'],ans:0,
+     fb:'to 後接原形動詞，且代名詞放中間：to cheer him up。'},
+   ],
+   match:{left:'cheer…up',right:'使……振奮、高興'}},
+
+  {type:'phrase',en:'turn…down',zh:'拒絕……',
+   note:'可分式片語：受詞為代名詞時，放在 turn 和 down 中間。同義：refuse / reject / decline。',
+   ex:'Sam asked Ada out, but she <b>turned</b> him <b>down</b>.',
+   mcq:[
+    {q:'Sam asked Ada out on a date, but she ______ because she was already in a relationship.',
+     opts:['(A) turned him down','(B) turned down him','(C) turned away him','(D) turned him off'],ans:0,
+     fb:'turn down = 拒絕，代名詞放中間：turned him down ✓。turned down him ✗。'},
+    {q:'"turn down" 的同義詞是？',
+     opts:['(A) accept','(B) consider','(C) decline','(D) welcome'],ans:2,
+     fb:'turn down = refuse = reject = decline（拒絕）。accept 和 welcome 是反義詞。'},
+   ],
+   match:{left:'turn…down',right:'拒絕……'}},
+
+  {type:'phrase',en:'be about to',zh:'即將；正要',
+   note:'to 後接動詞原形，表示「即將要做」或「幾分鐘內就要做」的事，不能接 V-ing。',
+   ex:'Kelly <b>was just about to</b> unlock the door when she heard a loud bang.',
+   mcq:[
+    {q:'Tina ______ call her son when he arrived home.',
+     opts:['(A) was about to','(B) is about to','(C) was about of','(D) was about for'],ans:0,
+     fb:'be about to + VR（原形），介系詞是 to，不是 of 或 for。時態配合過去式用 was。'},
+    {q:'"be about to" 表示什麼？',
+     opts:['(A) 剛完成某事','(B) 即將要做某事','(C) 習慣做某事','(D) 被允許做某事'],ans:1,
+     fb:'be about to = 即將；正要（幾分鐘內就要發生的事）。與 just 連用更強調「正要」。'},
+   ],
+   match:{left:'be about to',right:'即將；正要'}},
+
+  {type:'phrase',en:'after all',zh:'畢竟',
+   note:'轉折語，當前後各有一個句子時，第二句用來解釋或說明第一句，通常置於句首或句中。',
+   ex:'Maybe we should wear costumes. <b>After all</b>, everyone else is dressing up.',
+   mcq:[
+    {q:'Dad should have punished Steve; ______, it was Steve who made Mom angry.',
+     opts:['(A) after that','(B) after all','(C) as a result','(D) in conclusion'],ans:1,
+     fb:'after all = 畢竟，用於說明前一句的理由。其他選項表因果或結論，語意不符。'},
+    {q:'"after all" 在句子中的功能是？',
+     opts:['(A) 表示時間順序','(B) 說明前句理由','(C) 表示對比','(D) 表示讓步'],ans:1,
+     fb:'after all 是轉折語，第二句用來解釋或補充說明第一句的原因。'},
+   ],
+   match:{left:'after all',right:'畢竟'}},
+
+  {type:'phrase',en:'pass away',zh:'過世',
+   note:'委婉說法，意同 die，語氣較溫和。注意：pass on 也有「過世」之意，但較少用。',
+   ex:'Billy\'s mom told Ronald that her son had <b>passed away</b>.',
+   mcq:[
+    {q:'Darren\'s grandmother ______ peacefully in her sleep last night.',
+     opts:['(A) passed away','(B) passed by','(C) passed on','(D) passed out'],ans:0,
+     fb:'pass away = 過世（die 的委婉說法）。pass by = 經過；pass out = 昏倒；pass on 雖也有「過世」之意但較少用。'},
+    {q:'"pass away" 的意思等同於？',
+     opts:['(A) travel abroad','(B) fall asleep','(C) die','(D) disappear'],ans:2,
+     fb:'pass away 是 die 的委婉說法，語氣較為溫和，常用於正式或書面場合。'},
+   ],
+   match:{left:'pass away',right:'過世'}},
+
+  {type:'phrase',en:'make a difference',zh:'有所影響',
+   note:'後可接 in 或 to 表「對……有影響」。可替換：make a great/no difference（有很大／沒有影響）。',
+   ex:'Mrs. Tate <b>made a difference</b> in my life because she always tried to help me.',
+   mcq:[
+    {q:'The new policy will ______ great ______ in people\'s lives.',
+     opts:['(A) make; difference','(B) make; a difference','(C) do; difference','(D) have; difference'],ans:1,
+     fb:'make a difference 是固定用法。make + a + great + difference：「造成很大影響」。動詞用 make，不用 do 或 have。'},
+    {q:'用 no difference 改寫後，句意有什麼變化？',
+     opts:['(A) 影響很大','(B) 有一些影響','(C) 沒有影響','(D) 有正面影響'],ans:2,
+     fb:'make no difference = 沒有影響（毫無差別）。make a great difference = 有很大影響。'},
+   ],
+   match:{left:'make a difference',right:'有所影響'}},
+];
+
+const GRAMMAR=[
+  {type:'grammar',label:'句型一',
+   en:'S + find/consider/feel/think + it + adj./N + to VR',
+   zh:'發現／認為（做某事）是……的（虛受詞句型）',
+   formula:'S + find / consider / feel / think + it + adj./N + to VR',
+   steps:[
+     '① "to + VR" 是語意上真正的受詞，因太長而移至句尾',
+     '② 句中用虛受詞 it 暫時佔位',
+     '③ 若強調「某人」的動作，在 to VR 前加 for + sb.',
+     '④ 常用動詞：find / consider / feel / think / make',
+   ],
+   examples:[
+     {en:'She <b>finds it</b> rewarding <b>to</b> help others.',                       zh:'她覺得幫助他人很有意義。'},
+     {en:'Olivia <b>considers it</b> bad manners <b>to</b> be late for a date.',       zh:'Olivia 認為約會遲到沒有禮貌。'},
+     {en:'Teachers <b>find it</b> unacceptable <b>for students to</b> cheat on tests.',zh:'老師認為學生考試作弊難以接受。（for + sb. 強調特定人）'},
+     {en:'課文：I <b>found it</b> tremendously rewarding <b>to</b> bring laughter to the kids.',zh:'我發現為孩子們帶來歡笑是極為有意義的。'},
+   ],
+   mcq:[
+    {q:'We could not wait for more help but found ______ essential ______ immediate action to solve the problem.',
+     opts:['(A) it; take','(B) that; take','(C) it; to take','(D) that; you take'],ans:2,
+     fb:'find + it（虛受詞）+ adj.（essential）+ to + VR（to take）。不能用 that 作虛受詞，也不能用原形 take（要用 to take）。'},
+    {q:'As a care center staff, Mike considers ______ an honor ______ the residents.',
+     opts:['(A) it; to help','(B) that; helping','(C) that; to help','(D) it; helping'],ans:0,
+     fb:'consider + it（虛受詞）+ N（an honor）+ to VR（to help）。虛受詞用 it，真正受詞用 to VR。'},
+    {q:'Many people find ______ hard to say goodbye to their loved ones.',
+     opts:['(A) that','(B) this','(C) it','(D) what'],ans:2,
+     fb:'find + it（虛受詞）+ adj. + to VR：find it hard to do sth.。虛受詞固定用 it，不用 that / this / what。'},
+    {q:'James thought ______ necessary ______ cheer the students up.',
+     opts:['(A) it; to','(B) that; to','(C) it; for','(D) this; to'],ans:0,
+     fb:'think + it（虛受詞）+ adj.（necessary）+ to + VR（to cheer up）。虛受詞 it，不定詞前加 to。'},
+    {q:'以下哪句正確？（find + O + OC）',
+     opts:['(A) She found it impossible finishing the work.','(B) She found it impossible to finish the work.','(C) She found that impossible to finish the work.','(D) She found that impossible finishing the work.'],ans:1,
+     fb:'find + it（虛受詞）+ adj.（impossible）+ to VR（to finish）。不能用 V-ing，也不能用 that 作虛受詞。'},
+   ],
+   match:[
+    {left:'find it adj. to VR',          right:'發現做某事是……的'},
+    {left:'consider it N to VR',          right:'認為做某事是……'},
+    {left:'find it hard for sb. to VR',   right:'發現對某人而言做某事很難'},
+    {left:'I found it rewarding to help.',right:'我覺得幫助人很有意義。'},
+    {left:'He thought it necessary to go.',right:'他認為去是必要的。'},
+   ]},
+
+  {type:'grammar',label:'句型二',
+   en:'It seems/appears that + S + V…',
+   zh:'似乎；看起來……（虛主詞句型）',
+   formula:'It seems / appears that + S + V…',
+   steps:[
+     '① that + S + V 是語意上真正的主詞，因太長而移至句尾',
+     '② 句首用虛主詞 it 代替，避免句子頭重腳輕',
+     '③ seems 與 appears 可互換，語意相同',
+     '④ 時態：it seemed/appeared that…（對應過去的情況）',
+   ],
+   examples:[
+     {en:'<b>It seems that</b> he is not feeling well.',             zh:'他似乎不太舒服。'},
+     {en:'<b>It appeared that</b> they would win the game.',         zh:'他們似乎會贏得比賽。'},
+     {en:'<b>It seemed that</b> Billy knew he would never go home.', zh:'Billy 似乎知道他再也回不了家。（課文）'},
+     {en:'課文：<b>It appeared that</b> he was getting drowsy, so I rose to leave.',zh:'他看起來愈來愈昏昏欲睡，所以我站起來準備離開。'},
+   ],
+   mcq:[
+    {q:'______ Michelle is very proud of her daughter\'s achievement.',
+     opts:['(A) It appears to','(B) It appears that','(C) Michelle seems that','(D) Michelle seems to'],ans:1,
+     fb:'It appears/seems that + S + V（完整子句）。(A) It appears to 後接動詞原形，不是子句。(C)(D) Michelle 不能是虛主詞，語法錯誤。'},
+    {q:'______ keeping a pet helps get rid of loneliness.',
+     opts:['(A) They appear','(B) They seem to','(C) It seems that','(D) It appears to'],ans:2,
+     fb:'It seems that + S（keeping）+ V（helps）。keeping a pet 是動名詞片語作主詞，需用虛主詞 it 代替，後接 that 引導的子句。'},
+    {q:'The team lost three games. It seems that they ______ serious problems.',
+     opts:['(A) had had','(B) are having','(C) were having','(D) A or B'],ans:3,
+     fb:'它似乎正在有問題（現在進行）或曾經有問題（過去完成）都合理，所以 A 或 B 都可，選 D。此題測試時態彈性。'},
+    {q:'After the problem was exposed, it appeared that the man ______ no choice but to resign.',
+     opts:['(A) has','(B) have','(C) had','(D) having'],ans:2,
+     fb:'it appeared（過去式）→ that 子句用過去式：had no choice。時態需與主句一致或更早。'},
+    {q:'以下哪句正確？',
+     opts:['(A) It seems that she nervous.','(B) She seems that is nervous.','(C) It seems that she is nervous.','(D) It seems she is nervous not.'],ans:2,
+     fb:'It seems that + 完整子句（主詞 + 動詞）：It seems that she is nervous. ✓。(A) 缺動詞，(B) 語序錯誤，(D) 否定位置錯誤。'},
+   ],
+   match:[
+    {left:'It seems that S+V…',         right:'似乎；看起來……'},
+    {left:'It appeared that S+V…',       right:'看起來……（appears 同義）'},
+    {left:'It seemed that he was tired.', right:'他看起來很疲憊。'},
+    {left:'It appears that she is happy.',right:'她看起來很快樂。'},
+    {left:'虛主詞 it 代替 that 子句',    right:'避免句子頭重腳輕'},
+   ]},
+];
+
+const GROUPS_CFG=[
+  {label:'💬 片語',tabLabel:'💬 片語',   items:PHRASES},
+  {label:'📐 句型一',tabLabel:'📐 句型一',items:[GRAMMAR[0]]},
+  {label:'📐 句型二',tabLabel:'📐 句型二',items:[GRAMMAR[1]]},
+];
+
+const S={group:0,phase:0,done:[false,false,false],mcqAnswered:[0,0,0],matchState:[null,null,null]};
+function shuf(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
+function phaseBar(cur){return['📖 學習','❓ 選擇','🔗 配對'].map((s,i)=>{const c=i<cur?'done':i===cur?'current':'pending';return`<div class="phase-step ${c}">${i<cur?'✓ ':''}${s}</div>`;}).join('');}
+
+document.querySelectorAll('.group-tab').forEach((t,i)=>t.addEventListener('click',()=>{if(!t.classList.contains('locked'))setGroup(i);}));
+function setGroup(g){S.group=g;S.phase=S.done[g]?3:0;document.querySelectorAll('.group-tab').forEach((t,i)=>t.classList.toggle('active',i===g));render();}
+function setPhase(p){S.phase=p;render();}
+function updateProg(){const d=S.done.filter(Boolean).length;document.getElementById('prog-text').textContent=`${d} / 3 組完成`;document.getElementById('prog-fill').style.width=`${Math.round(d/3*100)}%`;}
+
+function render(){
+  const g=S.group,p=S.phase,area=document.getElementById('main-area'),items=GROUPS_CFG[g].items;
+  if(p===0)renderLearn(g,items,area);
+  else if(p===1)renderMcq(g,items,area);
+  else if(p===2)renderMatch(g,items,area);
+  else renderDone(g,area);
+}
+
+function renderLearn(g,items,area){
+  const cards=items.map(item=>{
+    if(item.type==='phrase'){
+      return`<div class="learn-card phrase">
+        <div class="card-label phrase">PHRASE · 片語</div>
+        <div class="card-en phrase">${item.en}</div>
+        <div class="card-zh">${item.zh}</div>
+        <div class="card-note phrase">${item.note}</div>
+        <div class="card-ex">📌 ${item.ex}</div>
+      </div>`;
+    }else{
+      const stepsHtml=item.steps?`<ul class="step-list">${item.steps.map(s=>`<li>${s}</li>`).join('')}</ul>`:'';
+      const exHtml=item.examples.map(e=>`<div class="ex-block"><div class="en">📌 ${e.en}</div><div class="zh">${e.zh}</div></div>`).join('');
+      return`<div class="learn-card grammar">
+        <div class="card-label grammar">GRAMMAR · ${item.label}</div>
+        <div class="formula-box">${item.formula}</div>
+        <div class="card-zh">${item.zh}</div>
+        <div class="card-note grammar">${item.note||''}${stepsHtml}</div>
+        <div style="margin-top:8px;">${exHtml}</div>
+      </div>`;
+    }
+  }).join('');
+  area.innerHTML=`<div class="phase-bar">${phaseBar(0)}</div>${cards}<button class="next-btn" onclick="setPhase(1)">記住了！去做選擇題 →</button>`;
+}
+
+function renderMcq(g,items,area){
+  const allQ=[];
+  items.forEach(item=>item.mcq.forEach(q=>allQ.push(q)));
+  S._mcqQ=S._mcqQ||[];S._mcqQ[g]=allQ;
+  const html=allQ.map((q,qi)=>{
+    const btns=q.opts.map((o,oi)=>`<button class="mcq-opt" onclick="pickMcq(${g},${qi},${oi})">${o}</button>`).join('');
+    return`<div class="mcq-block" id="mq${g}_${qi}"><div class="mcq-q">
+      <div class="mcq-qtext">Q${qi+1}. ${q.q}</div>
+      <div class="mcq-options">${btns}</div>
+      <div class="feedback" id="mfb${g}_${qi}"></div>
+    </div></div>`;
+  }).join('');
+  area.innerHTML=`<div class="phase-bar">${phaseBar(1)}</div>${html}<button class="next-btn" id="toMatch" onclick="setPhase(2)" disabled>全部作答後繼續 →</button>`;
+  S.mcqAnswered[g]=0;
+}
+
+function pickMcq(g,qi,chosen){
+  const allQ=S._mcqQ[g],block=document.getElementById(`mq${g}_${qi}`);
+  if(block.querySelector('.correct,.wrong'))return;
+  block.querySelectorAll('.mcq-opt').forEach(o=>o.disabled=true);
+  const isOk=chosen===allQ[qi].ans;
+  block.querySelectorAll('.mcq-opt')[chosen].classList.add(isOk?'correct':'wrong');
+  if(!isOk)block.querySelectorAll('.mcq-opt')[allQ[qi].ans].classList.add('correct');
+  const fb=document.getElementById(`mfb${g}_${qi}`);
+  fb.className=`feedback ${isOk?'ok':'ng'}`;
+  fb.textContent=isOk?'✓ 正確！':'✗ '+allQ[qi].fb;
+  S.mcqAnswered[g]++;
+  if(S.mcqAnswered[g]===allQ.length)document.getElementById('toMatch').disabled=false;
+}
+
+function renderMatch(g,items,area){
+  // collect match pairs from all items
+  let allPairs=[];
+  items.forEach(item=>{
+    if(item.match&&!Array.isArray(item.match))allPairs.push(item.match);
+    else if(Array.isArray(item.match))allPairs=allPairs.concat(item.match);
+  });
+  const enItems=allPairs.map((p,i)=>({id:i,text:p.left}));
+  const zhItems=shuf(allPairs.map((p,i)=>({id:i,text:p.right})));
+  S.matchState[g]={enItems,zhItems,selectedEn:null,matched:new Set(),total:allPairs.length};
+  const enCol=enItems.map(item=>`<div class="match-item" id="men_${g}_${item.id}" onclick="pickEn(${g},${item.id})">${item.text}</div>`).join('');
+  const zhCol=zhItems.map(item=>`<div class="match-item" id="mzh_${g}_${item.id}" onclick="pickZh(${g},${item.id})">${item.text}</div>`).join('');
+  area.innerHTML=`<div class="phase-bar">${phaseBar(2)}</div>
+    <div class="match-wrap">
+      <div class="match-instruct">點選左欄，再點右欄完成配對</div>
+      <div class="match-grid">
+        <div><div class="match-col-label">英文</div><div class="match-col">${enCol}</div></div>
+        <div><div class="match-col-label">中文</div><div class="match-col">${zhCol}</div></div>
+      </div>
+      <div class="match-score" id="mscore_${g}"></div>
+    </div>
+    <button class="next-btn" id="toDone" onclick="finishGroup(${g})" disabled>完成本組！→</button>`;
+}
+
+function pickEn(g,id){const ms=S.matchState[g];if(!ms||ms.matched.has(id))return;ms.selectedEn=id;document.querySelectorAll(`[id^="men_${g}_"]`).forEach(el=>el.classList.toggle('selected',el.id===`men_${g}_${id}`&&!ms.matched.has(id)));}
+function pickZh(g,id){
+  const ms=S.matchState[g];if(!ms||ms.selectedEn===null)return;
+  const enId=ms.selectedEn;if(ms.matched.has(enId))return;
+  const enEl=document.getElementById(`men_${g}_${enId}`),zhEl=document.getElementById(`mzh_${g}_${id}`);
+  if(enId===id){
+    enEl.classList.remove('selected');enEl.classList.add('matched','locked');zhEl.classList.add('matched','locked');
+    ms.matched.add(enId);ms.selectedEn=null;
+    const sc=document.getElementById(`mscore_${g}`);sc.textContent=`✓ ${ms.matched.size} / ${ms.total} 配對完成`;
+    if(ms.matched.size===ms.total){sc.textContent='🎉 全部配對完成！';document.getElementById('toDone').disabled=false;}
+  }else{
+    enEl.classList.add('wrong-flash');zhEl.classList.add('wrong-flash');
+    setTimeout(()=>{enEl.classList.remove('wrong-flash');zhEl.classList.remove('wrong-flash');},600);
+  }
+}
+
+function finishGroup(g){S.done[g]=true;if(g<2){const nt=document.getElementById(`tab-${g+1}`);nt.classList.remove('locked');nt.textContent=GROUPS_CFG[g+1].tabLabel;}updateProg();S.phase=3;render();}
+function renderDone(g,area){
+  const allDone=S.done.every(Boolean);
+  area.innerHTML=`<div class="phase-bar">${phaseBar(3)}</div>
+    <div class="score-wrap">
+      <div class="score-circle">✓</div>
+      <div style="font-size:16px;font-weight:700;color:var(--mid);margin-bottom:8px;">${GROUPS_CFG[g].label} 完成！</div>
+      ${allDone?'<div style="font-size:15px;color:var(--teal);font-weight:700;margin-top:8px;">🎉 片語和句型全部完成！</div>':''}
+    </div>
+    ${g<2?`<button class="unlock-btn" onclick="setGroup(${g+1})">去${GROUPS_CFG[g+1].label} →</button>`:''}`;
+}
+
+updateProg();render();
+</script>
+</body>
+</html>

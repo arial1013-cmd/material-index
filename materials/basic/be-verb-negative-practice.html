@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Be 動詞否定句練習 | Be Verb Negative Sentences Practice</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            padding-top: env(safe-area-inset-top, 0px);
+            padding-bottom: env(safe-area-inset-bottom, 0px);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ee7752 0%, #e73c7e 50%, #23a6d5 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .instructions {
+            background: #f0f4f8;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border-left: 4px solid #e73c7e;
+        }
+
+        .instructions h3 {
+            color: #e73c7e;
+            margin-bottom: 10px;
+        }
+
+        .rule-box {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 2px solid #ffc107;
+        }
+
+        .rule-box h4 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .contraction-table {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 12px;
+            padding: 12px;
+            background: white;
+            border-radius: 5px;
+        }
+
+        .contraction-table div {
+            padding: 4px 0;
+        }
+
+        .exercise-section {
+            margin-top: 30px;
+        }
+
+        .question-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .question-card:hover {
+            border-color: #e73c7e;
+            box-shadow: 0 5px 15px rgba(231, 60, 126, 0.1);
+        }
+
+        .question-number {
+            display: inline-block;
+            background: #e73c7e;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .statement {
+            font-size: 1.2em;
+            color: #333;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+        }
+
+        .input-area {
+            margin-bottom: 15px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            font-size: 1.1em;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #e73c7e;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 1em;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .check-btn {
+            background: #28a745;
+            color: white;
+        }
+
+        .check-btn:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+
+        .hint-btn {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .hint-btn:hover {
+            background: #e0a800;
+            transform: translateY(-2px);
+        }
+
+        .show-answer-btn {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .show-answer-btn:hover {
+            background: #138496;
+            transform: translateY(-2px);
+        }
+
+        .feedback {
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-weight: bold;
+            display: none;
+        }
+
+        .correct {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .incorrect {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .hint {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .answer {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            display: none;
+            font-size: 1.1em;
+        }
+
+        .score-section {
+            background: linear-gradient(135deg, #ee7752 0%, #e73c7e 50%, #23a6d5 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .score {
+            font-size: 2em;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .reset-btn {
+            background: white;
+            color: #e73c7e;
+            margin-top: 20px;
+            padding: 12px 30px;
+            font-size: 1.1em;
+        }
+
+        .reset-btn:hover {
+            background: #f8f9fa;
+            transform: scale(1.05);
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.5em;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .contraction-table {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚫 Be 動詞否定句練習</h1>
+        <p class="subtitle">Be Verb Negative Sentences Practice</p>
+
+        <div class="instructions">
+            <h3>📚 練習說明 Instructions</h3>
+            <p>將下列肯定句改成否定句。記得在 be 動詞後面加上 not！</p>
+            <p style="color: #666; margin-top: 5px;">Transform the statements below into negative sentences. Remember to add "not" after the be verb!</p>
+        </div>
+
+        <div class="rule-box">
+            <h4>🔑 重要規則 Key Rules:</h4>
+            <ul style="margin-left: 20px; line-height: 1.8;">
+                <li><strong>be 動詞後面直接加 not</strong>（Add "not" right after the be verb）</li>
+                <li><strong>主詞位置不變</strong>（Subject stays in the same place）</li>
+                <li><strong>句尾維持句號</strong>（Keep the period at the end，不是問號）</li>
+                <li><strong>可以用完整式或縮寫式，兩種都算對</strong>（Full form or contraction — both are accepted）</li>
+            </ul>
+            <div class="contraction-table">
+                <div><strong>is not</strong> → isn't</div>
+                <div><strong>are not</strong> → aren't</div>
+                <div><strong>am not</strong> → 沒有縮寫，只能說 I'm not</div>
+            </div>
+            <div style="margin-top: 15px; padding: 10px; background: white; border-radius: 5px;">
+                <p><strong>範例 Example:</strong></p>
+                <p style="color: #666;">Statement: He is a teacher.</p>
+                <p style="color: #28a745;">Negative: He is not a teacher. / He isn't a teacher.</p>
+            </div>
+        </div>
+
+        <div class="exercise-section">
+            <div id="exercises"></div>
+        </div>
+
+        <div class="score-section">
+            <h3>📊 你的成績 Your Score</h3>
+            <div class="score">
+                <span id="correct-count">0</span> / <span id="total-count">0</span>
+            </div>
+            <button class="reset-btn" onclick="resetExercises()">🔄 重新開始 Start Over</button>
+        </div>
+    </div>
+
+    <script>
+        // 練習題目：每題可接受完整式與縮寫式兩種答案
+        const exercises = [
+            {
+                statement: "She is happy.",
+                answers: ["she is not happy.", "she isn't happy."],
+                display: "She is not happy. / She isn't happy.",
+                hint: "be 動詞 is 後面加 not：is not / isn't"
+            },
+            {
+                statement: "They are students.",
+                answers: ["they are not students.", "they aren't students."],
+                display: "They are not students. / They aren't students.",
+                hint: "be 動詞 are 後面加 not：are not / aren't"
+            },
+            {
+                statement: "I am ready.",
+                answers: ["i am not ready.", "i'm not ready."],
+                display: "I am not ready. / I'm not ready.",
+                hint: "am not 沒有縮寫形式，只能寫 I'm not"
+            },
+            {
+                statement: "He is from Taiwan.",
+                answers: ["he is not from taiwan.", "he isn't from taiwan."],
+                display: "He is not from Taiwan. / He isn't from Taiwan.",
+                hint: "is 後面加 not，主詞 He 位置不變"
+            },
+            {
+                statement: "We are late.",
+                answers: ["we are not late.", "we aren't late."],
+                display: "We are not late. / We aren't late.",
+                hint: "are 後面加 not：are not / aren't"
+            },
+            {
+                statement: "The book is interesting.",
+                answers: ["the book is not interesting.", "the book isn't interesting."],
+                display: "The book is not interesting. / The book isn't interesting.",
+                hint: "主詞是 the book，is 後面加 not"
+            },
+            {
+                statement: "You are tired.",
+                answers: ["you are not tired.", "you aren't tired."],
+                display: "You are not tired. / You aren't tired.",
+                hint: "are 後面加 not：are not / aren't"
+            },
+            {
+                statement: "It is cold today.",
+                answers: ["it is not cold today.", "it isn't cold today."],
+                display: "It is not cold today. / It isn't cold today.",
+                hint: "is 後面加 not，today 位置不變"
+            },
+            {
+                statement: "The children are playing.",
+                answers: ["the children are not playing.", "the children aren't playing."],
+                display: "The children are not playing. / The children aren't playing.",
+                hint: "主詞是 the children，are 後面加 not"
+            },
+            {
+                statement: "Mary is a doctor.",
+                answers: ["mary is not a doctor.", "mary isn't a doctor."],
+                display: "Mary is not a doctor. / Mary isn't a doctor.",
+                hint: "主詞 Mary 位置不變，is 後面加 not"
+            }
+        ];
+
+        const STORAGE_KEY = "beVerbNegativePractice_v1";
+        let correctAnswers = 0;
+        let attemptedQuestions = new Set();
+        let userInputs = {};
+
+        function saveState() {
+            try {
+                const state = {
+                    correctAnswers,
+                    attempted: Array.from(attemptedQuestions),
+                    inputs: userInputs
+                };
+                window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+            } catch (e) {
+                console.error("localStorage 儲存失敗", e);
+            }
+        }
+
+        function loadState() {
+            try {
+                const raw = window.localStorage.getItem(STORAGE_KEY);
+                if (!raw) return null;
+                return JSON.parse(raw);
+            } catch (e) {
+                console.error("localStorage 讀取失敗", e);
+                return null;
+            }
+        }
+
+        function normalize(str) {
+            return str.trim().toLowerCase().replace(/\s+/g, ' ');
+        }
+
+        function initializeExercises() {
+            const container = document.getElementById('exercises');
+            container.innerHTML = '';
+
+            const saved = loadState();
+            if (saved) {
+                correctAnswers = saved.correctAnswers || 0;
+                attemptedQuestions = new Set(saved.attempted || []);
+                userInputs = saved.inputs || {};
+            }
+
+            exercises.forEach((exercise, index) => {
+                const card = document.createElement('div');
+                card.className = 'question-card';
+                card.innerHTML = `
+                    <span class="question-number">Question ${index + 1}</span>
+                    <div class="statement">
+                        <strong>Statement:</strong> ${exercise.statement}
+                    </div>
+                    <div class="input-area">
+                        <input type="text"
+                               id="answer-${index}"
+                               placeholder="Type the negative sentence here..."
+                               value="${userInputs[index] ? userInputs[index].replace(/"/g, '&quot;') : ''}"
+                               onkeypress="handleEnter(event, ${index})">
+                    </div>
+                    <div class="button-group">
+                        <button class="check-btn" onclick="checkAnswer(${index})">✓ Check 檢查</button>
+                        <button class="hint-btn" onclick="showHint(${index})">💡 Hint 提示</button>
+                        <button class="show-answer-btn" onclick="showAnswer(${index})">👁️ Answer 答案</button>
+                    </div>
+                    <div id="hint-${index}" class="hint"></div>
+                    <div id="answer-display-${index}" class="answer"></div>
+                    <div id="feedback-${index}" class="feedback"></div>
+                `;
+                container.appendChild(card);
+
+                if (attemptedQuestions.has(index)) {
+                    const isCorrect = exercise.answers.includes(normalize(userInputs[index] || ''));
+                    showFeedback(index, isCorrect);
+                }
+            });
+
+            updateScore();
+        }
+
+        function handleEnter(event, index) {
+            if (event.key === 'Enter') {
+                checkAnswer(index);
+            }
+        }
+
+        function showFeedback(index, isCorrect) {
+            const feedback = document.getElementById(`feedback-${index}`);
+            if (isCorrect) {
+                feedback.className = 'feedback correct';
+                feedback.innerHTML = '✅ Excellent! 太棒了！';
+            } else {
+                feedback.className = 'feedback incorrect';
+                feedback.innerHTML = '❌ Not quite right. 不太對喔。';
+            }
+            feedback.style.display = 'block';
+        }
+
+        function checkAnswer(index) {
+            const inputEl = document.getElementById(`answer-${index}`);
+            const userAnswer = inputEl.value.trim();
+            const feedback = document.getElementById(`feedback-${index}`);
+
+            if (userAnswer === '') {
+                feedback.className = 'feedback incorrect';
+                feedback.style.display = 'block';
+                feedback.innerHTML = '❌ Please enter an answer! 請輸入答案！';
+                return;
+            }
+
+            userInputs[index] = userAnswer;
+            const normalized = normalize(userAnswer);
+            const isCorrect = exercises[index].answers.includes(normalized);
+
+            if (!attemptedQuestions.has(index)) {
+                attemptedQuestions.add(index);
+                if (isCorrect) {
+                    correctAnswers++;
+                }
+            } else {
+                // 已作答過，允許修正分數（若原本錯現在對，或原本對現在錯）
+                // 重新計算所有已作答題目的正確數，避免重複計分
+                recalculateScore();
+            }
+
+            if (isCorrect) {
+                feedback.className = 'feedback correct';
+                feedback.innerHTML = '✅ Excellent! 太棒了！';
+            } else {
+                feedback.className = 'feedback incorrect';
+                let errorMessage = '❌ Not quite right. 不太對喔。';
+
+                if (userAnswer.endsWith('?')) {
+                    errorMessage += ' This is a negative sentence, not a question — use a period! 這是否定句，不是問句，句尾要用句號！';
+                } else if (!normalized.includes(' not ') && !normalized.includes("n't ")) {
+                    errorMessage += ' Remember to add "not" after the be verb! 別忘了在 be 動詞後面加 not！';
+                }
+
+                feedback.innerHTML = errorMessage;
+            }
+
+            feedback.style.display = 'block';
+            updateScore();
+            saveState();
+        }
+
+        function recalculateScore() {
+            let count = 0;
+            attemptedQuestions.forEach((idx) => {
+                const ans = userInputs[idx] || '';
+                if (exercises[idx].answers.includes(normalize(ans))) {
+                    count++;
+                }
+            });
+            correctAnswers = count;
+        }
+
+        function showHint(index) {
+            const hint = document.getElementById(`hint-${index}`);
+            hint.innerHTML = `💡 <strong>Hint:</strong> ${exercises[index].hint}`;
+            hint.style.display = 'block';
+        }
+
+        function showAnswer(index) {
+            const answerDisplay = document.getElementById(`answer-display-${index}`);
+            answerDisplay.innerHTML = `📝 <strong>Correct Answer:</strong> ${exercises[index].display}`;
+            answerDisplay.style.display = 'block';
+        }
+
+        function updateScore() {
+            document.getElementById('correct-count').textContent = correctAnswers;
+            document.getElementById('total-count').textContent = exercises.length;
+        }
+
+        function resetExercises() {
+            correctAnswers = 0;
+            attemptedQuestions.clear();
+            userInputs = {};
+
+            exercises.forEach((_, index) => {
+                document.getElementById(`answer-${index}`).value = '';
+                document.getElementById(`feedback-${index}`).style.display = 'none';
+                document.getElementById(`hint-${index}`).style.display = 'none';
+                document.getElementById(`answer-display-${index}`).style.display = 'none';
+            });
+
+            updateScore();
+            saveState();
+        }
+
+        // 初始化練習
+        initializeExercises();
+    </script>
+</body>
+</html>
