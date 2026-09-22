@@ -349,7 +349,18 @@ function updateScoreBar() {
     pr.forEach(p => { if (p.answered) totalDone++; if (p.correct) totalCorrect++; });
   }));
   document.getElementById('score-bar').innerHTML =
-    `這一組：<span class="big">${correct}</span> / ${items.length} 　｜　全部進度：${totalCorrect} / ${totalAll} 題答對`;
+    `這一組：<span class="big">${correct}</span> / ${items.length} 　｜　全部進度：${totalCorrect} / ${totalAll} 題答對
+     <div style="margin-top:10px;">
+       <button onclick="resetCurrentSet()" style="padding:8px 18px;border:none;border-radius:8px;background:white;color:#e73c7e;font-weight:bold;cursor:pointer;">🔄 重來這一組</button>
+     </div>`;
+}
+
+function resetCurrentSet() {
+  const items = data[state.module][state.level];
+  state.progress[state.module][state.level] = items.map(() => defaultItemState(state.module));
+  items.forEach((_, idx) => { delete runtimeCache[cacheKey(state.module, state.level, idx)]; });
+  saveState();
+  renderAll();
 }
 
 /* ============ 配對模組 ============ */
@@ -375,12 +386,18 @@ function renderMatching(container, items, level) {
         else if (opt === st.chosen) b.classList.add('wrong');
       }
       b.onclick = () => {
-        st.chosen = opt;
-        st.answered = true;
-        st.correct = (opt === item.answer);
-        saveState();
-        renderExercise();
-        updateScoreBar();
+        if (opt === item.answer) {
+          st.chosen = opt;
+          st.answered = true;
+          st.correct = true;
+          saveState();
+          renderExercise();
+          updateScoreBar();
+        } else {
+          b.classList.add('wrong');
+          b.disabled = true;
+          setTimeout(() => { b.classList.remove('wrong'); b.disabled = false; }, 500);
+        }
       };
       optWrap.appendChild(b);
     });
