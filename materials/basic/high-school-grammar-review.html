@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>高中基礎文法總複習</title>
+<style>
+  :root{
+    --teal:#0f766e; --teal-light:#ccfbf1; --teal-dark:#134e4a;
+    --amber:#b45309; --bg:#f8fafc; --card:#ffffff; --ink:#1e293b; --sub:#64748b;
+    --good:#16a34a; --bad:#dc2626; --border:#e2e8f0;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+    background:var(--bg); color:var(--ink); padding-bottom:60px;
+  }
+  header{
+    background:linear-gradient(135deg,var(--teal),var(--teal-dark));
+    color:#fff; padding:22px 16px 18px; text-align:center;
+  }
+  header h1{margin:0 0 4px; font-size:1.4rem;}
+  header p{margin:0; font-size:.85rem; opacity:.9;}
+  .tabs{
+    display:flex; overflow-x:auto; gap:6px; padding:10px 10px 0; background:#fff;
+    border-bottom:2px solid var(--border); position:sticky; top:0; z-index:10;
+  }
+  .tab{
+    flex:0 0 auto; padding:8px 14px; border-radius:10px 10px 0 0; cursor:pointer;
+    font-size:.85rem; white-space:nowrap; color:var(--sub); border:2px solid transparent;
+    border-bottom:none; background:#f1f5f9;
+  }
+  .tab.active{ background:var(--teal-light); color:var(--teal-dark); font-weight:700; border-color:var(--border);}
+  main{max-width:720px; margin:0 auto; padding:16px;}
+  .phase-nav{display:flex; gap:8px; margin-bottom:16px;}
+  .phase-btn{
+    flex:1; padding:10px; border-radius:10px; border:2px solid var(--border);
+    background:#fff; color:var(--sub); font-weight:700; cursor:pointer; font-size:.85rem;
+  }
+  .phase-btn.active{background:var(--teal); color:#fff; border-color:var(--teal);}
+  .card{
+    background:var(--card); border:1px solid var(--border); border-radius:14px;
+    padding:16px; margin-bottom:14px; box-shadow:0 1px 3px rgba(0,0,0,.04);
+  }
+  .card h3{margin:0 0 8px; color:var(--teal-dark); font-size:1.05rem;}
+  .card p.zh{margin:0 0 10px; line-height:1.7; font-size:.95rem;}
+  .ex{
+    display:flex; align-items:flex-start; gap:8px; background:#f8fafc; border-radius:8px;
+    padding:8px 10px; margin-bottom:6px;
+  }
+  .ex button{
+    border:none; background:var(--teal-light); color:var(--teal-dark); border-radius:50%;
+    width:28px; height:28px; flex:0 0 28px; cursor:pointer; font-size:.9rem;
+  }
+  .ex .en{font-weight:600;}
+  .ex .zh-line{color:var(--sub); font-size:.85rem;}
+  .progress{font-size:.8rem; color:var(--sub); text-align:center; margin-bottom:8px;}
+  .q-card{background:#fff; border:1px solid var(--border); border-radius:14px; padding:16px;}
+  .q-text{font-size:1.05rem; font-weight:700; margin-bottom:14px;}
+  .opt{
+    display:block; width:100%; text-align:left; padding:10px 12px; margin-bottom:8px;
+    border-radius:10px; border:2px solid var(--border); background:#fff; cursor:pointer; font-size:.95rem;
+  }
+  .opt.correct{border-color:var(--good); background:#f0fdf4; color:var(--good); font-weight:700;}
+  .opt.wrong{border-color:var(--bad); background:#fef2f2; color:var(--bad); font-weight:700;}
+  .explain{margin-top:10px; padding:10px; background:#f8fafc; border-radius:8px; font-size:.88rem; color:var(--sub); display:none;}
+  .nextbtn{
+    margin-top:14px; width:100%; padding:12px; border:none; border-radius:10px;
+    background:var(--teal); color:#fff; font-weight:700; font-size:.95rem; cursor:pointer;
+  }
+  .result{text-align:center; padding:30px 16px;}
+  .result .score{font-size:2.4rem; font-weight:800; color:var(--teal-dark);}
+  .match-grid{display:grid; grid-template-columns:1fr 1fr; gap:8px;}
+  .match-item{
+    padding:10px 8px; border-radius:10px; border:2px solid var(--border); background:#fff;
+    cursor:pointer; font-size:.85rem; text-align:center; min-height:44px; display:flex; align-items:center; justify-content:center;
+  }
+  .match-item.selected{border-color:var(--teal); background:var(--teal-light);}
+  .match-item.matched{border-color:var(--good); background:#f0fdf4; color:var(--good); opacity:.6; cursor:default;}
+  .match-item.wrongflash{border-color:var(--bad); background:#fef2f2;}
+  .restart{
+    margin-top:16px; width:100%; padding:12px; border:none; border-radius:10px;
+    background:var(--teal); color:#fff; font-weight:700; cursor:pointer;
+  }
+  footer{text-align:center; color:var(--sub); font-size:.78rem; padding:20px;}
+</style>
+</head>
+<body>
+<header>
+  <h1>📘 高中基礎文法總複習</h1>
+  <p>Learn 觀念 → MCQ 測驗 → Match 配對 · 點🔊可以聽發音</p>
+</header>
+<div class="tabs" id="tabs"></div>
+<main id="main"></main>
+<footer>資源班英文學習系統</footer>
+
+<script>
+// 高中基礎文法總複習 - 共用資料
+// 供 HTML 互動練習系統 與 docx 講義產生腳本 共同使用
+
+const GROUPS = [
+  // ========== 1. be動詞 ==========
+  {
+    id: "beverb",
+    name: "be動詞",
+    icon: "🔹",
+    learn: [
+      {
+        title: "be動詞是什麼？",
+        zh: "be動詞（am / is / are / was / were）用來說明「主詞是什麼、在哪裡、怎麼樣」，後面常接名詞、形容詞、地點。中文常常翻成「是」，但『在』某地、『很』怎樣，也是用be動詞。",
+        examples: [
+          { en: "I am a student.", zh: "我是學生。" },
+          { en: "She is happy.", zh: "她很開心。" },
+          { en: "They are in the classroom.", zh: "他們在教室裡。" }
+        ]
+      },
+      {
+        title: "現在式：am / is / are",
+        zh: "主詞是 I 用 am；主詞是 he/she/it 或單數名詞用 is；主詞是 you/we/they 或複數名詞用 are。",
+        examples: [
+          { en: "I am tired.", zh: "我累了。" },
+          { en: "He is my brother.", zh: "他是我哥哥。" },
+          { en: "We are ready.", zh: "我們準備好了。" }
+        ]
+      },
+      {
+        title: "過去式：was / were",
+        zh: "was 對應 I / he / she / it（單數）；were 對應 you / we / they（複數）。",
+        examples: [
+          { en: "I was at home yesterday.", zh: "我昨天在家。" },
+          { en: "They were happy last night.", zh: "他們昨晚很開心。" }
+        ]
+      },
+      {
+        title: "否定句與疑問句",
+        zh: "否定句：be動詞 + not（is not = isn't，are not = aren't，was not = wasn't）。疑問句：把be動詞移到句首。",
+        examples: [
+          { en: "She is not (isn't) here.", zh: "她不在這裡。" },
+          { en: "Are you a teacher?", zh: "你是老師嗎？" },
+          { en: "Was he late?", zh: "他遲到了嗎？" }
+        ]
+      }
+    ],
+    mcq: [
+      { q: "I ___ a student.", options: ["am", "is", "are", "be"], answer: 0, explain: "主詞是 I，一律用 am。" },
+      { q: "She ___ very kind.", options: ["am", "is", "are", "were"], answer: 1, explain: "主詞是 she（單數第三人稱），用 is。" },
+      { q: "We ___ classmates.", options: ["am", "is", "are", "was"], answer: 2, explain: "主詞是 we（複數），用 are。" },
+      { q: "They ___ at the park last Sunday.", options: ["are", "is", "were", "am"], answer: 2, explain: "they 是複數，過去式用 were。" },
+      { q: "___ you ready?", options: ["Am", "Is", "Are", "Be"], answer: 2, explain: "主詞是 you，疑問句把 are 移到句首。" },
+      { q: "He ___ not at school yesterday.", options: ["is", "are", "was", "were"], answer: 2, explain: "he 是單數，過去式用 was，否定加 not。" },
+      { q: "It ___ a rainy day.", options: ["am", "is", "are", "were"], answer: 1, explain: "it 是單數第三人稱，用 is。" },
+      { q: "My parents ___ doctors.", options: ["is", "am", "are", "was"], answer: 2, explain: "my parents 是複數，用 are。" }
+    ],
+    match: [
+      { term: "I", def: "am" },
+      { term: "She / He / It", def: "is" },
+      { term: "You / We / They", def: "are" },
+      { term: "I / He / She / It（過去）", def: "was" },
+      { term: "You / We / They（過去）", def: "were" },
+      { term: "is not 縮寫", def: "isn't" },
+      { term: "are not 縮寫", def: "aren't" },
+      { term: "was not 縮寫", def: "wasn't" }
+    ]
+  },
+
+  // ========== 2. do/does/did（一般動詞的助動詞） ==========
+  {
+    id: "dodoes",
+    name: "do / does / did",
+    icon: "🔹",
+    learn: [
+      {
+        title: "一般動詞 vs be動詞",
+        zh: "句子裡的動詞如果不是be動詞（am/is/are/was/were），就是「一般動詞」，例如 play、like、go、eat。一般動詞的否定句和疑問句要靠 do/does/did 幫忙，不能直接加 not 或移到句首。",
+        examples: [
+          { en: "I play basketball. (一般動詞)", zh: "我打籃球。" },
+          { en: "I am a player. (be動詞)", zh: "我是球員。" }
+        ]
+      },
+      {
+        title: "現在式的 do / does",
+        zh: "主詞是 I/you/we/they 用 do；主詞是 he/she/it 用 does。用了 does 之後，動詞要變回原形（去掉 -s/-es）。",
+        examples: [
+          { en: "Do you like coffee?", zh: "你喜歡咖啡嗎？" },
+          { en: "Does she like coffee?", zh: "她喜歡咖啡嗎？" },
+          { en: "He does not (doesn't) like tea.", zh: "他不喜歡茶。" }
+        ]
+      },
+      {
+        title: "過去式的 did",
+        zh: "不管主詞是誰，過去式一律用 did，動詞也要變回原形（不能再加 -ed）。",
+        examples: [
+          { en: "Did you finish your homework?", zh: "你做完作業了嗎？" },
+          { en: "I did not (didn't) go to school.", zh: "我沒有去上學。" }
+        ]
+      },
+      {
+        title: "常見錯誤提醒",
+        zh: "❌ He is don't play games.（is 和 don't 不能同時用）→ ✅ He doesn't play games. be動詞句用be動詞否定，一般動詞句用 don't/doesn't/didn't 否定，兩種不可以混用！",
+        examples: [
+          { en: "✅ He doesn't play games.", zh: "他不玩遊戲。" },
+          { en: "✅ He isn't playing games now.", zh: "他現在沒在玩遊戲。（現在進行式）" }
+        ]
+      }
+    ],
+    mcq: [
+      { q: "___ you like pizza?", options: ["Do", "Does", "Did", "Are"], answer: 0, explain: "主詞 you 用 Do。" },
+      { q: "___ she speak English?", options: ["Do", "Does", "Did", "Is"], answer: 1, explain: "主詞 she 用 Does。" },
+      { q: "He ___ not like vegetables.", options: ["do", "does", "did", "is"], answer: 1, explain: "he 用 does not (doesn't)。" },
+      { q: "They ___ not come yesterday.", options: ["do", "does", "did", "were"], answer: 2, explain: "過去式一律用 did。" },
+      { q: "找出正確句子：", options: ["He is don't play games.", "He doesn't plays games.", "He doesn't play games.", "He not play games."], answer: 2, explain: "doesn't 後面動詞要變回原形 play，不能加 s，也不能跟 is 混用。" },
+      { q: "___ they go to the party last night?", options: ["Do", "Does", "Did", "Were"], answer: 2, explain: "last night 表示過去，用 Did。" },
+      { q: "I ___ not know the answer.", options: ["am", "do", "does", "is"], answer: 1, explain: "know 是一般動詞，主詞 I 用 do not (don't)。" },
+      { q: "選出錯誤句子：", options: ["Does he like music?", "He does likes music.", "He doesn't like music.", "Did he like music?"], answer: 1, explain: "does 後面動詞要用原形 like，不可以加 s。" }
+    ],
+    match: [
+      { term: "I / You / We / They（現在，疑問/否定）", def: "do" },
+      { term: "He / She / It（現在，疑問/否定）", def: "does" },
+      { term: "任何主詞（過去，疑問/否定）", def: "did" },
+      { term: "do not 縮寫", def: "don't" },
+      { term: "does not 縮寫", def: "doesn't" },
+      { term: "did not 縮寫", def: "didn't" },
+      { term: "does/did 後面的動詞形式", def: "原形動詞" },
+      { term: "be動詞句的否定方式", def: "be動詞 + not" }
+    ]
+  },
+
+  // ========== 3. to + V（不定詞） ==========
+  {
+    id: "toV",
+    name: "to + 原形動詞",
+    icon: "🔹",
+    learn: [
+      {
+        title: "to + V 是什麼？",
+        zh: "「to + 原形動詞」叫做不定詞，可以表示「去做某件事」或「目的」。to 後面一定要接動詞原形，不能加 s、ing、ed。",
+        examples: [
+          { en: "I want to eat pizza.", zh: "我想吃披薩。" },
+          { en: "She decided to study abroad.", zh: "她決定去國外唸書。" }
+        ]
+      },
+      {
+        title: "常接 to V 的動詞",
+        zh: "want to、need to、decide to、plan to、hope to、try to、like to、love to、forget to、learn to 後面都接 to + 原形動詞。",
+        examples: [
+          { en: "He needs to rest.", zh: "他需要休息。" },
+          { en: "We plan to visit Taipei.", zh: "我們計劃去拜訪台北。" }
+        ]
+      },
+      {
+        title: "表示「目的」：為了要...",
+        zh: "to + V 放在句尾，可以表示做某動作的目的，等於 in order to。",
+        examples: [
+          { en: "I get up early to catch the bus.", zh: "我早起是為了要趕公車。" },
+          { en: "She studies hard to pass the exam.", zh: "她努力唸書是為了要通過考試。" }
+        ]
+      }
+    ],
+    mcq: [
+      { q: "I want ___ a new phone.", options: ["buy", "to buy", "buying", "bought"], answer: 1, explain: "want 後面接 to + 原形動詞。" },
+      { q: "She decided ___ home early.", options: ["go", "to go", "going", "goes"], answer: 1, explain: "decide 後面接 to + 原形動詞。" },
+      { q: "He gets up early ___ breakfast.", options: ["make", "made", "to make", "making"], answer: 2, explain: "表示目的，用 to + 原形動詞。" },
+      { q: "They plan ___ the movie tonight.", options: ["to watch", "watched", "watches", "watching"], answer: 0, explain: "plan 後面接 to + 原形動詞。" },
+      { q: "找出正確句子：", options: ["I want to eating.", "I want to eats.", "I want to eat.", "I want eating."], answer: 2, explain: "to 後面一定接原形動詞 eat。" },
+      { q: "She needs ___ more water.", options: ["drink", "drinks", "to drink", "drank"], answer: 2, explain: "need 後面接 to + 原形動詞。" },
+      { q: "We study hard ___ good grades.", options: ["get", "to get", "getting", "got"], answer: 1, explain: "表示目的（為了得到好成績）。" }
+    ],
+    match: [
+      { term: "want to", def: "想要做..." },
+      { term: "need to", def: "需要做..." },
+      { term: "decide to", def: "決定做..." },
+      { term: "plan to", def: "計劃做..." },
+      { term: "hope to", def: "希望做..." },
+      { term: "try to", def: "嘗試做..." },
+      { term: "forget to", def: "忘記做..." },
+      { term: "to + V 表目的", def: "為了要..." }
+    ]
+  },
+
+  // ========== 4. 現在簡單式 ==========
+  {
+    id: "presentsimple",
+    name: "現在簡單式",
+    icon: "🔹",
+    learn: [
+      {
+        title: "什麼時候用現在簡單式？",
+        zh: "用來說「習慣」「事實」「固定行程」。常搭配 always、usually、often、sometimes、every day、on Mondays 等時間副詞。",
+        examples: [
+          { en: "I get up at seven every day.", zh: "我每天七點起床。" },
+          { en: "The sun rises in the east.", zh: "太陽從東邊升起。（事實）" }
+        ]
+      },
+      {
+        title: "動詞變化：第三人稱單數加 -s/-es",
+        zh: "主詞是 he/she/it 時，動詞要加 s 或 es。一般加 s；字尾是 s, x, ch, sh, o 加 es；字尾是子音+y，去y加ies。",
+        examples: [
+          { en: "He plays basketball.", zh: "他打籃球。" },
+          { en: "She watches TV.", zh: "她看電視。" },
+          { en: "The baby cries a lot.", zh: "這個嬰兒常常哭。" }
+        ]
+      },
+      {
+        title: "否定與疑問",
+        zh: "用 don't/doesn't + 原形動詞。",
+        examples: [
+          { en: "I don't like spicy food.", zh: "我不喜歡辣的食物。" },
+          { en: "Does he go to school by bus?", zh: "他搭公車上學嗎？" }
+        ]
+      }
+    ],
+    mcq: [
+      { q: "She ___ (watch) TV every night.", options: ["watch", "watches", "watching", "watched"], answer: 1, explain: "she 是第三人稱單數，watch 字尾加 es。" },
+      { q: "The train ___ (leave) at 9 o'clock every day.", options: ["leave", "leaves", "leaving", "left"], answer: 1, explain: "固定行程用現在簡單式，第三人稱加 s。" },
+      { q: "I ___ (not / like) coffee.", options: ["not like", "doesn't like", "don't like", "am not like"], answer: 2, explain: "主詞 I 用 don't + 原形。" },
+      { q: "He ___ (study) every day.", options: ["study", "studys", "studies", "studied"], answer: 2, explain: "子音+y結尾，去y加ies。" },
+      { q: "___ she speak French?", options: ["Do", "Does", "Did", "Is"], answer: 1, explain: "she 是第三人稱單數，疑問句用 Does。" },
+      { q: "找出正確句子：", options: ["He go to school on foot.", "He goes to school on foot.", "He going to school on foot.", "He is go to school."], answer: 1, explain: "he 是第三人稱單數，go 要變 goes。" },
+      { q: "選出信號詞會搭配現在簡單式：", options: ["yesterday", "last week", "usually", "two days ago"], answer: 2, explain: "usually（通常）是現在簡單式常見的時間副詞。" }
+    ],
+    match: [
+      { term: "always", def: "總是" },
+      { term: "usually", def: "通常" },
+      { term: "often", def: "常常" },
+      { term: "sometimes", def: "有時候" },
+      { term: "every day", def: "每天" },
+      { term: "第三人稱單數動詞變化", def: "加 s / es" },
+      { term: "子音 + y 結尾動詞", def: "去y加ies" },
+      { term: "現在簡單式的功能", def: "習慣、事實、固定行程" }
+    ]
+  },
+
+  // ========== 5. 過去簡單式 ==========
+  {
+    id: "pastsimple",
+    name: "過去簡單式",
+    icon: "🔹",
+    learn: [
+      {
+        title: "什麼時候用過去簡單式？",
+        zh: "用來說「過去已經發生、已經結束」的動作，常搭配 yesterday、last night/week/year、...ago、in 2020 等表示過去的時間詞。",
+        examples: [
+          { en: "I watched a movie last night.", zh: "我昨晚看了一部電影。" },
+          { en: "She visited Japan two years ago.", zh: "她兩年前去過日本。" }
+        ]
+      },
+      {
+        title: "規則動詞：加 -ed",
+        zh: "一般動詞加 ed；字尾是 e 加 d；子音+y結尾去y加ied；重音在最後一個音節的短母音+子音要重複字尾子音再加ed。",
+        examples: [
+          { en: "play → played", zh: "" },
+          { en: "like → liked", zh: "" },
+          { en: "study → studied", zh: "" },
+          { en: "stop → stopped", zh: "" }
+        ]
+      },
+      {
+        title: "不規則動詞：要背 V2",
+        zh: "有些動詞過去式不是加ed，要單獨記憶，例如：go→went、eat→ate、see→saw、have→had、do→did、come→came、buy→bought。",
+        examples: [
+          { en: "I went to the park yesterday.", zh: "我昨天去了公園。" },
+          { en: "We ate dinner together.", zh: "我們一起吃了晚餐。" }
+        ]
+      }
+    ],
+    mcq: [
+      { q: "I ___ (go) to the zoo last Sunday.", options: ["go", "goes", "went", "going"], answer: 2, explain: "go 是不規則動詞，過去式是 went。" },
+      { q: "She ___ (study) hard for the test yesterday.", options: ["study", "studys", "studied", "studying"], answer: 2, explain: "子音+y結尾，去y加ied。" },
+      { q: "They ___ (play) soccer last weekend.", options: ["play", "plays", "played", "playing"], answer: 2, explain: "規則動詞加ed。" },
+      { q: "He ___ (eat) breakfast this morning.", options: ["eat", "eats", "ate", "eating"], answer: 2, explain: "eat 是不規則動詞，過去式是 ate。" },
+      { q: "I ___ not (see) him yesterday.", options: ["do", "did", "does", "was"], answer: 1, explain: "過去式否定用 did not + 原形動詞。" },
+      { q: "找出正確句子：", options: ["I stoped the car.", "I stopped the car.", "I stopd the car.", "I stops the car."], answer: 1, explain: "短母音+子音結尾，重複字尾子音再加ed：stop→stopped。" },
+      { q: "___ you finish your homework last night?", options: ["Do", "Does", "Did", "Were"], answer: 2, explain: "過去式疑問句用 Did。" },
+      { q: "have 的過去式是？", options: ["haved", "haves", "had", "having"], answer: 2, explain: "have 是不規則動詞，過去式是 had。" }
+    ],
+    match: [
+      { term: "go", def: "went" },
+      { term: "eat", def: "ate" },
+      { term: "have", def: "had" },
+      { term: "see", def: "saw" },
+      { term: "do", def: "did" },
+      { term: "come", def: "came" },
+      { term: "buy", def: "bought" },
+      { term: "yesterday / ...ago / last...", def: "過去簡單式的時間信號詞" }
+    ]
+  },
+
+  // ========== 6. 未來式 ==========
+  {
+    id: "future",
+    name: "未來式",
+    icon: "🔹",
+    learn: [
+      {
+        title: "will + 原形動詞",
+        zh: "will 表示「臨時決定」「預測」「承諾」，後面一定接原形動詞，不隨主詞變化。",
+        examples: [
+          { en: "I will call you tonight.", zh: "我今晚會打電話給你。" },
+          { en: "It will rain tomorrow.", zh: "明天可能會下雨。（預測）" }
+        ]
+      },
+      {
+        title: "be going to + 原形動詞",
+        zh: "be going to 表示「已經計劃好的事」或「有徵兆看得出來的事」。be動詞要隨主詞變化（am/is/are）。",
+        examples: [
+          { en: "I am going to visit my grandma this weekend.", zh: "我這週末要去拜訪奶奶。（已計劃）" },
+          { en: "Look at the clouds! It is going to rain.", zh: "你看那些雲！要下雨了。（有跡象）" }
+        ]
+      },
+      {
+        title: "否定與疑問",
+        zh: "will not = won't；be動詞的否定與疑問方式照原本be動詞規則。",
+        examples: [
+          { en: "I won't be late.", zh: "我不會遲到。" },
+          { en: "Are you going to join us?", zh: "你要加入我們嗎？" }
+        ]
+      }
+    ],
+    mcq: [
+      { q: "I ___ (call) you when I arrive.", options: ["call", "calls", "will call", "called"], answer: 2, explain: "臨時決定用 will + 原形動詞。" },
+      { q: "She ___ (visit) her cousin next week. (已經計劃好)", options: ["visits", "will visit", "is going to visit", "visited"], answer: 2, explain: "已經計劃好的事用 be going to。" },
+      { q: "Look at the sky! It ___ (rain).", options: ["will rain", "is going to rain", "rains", "rained"], answer: 1, explain: "有明顯跡象（烏雲）用 be going to。" },
+      { q: "will not 的縮寫是？", options: ["willn't", "won't", "wo'nt", "wilnt"], answer: 1, explain: "will not 的縮寫是 won't（特殊縮寫）。" },
+      { q: "___ you help me tomorrow?", options: ["Do", "Will", "Is", "Are"], answer: 1, explain: "詢問未來的意願用 Will。" },
+      { q: "找出正確句子：", options: ["I will to go there.", "I will going there.", "I will go there.", "I wills go there."], answer: 2, explain: "will 後面一定接原形動詞，不加 to、ing 或 s。" },
+      { q: "We ___ (not / be) late for the meeting.", options: ["will not be", "not will be", "will be not", "won't"], answer: 0, explain: "will 的否定：will not + 原形，won't 是縮寫需搭配動詞。" }
+    ],
+    match: [
+      { term: "will + 原形", def: "臨時決定 / 預測 / 承諾" },
+      { term: "be going to + 原形", def: "已計劃好的事 / 有跡象的事" },
+      { term: "will not 縮寫", def: "won't" },
+      { term: "tomorrow", def: "明天" },
+      { term: "next week / next year", def: "下週 / 明年" },
+      { term: "soon", def: "很快" },
+      { term: "will 後面的動詞形式", def: "原形動詞" }
+    ]
+  },
+
+  // ========== 7. 現在進行式 ==========
+  {
+    id: "presentcont",
+    name: "現在進行式",
+    icon: "🔹",
+    learn: [
+      {
+        title: "結構：be動詞 + V-ing",
+        zh: "表示「現在正在發生」的動作，常搭配 now、right now、at the moment、Look!、Listen!。",
+        examples: [
+          { en: "I am doing my homework now.", zh: "我現在正在做作業。" },
+          { en: "She is reading a book right now.", zh: "她現在正在看書。" }
+        ]
+      },
+      {
+        title: "動詞加 -ing 的拼字規則",
+        zh: "一般直接加ing；字尾是不發音的e，去e加ing；短母音+子音結尾，重複字尾子音再加ing。",
+        examples: [
+          { en: "play → playing", zh: "" },
+          { en: "make → making", zh: "" },
+          { en: "run → running", zh: "" },
+          { en: "swim → swimming", zh: "" }
+        ]
+      },
+      {
+        title: "否定與疑問",
+        zh: "否定：be動詞+not+V-ing。疑問：be動詞移到句首。",
+        examples: [
+          { en: "He is not sleeping.", zh: "他沒有在睡覺。" },
+          { en: "Are they studying now?", zh: "他們現在在唸書嗎？" }
+        ]
+      }
+    ],
+    mcq: [
+      { q: "I ___ (do) my homework now.", options: ["do", "does", "am doing", "did"], answer: 2, explain: "現在進行式：be動詞+V-ing，主詞I用am。" },
+      { q: "She ___ (make) a cake now.", options: ["make", "makes", "is making", "made"], answer: 2, explain: "make去e加ing變making。" },
+      { q: "They ___ (run) in the park now.", options: ["run", "runs", "are running", "ran"], answer: 2, explain: "run短母音+子音，重複n再加ing。" },
+      { q: "Listen! Someone ___ (sing) outside.", options: ["sings", "sang", "is singing", "sing"], answer: 2, explain: "Listen!是現在進行式的信號詞。" },
+      { q: "找出正確句子：", options: ["He is swiming.", "He is swimming.", "He swimming.", "He is swims."], answer: 1, explain: "swim重複m再加ing，且需要be動詞is。" },
+      { q: "___ you watching TV right now?", options: ["Do", "Are", "Does", "Is"], answer: 1, explain: "主詞you用Are。" },
+      { q: "He ___ not (study) at the moment.", options: ["is", "does", "do", "did"], answer: 0, explain: "現在進行式否定用be動詞+not。" }
+    ],
+    match: [
+      { term: "now / right now", def: "現在" },
+      { term: "at the moment", def: "此刻" },
+      { term: "Look! / Listen!", def: "現在進行式常見信號詞" },
+      { term: "一般動詞加ing", def: "直接加ing" },
+      { term: "字尾不發音e", def: "去e加ing" },
+      { term: "短母音+子音結尾", def: "重複字尾子音+ing" },
+      { term: "現在進行式結構", def: "be動詞 + V-ing" }
+    ]
+  },
+
+  // ========== 8. 現在完成式 ==========
+  {
+    id: "presentperfect",
+    name: "現在完成式",
+    icon: "🔹",
+    learn: [
+      {
+        title: "結構：have/has + p.p.（過去分詞）",
+        zh: "主詞是I/you/we/they用have；he/she/it用has。表示「從過去持續到現在」或「過去發生、現在仍有影響／經驗」。",
+        examples: [
+          { en: "I have lived here for five years.", zh: "我已經住在這裡五年了。（持續到現在）" },
+          { en: "She has already finished her homework.", zh: "她已經做完作業了。（現在的結果）" }
+        ]
+      },
+      {
+        title: "常見信號詞",
+        zh: "for + 一段時間、since + 起點、already、yet、just、ever、never、so far。",
+        examples: [
+          { en: "I have known him for ten years.", zh: "我認識他十年了。" },
+          { en: "He has never been to Japan.", zh: "他從沒去過日本。" },
+          { en: "Have you finished it yet?", zh: "你做完了嗎？（疑問句用yet）" }
+        ]
+      },
+      {
+        title: "for vs since",
+        zh: "for後面接「一段時間」（for three years）；since後面接「一個時間點」（since 2020 / since I was a child）。",
+        examples: [
+          { en: "I have studied English for six years.", zh: "我學英文六年了。" },
+          { en: "I have studied English since 2018.", zh: "我從2018年開始學英文。" }
+        ]
+      },
+      {
+        title: "過去分詞（p.p.）",
+        zh: "規則動詞p.p.和過去式一樣加ed；不規則動詞要單獨背，例如：go→gone、see→seen、eat→eaten、do→done、write→written。",
+        examples: [
+          { en: "have gone", zh: "" },
+          { en: "have seen", zh: "" },
+          { en: "have eaten", zh: "" }
+        ]
+      }
+    ],
+    mcq: [
+      { q: "I ___ (live) here for ten years.", options: ["live", "lived", "have lived", "am living"], answer: 2, explain: "現在完成式：have+p.p.，表示持續到現在。" },
+      { q: "She ___ (finish) her homework already.", options: ["finishes", "finished", "has finished", "is finishing"], answer: 2, explain: "主詞she用has+p.p.。" },
+      { q: "選出正確用法：___ + 一段時間", options: ["since", "for", "ago", "in"], answer: 1, explain: "for 後面接一段時間，例如for three years。" },
+      { q: "選出正確用法：___ + 時間點", options: ["for", "since", "during", "at"], answer: 1, explain: "since 後面接時間點，例如since 2020。" },
+      { q: "He has ___ (go) to Japan before.", options: ["go", "went", "gone", "going"], answer: 2, explain: "go的過去分詞是gone。" },
+      { q: "___ you ever (eat) sushi?", options: ["Do", "Did", "Have", "Has"], answer: 2, explain: "主詞you用Have，ever是常見信號詞。" },
+      { q: "I have ___ (never) seen a panda.", options: ["never", "already", "yet", "just"], answer: 0, explain: "never表示從來沒有，常用於現在完成式。" },
+      { q: "找出正確句子：", options: ["I have saw the movie.", "I have seen the movie.", "I has seen the movie.", "I have see the movie."], answer: 1, explain: "see的過去分詞是seen，主詞I用have。" }
+    ],
+    match: [
+      { term: "have/has + p.p.", def: "現在完成式結構" },
+      { term: "for + 一段時間", def: "for three years" },
+      { term: "since + 時間點", def: "since 2020" },
+      { term: "already", def: "已經" },
+      { term: "yet", def: "還（沒）/ 了嗎（疑問、否定句）" },
+      { term: "just", def: "剛剛" },
+      { term: "ever", def: "曾經" },
+      { term: "never", def: "從未" },
+      { term: "go 的過去分詞", def: "gone" },
+      { term: "see 的過去分詞", def: "seen" }
+    ]
+  },
+
+  // ========== 9. 被動語態 ==========
+  {
+    id: "passive",
+    name: "被動語態",
+    icon: "🔹",
+    learn: [
+      {
+        title: "什麼是被動語態？",
+        zh: "主動句強調「誰做了這件事」，被動句強調「事情被做了」，動作的接受者變成主詞。結構：be動詞 + 過去分詞(p.p.)，依時態改變be動詞。",
+        examples: [
+          { en: "主動：The chef cooks the meal.", zh: "廚師煮這道餐點。" },
+          { en: "被動：The meal is cooked by the chef.", zh: "這道餐點被廚師煮。" }
+        ]
+      },
+      {
+        title: "改寫步驟",
+        zh: "① 把主動句的受詞移到句首當主詞 ② 加上對應時態的be動詞 ③ 動詞改成過去分詞 ④ 原本的主詞用by接在後面（若不重要可省略）。",
+        examples: [
+          { en: "主動：She writes a letter. → 被動：A letter is written by her.", zh: "" },
+          { en: "主動：They built this house in 2000. → 被動：This house was built (by them) in 2000.", zh: "" }
+        ]
+      },
+      {
+        title: "不同時態的被動式",
+        zh: "現在式被動：am/is/are + p.p.；過去式被動：was/were + p.p.；未來式被動：will be + p.p.；現在完成式被動：have/has been + p.p.。",
+        examples: [
+          { en: "The window is broken. (現在)", zh: "窗戶被打破了。" },
+          { en: "The window was broken. (過去)", zh: "窗戶（當時）被打破了。" },
+          { en: "The report will be sent tomorrow. (未來)", zh: "報告明天會被寄出。" }
+        ]
+      }
+    ],
+    mcq: [
+      { q: "This song ___ (sing) by a famous singer.", options: ["sing", "sings", "is sung", "sang"], answer: 2, explain: "現在式被動：is + p.p.，sing的p.p.是sung。" },
+      { q: "The window ___ (break) yesterday.", options: ["broke", "was broken", "is broken", "breaks"], answer: 1, explain: "過去式被動：was + p.p.。" },
+      { q: "English ___ (speak) in many countries.", options: ["speaks", "is spoken", "spoke", "speak"], answer: 1, explain: "被動語態：主詞是動作的接受者，speak的p.p.是spoken。" },
+      { q: "The letter ___ (write) by her tomorrow.", options: ["will write", "will be written", "is written", "wrote"], answer: 1, explain: "未來式被動：will be + p.p.。" },
+      { q: "選出正確的被動句改寫：\"The chef cooks the meal.\"", options: ["The meal cooks by the chef.", "The meal is cooked by the chef.", "The meal cooked by the chef.", "The meal is cook by the chef."], answer: 1, explain: "現在式被動：is + p.p. (cooked)。" },
+      { q: "The house ___ (build) in 2010.", options: ["built", "was built", "is built", "builds"], answer: 1, explain: "過去式被動：was + p.p.。" },
+      { q: "被動語態的基本結構是？", options: ["be動詞 + V-ing", "be動詞 + p.p.", "have + p.p.", "do + 原形"], answer: 1, explain: "被動語態結構固定為 be動詞 + 過去分詞。" }
+    ],
+    match: [
+      { term: "被動語態基本結構", def: "be動詞 + p.p." },
+      { term: "現在式被動", def: "am/is/are + p.p." },
+      { term: "過去式被動", def: "was/were + p.p." },
+      { term: "未來式被動", def: "will be + p.p." },
+      { term: "現在完成式被動", def: "have/has been + p.p." },
+      { term: "動作執行者", def: "by + 人（可省略）" },
+      { term: "主動句主詞", def: "變成被動句 by 後面的人" },
+      { term: "主動句受詞", def: "變成被動句的主詞" }
+    ]
+  },
+
+  // ========== 10. 比較級與最高級 ==========
+  {
+    id: "comparison",
+    name: "比較級與最高級",
+    icon: "🔹",
+    learn: [
+      {
+        title: "規則變化",
+        zh: "短音節形容詞：比較級加-er，最高級加-est（前面加the）。字尾e結尾只加r/st；短母音+子音重複字尾再加er/est；子音+y結尾去y加ier/iest。",
+        examples: [
+          { en: "tall → taller → the tallest", zh: "" },
+          { en: "nice → nicer → the nicest", zh: "" },
+          { en: "big → bigger → the biggest", zh: "" },
+          { en: "happy → happier → the happiest", zh: "" }
+        ]
+      },
+      {
+        title: "長音節形容詞：more / most",
+        zh: "兩個音節以上（或字尾是-ful, -ous, -ive等）的形容詞，比較級用more，最高級用the most。",
+        examples: [
+          { en: "beautiful → more beautiful → the most beautiful", zh: "" },
+          { en: "difficult → more difficult → the most difficult", zh: "" }
+        ]
+      },
+      {
+        title: "不規則變化",
+        zh: "good/well → better → the best；bad → worse → the worst；many/much → more → the most；little → less → the least。",
+        examples: [
+          { en: "This book is better than that one.", zh: "這本書比那本好。" },
+          { en: "He is the best player on the team.", zh: "他是隊上最好的球員。" }
+        ]
+      },
+      {
+        title: "常用句型",
+        zh: "比較級 + than（比...更）；as + 原級 + as（跟...一樣）；the + 最高級 + in/of（在...之中最...）。",
+        examples: [
+          { en: "She is taller than me.", zh: "她比我高。" },
+          { en: "He is as tall as his father.", zh: "他跟他爸爸一樣高。" },
+          { en: "This is the tallest building in the city.", zh: "這是這座城市中最高的建築物。" }
+        ]
+      }
+    ],
+    mcq: [
+      { q: "This bag is ___ (cheap) than that one.", options: ["cheap", "cheaper", "cheapest", "more cheap"], answer: 1, explain: "短音節形容詞加er。" },
+      { q: "She is the ___ (smart) student in class.", options: ["smart", "smarter", "smartest", "most smart"], answer: 2, explain: "最高級加est，前面加the。" },
+      { q: "This question is ___ (difficult) than that one.", options: ["difficulter", "more difficult", "difficultest", "most difficult"], answer: 1, explain: "長音節形容詞用more。" },
+      { q: "He runs ___ (fast) than his brother.", options: ["fast", "faster", "fastest", "more fast"], answer: 1, explain: "短音節副詞加er。" },
+      { q: "This is the ___ (good) movie I have ever seen.", options: ["good", "better", "best", "more good"], answer: 2, explain: "good是不規則變化，最高級是best。" },
+      { q: "big的比較級是？", options: ["biger", "bigger", "more big", "biggest"], answer: 1, explain: "短母音+子音結尾，重複字尾g再加er。" },
+      { q: "找出正確句子：", options: ["He is more tall than me.", "He is taller than me.", "He is tallest than me.", "He is the taller than me."], answer: 1, explain: "tall是短音節，用taller than。" },
+      { q: "happy的比較級是？", options: ["happyer", "happier", "more happy", "happiest"], answer: 1, explain: "子音+y結尾，去y加ier。" }
+    ],
+    match: [
+      { term: "短音節形容詞比較級", def: "加 -er" },
+      { term: "短音節形容詞最高級", def: "加 -est（+the）" },
+      { term: "長音節形容詞比較級", def: "more + 原級" },
+      { term: "長音節形容詞最高級", def: "the most + 原級" },
+      { term: "good/well 比較級", def: "better" },
+      { term: "bad 比較級", def: "worse" },
+      { term: "...than", def: "比...更..." },
+      { term: "as...as", def: "跟...一樣..." }
+    ]
+  },
+
+  // ========== 11. 拼字規則總表（字首字尾） ==========
+  {
+    id: "spelling",
+    name: "拼字規則總表",
+    icon: "🧩",
+    learn: [
+      {
+        title: "為什麼要學字首字尾？",
+        zh: "英文有很多字是由「字首(prefix) + 字根 + 字尾(suffix)」組成的。看懂字首字尾的意思，就算是沒看過的單字，也能猜出大概意思和詞性，對閱讀和拼字都很有幫助。",
+        examples: [
+          { en: "un + happy = unhappy", zh: "不快樂的（un-表示「不」）" },
+          { en: "teach + er = teacher", zh: "教師（-er表示「做...的人」）" }
+        ]
+      },
+      {
+        title: "常見字尾（Suffix）→ 名詞",
+        zh: "-er / -or：做...的人或物（teacher, actor）；-tion / -sion：動作或狀態的名詞（education, decision）；-ment：名詞（agreement）；-ness：名詞，狀態（happiness）；-ity：名詞（ability）。",
+        examples: [
+          { en: "teach → teacher", zh: "教師" },
+          { en: "educate → education", zh: "教育" },
+          { en: "agree → agreement", zh: "同意" },
+          { en: "happy → happiness", zh: "快樂" }
+        ]
+      },
+      {
+        title: "常見字尾（Suffix）→ 形容詞",
+        zh: "-ful：充滿...的（helpful）；-less：沒有...的（helpless）；-able / -ible：能夠...的（comfortable）；-ous：具有...性質的（dangerous）；-ive：有...傾向的（active）；-al：與...有關的（national）。",
+        examples: [
+          { en: "help → helpful / helpless", zh: "有幫助的 / 無助的（相反詞！）" },
+          { en: "danger → dangerous", zh: "危險的" },
+          { en: "act → active", zh: "主動的" }
+        ]
+      },
+      {
+        title: "常見字尾（Suffix）→ 動詞、副詞",
+        zh: "-ize / -ise：使成為...（realize）；-fy：使...化（simplify）；-ly：形容詞變副詞（quickly, happily）。",
+        examples: [
+          { en: "real → realize", zh: "實現" },
+          { en: "simple → simplify", zh: "簡化" },
+          { en: "quick → quickly", zh: "快速地" }
+        ]
+      },
+      {
+        title: "常見字首（Prefix）→ 否定、相反",
+        zh: "un-：不（unhappy）；im- / in-：不（impossible, incorrect）；dis-：不、相反（disagree）；non-：非（nonsense）。im-通常用在字根開頭是m/p前面，in-用在其他情況。",
+        examples: [
+          { en: "happy → unhappy", zh: "不快樂的" },
+          { en: "possible → impossible", zh: "不可能的" },
+          { en: "correct → incorrect", zh: "不正確的" },
+          { en: "agree → disagree", zh: "不同意" }
+        ]
+      },
+      {
+        title: "常見字首（Prefix）→ 方向、程度、其他",
+        zh: "ex-：向外、之前的（export外銷, ex-wife前妻）；re-：再一次（rewrite重寫）；pre-：之前（preview預覽）；sub-：在...之下（subway地下鐵）；inter-：在...之間（international國際的）；trans-：跨越、轉換（transport運輸）；mis-：錯誤地（misunderstand誤解）。",
+        examples: [
+          { en: "port(攜帶) → export", zh: "出口、外銷" },
+          { en: "write → rewrite", zh: "重寫" },
+          { en: "view → preview", zh: "預覽" },
+          { en: "understand → misunderstand", zh: "誤解" }
+        ]
+      }
+    ],
+    mcq: [
+      { q: "teach + ___ = teacher（做...的人）", options: ["-er", "-tion", "-ful", "-ly"], answer: 0, explain: "-er表示「做...的人」。" },
+      { q: "educate + ___ = education（動作的名詞）", options: ["-ness", "-tion", "-able", "-ive"], answer: 1, explain: "-tion把動詞變成名詞。" },
+      { q: "help + ___ = helpful（充滿...的）", options: ["-less", "-ful", "-ous", "-al"], answer: 1, explain: "-ful表示「充滿...的」。" },
+      { q: "help + ___ = helpless（沒有...的，與helpful相反）", options: ["-ful", "-less", "-ive", "-tion"], answer: 1, explain: "-less表示「沒有...的」，與-ful意思相反。" },
+      { q: "danger + ___ = dangerous（危險的）", options: ["-ful", "-ous", "-able", "-tion"], answer: 1, explain: "-ous表示「具有...性質的」。" },
+      { q: "quick + ___ = quickly（副詞）", options: ["-ness", "-ly", "-tion", "-ful"], answer: 1, explain: "-ly把形容詞變成副詞。" },
+      { q: "un + happy = unhappy，un-的意思是？", options: ["再一次", "不、非", "之前", "跨越"], answer: 1, explain: "un-表示否定「不」。" },
+      { q: "possible → impossible，im-的意思是？", options: ["不、非", "之間", "之下", "向外"], answer: 0, explain: "im-用在字根前是m/p時，表示否定「不」。" },
+      { q: "re + write = rewrite，re-的意思是？", options: ["向外", "再一次", "在...之間", "跨越"], answer: 1, explain: "re-表示「再一次」。" },
+      { q: "mis + understand = misunderstand，mis-的意思是？", options: ["正確地", "錯誤地", "之前", "之下"], answer: 1, explain: "mis-表示「錯誤地」。" },
+      { q: "agree → disagree，dis-的意思是？", options: ["不、相反", "之間", "跨越", "之前"], answer: 0, explain: "dis-表示「不、相反」。" },
+      { q: "inter + national = international，inter-的意思是？", options: ["之下", "之間", "向外", "跨越"], answer: 1, explain: "inter-表示「在...之間」。" }
+    ],
+    match: [
+      { term: "-er / -or", def: "做...的人或物" },
+      { term: "-tion / -sion", def: "動作或狀態的名詞" },
+      { term: "-ful", def: "充滿...的" },
+      { term: "-less", def: "沒有...的" },
+      { term: "-able / -ible", def: "能夠...的" },
+      { term: "-ous", def: "具有...性質的" },
+      { term: "-ly", def: "（形容詞變副詞）...地" },
+      { term: "un- / im- / in-", def: "不、非（否定）" },
+      { term: "dis-", def: "不、相反" },
+      { term: "re-", def: "再一次" },
+      { term: "pre-", def: "之前" },
+      { term: "mis-", def: "錯誤地" },
+      { term: "inter-", def: "在...之間" },
+      { term: "trans-", def: "跨越、轉換" }
+    ]
+  }
+];
+
+if (typeof module !== "undefined" && module.exports) {
+  module.exports = GROUPS;
+}
+
+</script>
+<script>
+let currentGroupIdx = 0;
+let currentPhase = "learn";
+let mcqState = {};
+let matchState = {};
+
+function speak(text){
+  if('speechSynthesis' in window){
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'en-US'; u.rate = 0.9;
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(u);
+  }
+}
+
+function renderTabs(){
+  const tabsEl = document.getElementById('tabs');
+  tabsEl.innerHTML = GROUPS.map((g,i)=>
+    `<div class="tab ${i===currentGroupIdx?'active':''}" onclick="selectGroup(${i})">${g.icon||''} ${g.name}</div>`
+  ).join('');
+}
+
+function selectGroup(i){
+  currentGroupIdx = i;
+  currentPhase = "learn";
+  render();
+}
+
+function selectPhase(p){
+  currentPhase = p;
+  render();
+}
+
+function render(){
+  renderTabs();
+  const g = GROUPS[currentGroupIdx];
+  const main = document.getElementById('main');
+  let html = `<div class="phase-nav">
+    <button class="phase-btn ${currentPhase==='learn'?'active':''}" onclick="selectPhase('learn')">📖 Learn</button>
+    <button class="phase-btn ${currentPhase==='mcq'?'active':''}" onclick="selectPhase('mcq')">✏️ MCQ</button>
+    <button class="phase-btn ${currentPhase==='match'?'active':''}" onclick="selectPhase('match')">🔗 Match</button>
+  </div>`;
+
+  if(currentPhase==='learn'){
+    html += renderLearn(g);
+  } else if(currentPhase==='mcq'){
+    html += renderMCQ(g);
+  } else if(currentPhase==='match'){
+    html += renderMatch(g);
+  }
+  main.innerHTML = html;
+
+  if(currentPhase==='mcq') bindMCQ(g);
+  if(currentPhase==='match') bindMatch(g);
+}
+
+function renderLearn(g){
+  return g.learn.map(item=>{
+    const exHtml = item.examples.map(ex=>`
+      <div class="ex">
+        <button onclick="speak(${JSON.stringify(ex.en)})">🔊</button>
+        <div>
+          <div class="en">${ex.en}</div>
+          ${ex.zh ? `<div class="zh-line">${ex.zh}</div>` : ''}
+        </div>
+      </div>`).join('');
+    return `<div class="card">
+      <h3>${item.title}</h3>
+      <p class="zh">${item.zh}</p>
+      ${exHtml}
+    </div>`;
+  }).join('');
+}
+
+// ---------- MCQ ----------
+function renderMCQ(g){
+  if(!mcqState[g.id] || mcqState[g.id].restart){
+    mcqState[g.id] = { idx:0, score:0, answered:false, order: shuffle([...Array(g.mcq.length).keys()]) };
+  }
+  const st = mcqState[g.id];
+  if(st.idx >= g.mcq.length){
+    return `<div class="result">
+      <div>本組測驗完成！</div>
+      <div class="score">${st.score} / ${g.mcq.length}</div>
+      <button class="restart" onclick="restartMCQ('${g.id}')">🔄 重新測驗</button>
+    </div>`;
+  }
+  const qIdx = st.order[st.idx];
+  const q = g.mcq[qIdx];
+  const optOrder = st.currentOptOrder || (st.currentOptOrder = shuffle([...Array(q.options.length).keys()]));
+  const optsHtml = optOrder.map(oi=>`<button class="opt" data-oi="${oi}">${q.options[oi]}</button>`).join('');
+  return `<div class="progress">第 ${st.idx+1} / ${g.mcq.length} 題　　得分：${st.score}</div>
+    <div class="q-card">
+      <div class="q-text">${q.q}</div>
+      <div id="opts">${optsHtml}</div>
+      <div class="explain" id="explainBox">${q.explain}</div>
+      <button class="nextbtn" id="nextBtn" style="display:none;" onclick="nextMCQ('${g.id}')">下一題 →</button>
+    </div>`;
+}
+
+function bindMCQ(g){
+  const st = mcqState[g.id];
+  if(st.idx >= g.mcq.length) return;
+  const qIdx = st.order[st.idx];
+  const q = g.mcq[qIdx];
+  document.querySelectorAll('#opts .opt').forEach(btn=>{
+    btn.onclick = ()=>{
+      if(st.answered) return;
+      st.answered = true;
+      const chosen = parseInt(btn.dataset.oi);
+      document.querySelectorAll('#opts .opt').forEach(b=>{
+        const oi = parseInt(b.dataset.oi);
+        if(oi === q.answer) b.classList.add('correct');
+        else if(oi === chosen) b.classList.add('wrong');
+        b.style.pointerEvents='none';
+      });
+      if(chosen === q.answer) st.score++;
+      document.getElementById('explainBox').style.display='block';
+      document.getElementById('nextBtn').style.display='block';
+    };
+  });
+}
+
+function nextMCQ(gid){
+  const st = mcqState[gid];
+  st.idx++;
+  st.answered = false;
+  st.currentOptOrder = null;
+  render();
+}
+
+function restartMCQ(gid){
+  mcqState[gid] = { restart:true };
+  render();
+}
+
+// ---------- Match ----------
+function shuffle(arr){
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+function renderMatch(g){
+  if(!matchState[g.id] || matchState[g.id].restart){
+    const pairs = g.match.map((p,i)=>({...p, pid:i}));
+    // pick up to 8 pairs per round for manageable board
+    const roundPairs = pairs.length > 8 ? shuffle(pairs).slice(0,8) : pairs;
+    matchState[g.id] = {
+      pairs: roundPairs,
+      leftOrder: shuffle(roundPairs.map(p=>p.pid)),
+      rightOrder: shuffle(roundPairs.map(p=>p.pid)),
+      selectedLeft: null, selectedRight: null,
+      matched: new Set(),
+    };
+  }
+  const st = matchState[g.id];
+  const total = st.pairs.length;
+  if(st.matched.size === total){
+    return `<div class="result">
+      <div>🎉 全部配對完成！</div>
+      <div class="score">${total} / ${total}</div>
+      <button class="restart" onclick="restartMatch('${g.id}')">🔄 重新配對（換一組）</button>
+    </div>`;
+  }
+  const byId = {};
+  st.pairs.forEach(p=>byId[p.pid]=p);
+  const leftHtml = st.leftOrder.map(pid=>{
+    const matched = st.matched.has(pid);
+    const selected = st.selectedLeft===pid;
+    return `<div class="match-item ${matched?'matched':''} ${selected?'selected':''}" data-side="left" data-pid="${pid}">${byId[pid].term}</div>`;
+  }).join('');
+  const rightHtml = st.rightOrder.map(pid=>{
+    const matched = st.matched.has(pid);
+    const selected = st.selectedRight===pid;
+    return `<div class="match-item ${matched?'matched':''} ${selected?'selected':''}" data-side="right" data-pid="${pid}">${byId[pid].def}</div>`;
+  }).join('');
+  return `<div class="progress">已配對 ${st.matched.size} / ${total}</div>
+    <div class="match-grid">${leftHtml}${rightHtml}</div>`;
+}
+
+function bindMatch(g){
+  const st = matchState[g.id];
+  document.querySelectorAll('.match-item').forEach(el=>{
+    if(el.classList.contains('matched')) return;
+    el.onclick = ()=>{
+      const side = el.dataset.side;
+      const pid = parseInt(el.dataset.pid);
+      if(side==='left') st.selectedLeft = (st.selectedLeft===pid) ? null : pid;
+      else st.selectedRight = (st.selectedRight===pid) ? null : pid;
+      if(st.selectedLeft!==null && st.selectedRight!==null){
+        if(st.selectedLeft === st.selectedRight){
+          st.matched.add(st.selectedLeft);
+          st.selectedLeft = null; st.selectedRight = null;
+          render();
+        } else {
+          render();
+          setTimeout(()=>{
+            st.selectedLeft = null; st.selectedRight = null;
+            render();
+          }, 500);
+        }
+      } else {
+        render();
+      }
+    };
+  });
+}
+
+function restartMatch(gid){
+  matchState[gid] = { restart:true };
+  render();
+}
+
+render();
+</script>
+</body>
+</html>
