@@ -164,23 +164,24 @@
   title: '教材名稱',
   unit: 'Unit 3',      // 單元或課次,沒有可留空字串
   tags: ['文法','時態'], // 標籤,用於搜尋
-  url: 'materials/xxx.html' // repo 裡 materials/ 資料夾中該檔案的相對路徑
+  url: 'materials/g10/xxx.html' // repo 裡 materials/年級/ 資料夾中該檔案的相對路徑
 }</pre>
-    <p>教材本體(HTML檔)請直接放在這個 repo 的 <code>materials/</code> 資料夾裡,url 填相對路徑即可,不再連到 CodePen。</p>
+    <p>教材本體(HTML檔)請放在這個 repo 的 <code>materials/年級代碼/</code> 資料夾裡(例如 <code>materials/g11/</code>、<code>materials/basic/</code>),url 填相對路徑即可,不再連到 CodePen。</p>
   </details>
 </div>
 
 <script>
 // ------- 資料區(在這裡新增/修改教材) -------
 const materialsData = [
-  { grade:'g11', title:'高二第三冊 L1 片語文法', unit:'L1', tags:['文法','片語'], url:'materials/g11-l1-phrases-grammar.html' },
-  { grade:'g11', title:'高二第三冊 L1 單字', unit:'L1', tags:['單字'], url:'materials/g11-l1-vocab.html' },
-  { grade:'g12', title:'高三第五冊 L1 單字(The Road Not Taken)', unit:'L1', tags:['單字'], url:'materials/g12-l1-road-not-taken-vocab.html' },
-  { grade:'g12', title:'高三第五冊 L1 片語文法(The Road Not Taken)', unit:'L1', tags:['文法','片語'], url:'materials/g12-l1-road-not-taken-phrases-grammar.html' },
+  { grade:'g11', title:'高二第三冊 L1 片語文法', unit:'L1', tags:['文法','片語'], url:'materials/g11/g11-l1-phrases-grammar.html' },
+  { grade:'g11', title:'高二第三冊 L1 單字', unit:'L1', tags:['單字'], url:'materials/g11/g11-l1-vocab.html' },
+  { grade:'g12', title:'高三第五冊 L1 單字(The Road Not Taken)', unit:'L1', tags:['單字'], url:'materials/g12/g12-l1-road-not-taken-vocab.html' },
+  { grade:'g12', title:'高三第五冊 L1 片語文法(The Road Not Taken)', unit:'L1', tags:['文法','片語'], url:'materials/g12/g12-l1-road-not-taken-phrases-grammar.html' },
   { grade:'basic', title:'基礎文法練習', unit:'', tags:['文法','基礎'], url:'' },
   { grade:'basic', title:'Be動詞 is/am 練習', unit:'', tags:['文法','be動詞'], url:'' },
   { grade:'basic', title:'Be動詞 are 練習', unit:'', tags:['文法','be動詞'], url:'' },
-  { grade:'basic', title:'Be動詞綜合練習(all)', unit:'', tags:['文法','be動詞'], url:'' },
+  { grade:'basic', title:'Be動詞綜合練習(all)', unit:'', tags:['文法','be動詞'], url:'materials/basic/be-verb-comprehensive-practice.html' },
+  { grade:'basic', title:'Be動詞否定句練習', unit:'', tags:['文法','be動詞','否定句'], url:'materials/basic/be-verb-negative-practice.html' },
   { grade:'basic', title:'Be動詞句子重組', unit:'', tags:['文法','be動詞','句型'], url:'' },
   { grade:'basic', title:'Be動詞問句練習', unit:'', tags:['文法','be動詞','問句'], url:'' }
 ];

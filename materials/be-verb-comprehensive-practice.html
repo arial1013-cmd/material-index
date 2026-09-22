@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>BE 動詞綜合練習 | is / am / are Comprehensive Practice</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --bg1:#ee7752; --bg2:#e73c7e; --bg3:#23a6d5;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+body {
+  font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, var(--bg1) 0%, var(--bg2) 50%, var(--bg3) 100%);
+  min-height:100vh; padding:20px;
+}
+.container {
+  max-width:850px; margin:0 auto; background:white;
+  border-radius:20px; box-shadow:0 20px 60px rgba(0,0,0,0.3); padding:32px;
+}
+h1 { color:#333; text-align:center; font-size:1.9em; margin-bottom:6px; }
+.subtitle { text-align:center; color:#666; margin-bottom:24px; }
+
+.module-tabs {
+  display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:18px;
+}
+.tab-btn {
+  padding:12px 6px; border:2px solid #ddd; border-radius:10px; background:#f8f9fa;
+  font-weight:bold; cursor:pointer; font-size:0.95em; color:#555; transition:all .2s;
+}
+.tab-btn:hover { border-color:#e73c7e; }
+.tab-btn.active {
+  background:linear-gradient(135deg, var(--bg1), var(--bg2));
+  color:white; border-color:transparent;
+}
+
+.level-row {
+  display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap; justify-content:center;
+}
+.level-btn {
+  padding:8px 18px; border:2px solid #e73c7e; border-radius:20px; background:white;
+  color:#e73c7e; font-weight:bold; cursor:pointer; transition:all .2s; font-size:0.9em;
+}
+.level-btn.active { background:#e73c7e; color:white; }
+
+.module-desc {
+  background:#f0f4f8; padding:14px 18px; border-radius:10px; margin-bottom:20px;
+  border-left:4px solid #e73c7e; font-size:0.95em; color:#444; line-height:1.6;
+}
+
+.score-bar {
+  background:linear-gradient(135deg, var(--bg1), var(--bg2), var(--bg3));
+  color:white; padding:14px; border-radius:10px; text-align:center; margin-bottom:22px;
+  font-weight:bold;
+}
+.score-bar .big { font-size:1.5em; }
+
+/* --- matching --- */
+.matching-row {
+  display:flex; align-items:center; gap:14px; background:#f8f9fa; padding:14px 16px;
+  border-radius:10px; margin-bottom:10px; flex-wrap:wrap;
+}
+.matching-subject {
+  font-size:1.15em; font-weight:bold; color:#333; min-width:140px;
+}
+.verb-options { display:flex; gap:8px; flex-wrap:wrap; }
+.verb-btn {
+  padding:8px 18px; border:2px solid #ddd; border-radius:8px; background:white;
+  cursor:pointer; font-weight:bold; font-size:1em; transition:all .2s;
+}
+.verb-btn:hover:not(:disabled) { border-color:#e73c7e; }
+.verb-btn.correct { background:#28a745; color:white; border-color:#28a745; }
+.verb-btn.wrong { background:#dc3545; color:white; border-color:#dc3545; }
+.verb-btn:disabled { cursor:not-allowed; opacity:0.6; }
+
+/* --- text question cards (question / negative) --- */
+.question-card {
+  background:#f8f9fa; padding:18px; border-radius:10px; margin-bottom:16px;
+  border:2px solid transparent; transition:all .2s;
+}
+.question-card:hover { border-color:#e73c7e; }
+.q-number {
+  display:inline-block; background:#e73c7e; color:white; padding:4px 10px;
+  border-radius:5px; margin-bottom:8px; font-size:0.85em; font-weight:bold;
+}
+.statement { font-size:1.1em; color:#333; margin-bottom:12px; padding:10px; background:white; border-radius:5px; }
+.wh-tag { color:#e73c7e; font-weight:bold; }
+input[type="text"] {
+  width:100%; padding:10px; font-size:1.05em; border:2px solid #ddd; border-radius:8px;
+}
+input[type="text"]:focus { outline:none; border-color:#e73c7e; }
+.btn-group { display:flex; gap:8px; margin-top:12px; flex-wrap:wrap; }
+button.action {
+  padding:9px 16px; border:none; border-radius:8px; cursor:pointer; font-weight:bold; font-size:0.9em;
+  transition:all .2s;
+}
+.check-btn { background:#28a745; color:white; }
+.check-btn:hover { background:#218838; }
+.hint-btn { background:#ffc107; color:#333; }
+.hint-btn:hover { background:#e0a800; }
+.answer-btn { background:#17a2b8; color:white; }
+.answer-btn:hover { background:#138496; }
+.feedback { padding:10px; border-radius:8px; margin-top:10px; font-weight:bold; display:none; font-size:0.95em; }
+.feedback.correct { background:#d4edda; color:#155724; }
+.feedback.incorrect { background:#f8d7da; color:#721c24; }
+.hint-box { background:#fff3cd; color:#856404; padding:10px; border-radius:5px; margin-top:8px; display:none; font-size:0.9em; }
+.answer-box-reveal { background:#d1ecf1; color:#0c5460; padding:10px; border-radius:5px; margin-top:8px; display:none; }
+
+/* --- scramble --- */
+.scramble-card {
+  background:#f8f9fa; padding:18px; border-radius:10px; margin-bottom:18px;
+}
+.answer-strip {
+  min-height:52px; background:white; border:2px dashed #ccc; border-radius:8px;
+  padding:8px; display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:10px;
+}
+.answer-strip.filled { border-style:solid; border-color:#e73c7e; }
+.word-bank { display:flex; gap:8px; flex-wrap:wrap; min-height:44px; }
+.word-chip {
+  padding:8px 14px; background:white; border:2px solid #23a6d5; color:#23a6d5;
+  border-radius:20px; cursor:pointer; font-weight:bold; transition:all .2s; user-select:none;
+}
+.word-chip:hover { background:#23a6d5; color:white; }
+.answer-strip .word-chip { background:#e73c7e; border-color:#e73c7e; color:white; }
+.answer-strip .word-chip:hover { background:white; color:#e73c7e; }
+
+@media (max-width:600px) {
+  .container { padding:18px; }
+  h1 { font-size:1.4em; }
+  .module-tabs { grid-template-columns:repeat(2,1fr); }
+  .matching-subject { min-width:100%; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>🔤 BE 動詞（is / am / are）綜合練習</h1>
+  <p class="subtitle">配對・疑問句・否定句・句子重組 — 難度自選</p>
+
+  <div class="module-tabs" id="module-tabs"></div>
+  <div class="level-row" id="level-row"></div>
+  <div class="module-desc" id="module-desc"></div>
+  <div class="score-bar" id="score-bar"></div>
+  <div id="exercise-container"></div>
+</div>
+
+<script>
+/* ============ 資料區 ============ */
+const data = {
+  matching: {
+    1: [
+      {subject:'I', answer:'am'},
+      {subject:'You', answer:'are'},
+      {subject:'He', answer:'is'},
+      {subject:'She', answer:'is'},
+      {subject:'It', answer:'is'},
+      {subject:'We', answer:'are'},
+      {subject:'They', answer:'are'}
+    ],
+    2: [
+      {subject:'Tom', answer:'is'},
+      {subject:'The students', answer:'are'},
+      {subject:'My parents', answer:'are'},
+      {subject:'This book', answer:'is'},
+      {subject:'Those cats', answer:'are'},
+      {subject:'The teacher', answer:'is'}
+    ],
+    3: [
+      {subject:'Tom and I', answer:'are'},
+      {subject:'My dog', answer:'is'},
+      {subject:'The children', answer:'are'},
+      {subject:'Everyone', answer:'is'},
+      {subject:'My glasses', answer:'are'},
+      {subject:'The news', answer:'is'}
+    ]
+  },
+  question: {
+    1: [
+      {statement:'She is happy.', answers:['is she happy?'], display:'Is she happy?', hint:'把 be 動詞 is 移到句首,主詞 she 放後面,句尾用問號'},
+      {statement:'They are students.', answers:['are they students?'], display:'Are they students?', hint:'把 be 動詞 are 移到句首'},
+      {statement:'I am ready.', answers:['am i ready?'], display:'Am I ready?', hint:'把 am 移到句首,I 放後面'},
+      {statement:'He is tired.', answers:['is he tired?'], display:'Is he tired?', hint:'把 is 移到句首'},
+      {statement:'We are late.', answers:['are we late?'], display:'Are we late?', hint:'把 are 移到句首'}
+    ],
+    2: [
+      {statement:'Tom is a teacher.', answers:['is tom a teacher?'], display:'Is Tom a teacher?', hint:'主詞是 Tom,把 is 移到最前面'},
+      {statement:'The dog is hungry.', answers:['is the dog hungry?'], display:'Is the dog hungry?', hint:'主詞是 the dog,整個不拆開'},
+      {statement:'The students are quiet.', answers:['are the students quiet?'], display:'Are the students quiet?', hint:'主詞是 the students,把 are 移到最前面'},
+      {statement:'Mary is at home.', answers:['is mary at home?'], display:'Is Mary at home?', hint:'把 is 移到句首'},
+      {statement:'The books are new.', answers:['are the books new?'], display:'Are the books new?', hint:'把 are 移到句首'}
+    ],
+    3: [
+      {statement:'She is at school.', wh:'Where', answers:['where is she?'], display:'Where is she?', hint:'Where + is + she'},
+      {statement:'He is sixteen years old.', wh:'How old', answers:['how old is he?'], display:'How old is he?', hint:'How old + is + he'},
+      {statement:'They are in the classroom.', wh:'Where', answers:['where are they?'], display:'Where are they?', hint:'Where + are + they'},
+      {statement:'It is a pen.', wh:'What', answers:['what is it?'], display:'What is it?', hint:'What + is + it'},
+      {statement:'The man is Mr. Wang.', wh:'Who', answers:['who is the man?'], display:'Who is the man?', hint:'Who + is + 主詞'}
+    ]
+  },
+  negative: {
+    1: [
+      {statement:'She is happy.', answers:['she is not happy.','she isn\'t happy.'], display:'She is not happy. / She isn\'t happy.', hint:'is 後面加 not：is not / isn\'t'},
+      {statement:'They are students.', answers:['they are not students.','they aren\'t students.'], display:'They are not students. / They aren\'t students.', hint:'are 後面加 not：are not / aren\'t'},
+      {statement:'I am ready.', answers:['i am not ready.','i\'m not ready.'], display:'I am not ready. / I\'m not ready.', hint:'am not 沒有縮寫,只能寫 I\'m not'},
+      {statement:'He is tired.', answers:['he is not tired.','he isn\'t tired.'], display:'He is not tired. / He isn\'t tired.', hint:'is 後面加 not'},
+      {statement:'We are late.', answers:['we are not late.','we aren\'t late.'], display:'We are not late. / We aren\'t late.', hint:'are 後面加 not'}
+    ],
+    2: [
+      {statement:'Tom is a teacher.', answers:['tom is not a teacher.','tom isn\'t a teacher.'], display:'Tom is not a teacher. / Tom isn\'t a teacher.', hint:'主詞 Tom 位置不變,is 後面加 not'},
+      {statement:'The dog is hungry.', answers:['the dog is not hungry.','the dog isn\'t hungry.'], display:'The dog is not hungry. / The dog isn\'t hungry.', hint:'is 後面加 not'},
+      {statement:'The students are quiet.', answers:['the students are not quiet.','the students aren\'t quiet.'], display:'The students are not quiet. / The students aren\'t quiet.', hint:'are 後面加 not'},
+      {statement:'Mary is at home.', answers:['mary is not at home.','mary isn\'t at home.'], display:'Mary is not at home. / Mary isn\'t at home.', hint:'is 後面加 not'},
+      {statement:'The books are new.', answers:['the books are not new.','the books aren\'t new.'], display:'The books are not new. / The books aren\'t new.', hint:'are 後面加 not'}
+    ],
+    3: [
+      {statement:'My brother and I are ready.', answers:['my brother and i are not ready.','my brother and i aren\'t ready.'], display:'My brother and I are not ready. / ...aren\'t ready.', hint:'主詞是 my brother and I,用 are'},
+      {statement:'The weather is nice today.', answers:['the weather is not nice today.','the weather isn\'t nice today.'], display:'The weather is not nice today. / ...isn\'t nice today.', hint:'is 後面加 not,today 位置不變'},
+      {statement:'Everyone is here.', answers:['everyone is not here.','everyone isn\'t here.'], display:'Everyone is not here. / Everyone isn\'t here.', hint:'everyone 當作單數,用 is'},
+      {statement:'The children are playing outside.', answers:['the children are not playing outside.','the children aren\'t playing outside.'], display:'The children are not playing outside. / ...aren\'t playing outside.', hint:'children 是複數,用 are'},
+      {statement:'This story is true.', answers:['this story is not true.','this story isn\'t true.'], display:'This story is not true. / This story isn\'t true.', hint:'is 後面加 not'}
+    ]
+  },
+  scramble: {
+    1: [
+      {tokens:['She','is','happy.'], hint:'主詞 + be動詞 + 形容詞'},
+      {tokens:['They','are','students.'], hint:'主詞 + be動詞 + 名詞'},
+      {tokens:['I','am','ready.'], hint:'主詞 + be動詞 + 形容詞'},
+      {tokens:['He','is','a','teacher.'], hint:'主詞 + be動詞 + 冠詞 + 名詞'},
+      {tokens:['We','are','late.'], hint:'主詞 + be動詞 + 形容詞'}
+    ],
+    2: [
+      {tokens:['The','dog','is','not','hungry.'], hint:'否定句：主詞 + be動詞 + not + 形容詞'},
+      {tokens:['Is','Tom','a','teacher?'], hint:'疑問句：be動詞先放句首'},
+      {tokens:['The','students','are','not','quiet.'], hint:'否定句：be動詞後面加 not'},
+      {tokens:['Are','they','ready?'], hint:'疑問句：be動詞放句首'},
+      {tokens:['My','sister','is','very','tall.'], hint:'主詞 + be動詞 + 程度副詞 + 形容詞'}
+    ],
+    3: [
+      {tokens:['Where','is','she','after','school?'], hint:'疑問詞 + be動詞 + 主詞 + 其他'},
+      {tokens:['The','books','on','the','desk','are','new.'], hint:'注意主詞其實是 the books,中間有修飾語'},
+      {tokens:['My','brother','and','I','are','not','ready.'], hint:'否定句：主詞是 my brother and I'},
+      {tokens:['Is','the','test','difficult','for','you?'], hint:'疑問句：be動詞放句首'},
+      {tokens:['The','children','in','the','park','are','playing.'], hint:'主詞是 the children,中間有修飾語'}
+    ]
+  }
+};
+
+const MODULE_LABELS = {matching:'🔗 配對', question:'❓ 疑問句', negative:'🚫 否定句', scramble:'🧩 句子重組'};
+const MODULE_DESC = {
+  matching:'看主詞,選出正確的 be 動詞（am / is / are）。',
+  question:'把下面的肯定句改成疑問句,注意 be 動詞要移到句首、句尾用問號。',
+  negative:'把下面的肯定句改成否定句,在 be 動詞後面加上 not,完整式或縮寫式都算對。',
+  scramble:'點選下方的字卡,依正確順序組成一個完整句子。點錯了可以再點回去。'
+};
+const LEVEL_LABELS = {1:'基礎 Level 1', 2:'中級 Level 2', 3:'進階 Level 3'};
+
+/* ============ 狀態與儲存 ============ */
+const STORAGE_KEY = 'bevComprehensivePractice_v1';
+let state = { module:'matching', level:1, progress:{} };
+const runtimeCache = {}; // 每個 item 的顯示順序快取（不需要持久化）
+
+function defaultItemState(module) {
+  if (module === 'matching') return { answered:false, correct:false, chosen:null };
+  if (module === 'scramble') return { answered:false, correct:false, answer:[] };
+  return { answered:false, correct:false, input:'' };
+}
+
+function ensureProgress() {
+  Object.keys(data).forEach(module => {
+    if (!state.progress[module]) state.progress[module] = {};
+    Object.keys(data[module]).forEach(level => {
+      const items = data[module][level];
+      const existing = state.progress[module][level];
+      if (!existing || !Array.isArray(existing) || existing.length !== items.length) {
+        state.progress[module][level] = items.map(() => defaultItemState(module));
+      }
+    });
+  });
+}
+
+function saveState() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ module: state.module, level: state.level, progress: state.progress }));
+  } catch (e) { console.error('儲存失敗', e); }
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+    const parsed = JSON.parse(raw);
+    if (parsed && parsed.progress) {
+      state.module = parsed.module || 'matching';
+      state.level = parsed.level || 1;
+      state.progress = parsed.progress;
+    }
+  } catch (e) { console.error('讀取失敗', e); }
+}
+
+/* ============ 工具函式 ============ */
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+function normalize(str) { return str.trim().toLowerCase().replace(/\s+/g, ' '); }
+function cacheKey(module, level, idx) { return module + '-' + level + '-' + idx; }
+
+/* ============ 渲染：頁籤與難度列 ============ */
+function renderTabs() {
+  const tabWrap = document.getElementById('module-tabs');
+  tabWrap.innerHTML = '';
+  Object.keys(MODULE_LABELS).forEach(m => {
+    const btn = document.createElement('button');
+    btn.className = 'tab-btn' + (state.module === m ? ' active' : '');
+    btn.textContent = MODULE_LABELS[m];
+    btn.onclick = () => { state.module = m; saveState(); renderAll(); };
+    tabWrap.appendChild(btn);
+  });
+}
+function renderLevels() {
+  const row = document.getElementById('level-row');
+  row.innerHTML = '';
+  [1,2,3].forEach(l => {
+    const btn = document.createElement('button');
+    btn.className = 'level-btn' + (state.level === l ? ' active' : '');
+    btn.textContent = LEVEL_LABELS[l];
+    btn.onclick = () => { state.level = l; saveState(); renderAll(); };
+    row.appendChild(btn);
+  });
+  document.getElementById('module-desc').textContent = MODULE_DESC[state.module];
+}
+
+/* ============ 分數列 ============ */
+function updateScoreBar() {
+  const items = data[state.module][state.level];
+  const prog = state.progress[state.module][state.level];
+  const correct = prog.filter(p => p.correct).length;
+  let totalDone = 0, totalCorrect = 0, totalAll = 0;
+  Object.keys(data).forEach(m => Object.keys(data[m]).forEach(l => {
+    const arr = data[m][l];
+    const pr = state.progress[m][l];
+    totalAll += arr.length;
+    pr.forEach(p => { if (p.answered) totalDone++; if (p.correct) totalCorrect++; });
+  }));
+  document.getElementById('score-bar').innerHTML =
+    `這一組：<span class="big">${correct}</span> / ${items.length} 　｜　全部進度：${totalCorrect} / ${totalAll} 題答對`;
+}
+
+/* ============ 配對模組 ============ */
+function renderMatching(container, items, level) {
+  items.forEach((item, idx) => {
+    const key = cacheKey('matching', level, idx);
+    if (!runtimeCache[key]) runtimeCache[key] = shuffle(['am','is','are']);
+    const order = runtimeCache[key];
+    const st = state.progress.matching[level][idx];
+
+    const row = document.createElement('div');
+    row.className = 'matching-row';
+    row.innerHTML = `<div class="matching-subject">${item.subject}</div><div class="verb-options"></div>`;
+    const optWrap = row.querySelector('.verb-options');
+
+    order.forEach(opt => {
+      const b = document.createElement('button');
+      b.className = 'verb-btn';
+      b.textContent = opt;
+      if (st.answered) {
+        b.disabled = true;
+        if (opt === item.answer) b.classList.add('correct');
+        else if (opt === st.chosen) b.classList.add('wrong');
+      }
+      b.onclick = () => {
+        st.chosen = opt;
+        st.answered = true;
+        st.correct = (opt === item.answer);
+        saveState();
+        renderExercise();
+        updateScoreBar();
+      };
+      optWrap.appendChild(b);
+    });
+    container.appendChild(row);
+  });
+}
+
+/* ============ 疑問句 / 否定句 共用模組 ============ */
+function renderTextModule(container, items, level, module) {
+  items.forEach((item, idx) => {
+    const st = state.progress[module][level][idx];
+    const card = document.createElement('div');
+    card.className = 'question-card';
+    const whTag = item.wh ? `<span class="wh-tag">（用 ${item.wh} 開頭）</span>` : '';
+    card.innerHTML = `
+      <span class="q-number">Q${idx+1}</span>
+      <div class="statement"><strong>Statement:</strong> ${item.statement} ${whTag}</div>
+      <div class="input-area">
+        <input type="text" id="input-${module}-${level}-${idx}" placeholder="輸入改寫後的句子..." value="${(st.input||'').replace(/"/g,'&quot;')}">
+      </div>
+      <div class="btn-group">
+        <button class="action check-btn">✓ 檢查</button>
+        <button class="action hint-btn">💡 提示</button>
+        <button class="action answer-btn">👁️ 答案</button>
+      </div>
+      <div class="hint-box"></div>
+      <div class="answer-box-reveal"></div>
+      <div class="feedback"></div>
+    `;
+    const input = card.querySelector('input');
+    const feedback = card.querySelector('.feedback');
+    const hintBox = card.querySelector('.hint-box');
+    const answerBox = card.querySelector('.answer-box-reveal');
+
+    if (st.answered) {
+      feedback.style.display = 'block';
+      feedback.className = 'feedback ' + (st.correct ? 'correct' : 'incorrect');
+      feedback.textContent = st.correct ? '✅ 太棒了！' : '❌ 不太對喔,再試試看。';
+    }
+
+    card.querySelector('.check-btn').onclick = () => {
+      const val = input.value.trim();
+      if (!val) { feedback.style.display='block'; feedback.className='feedback incorrect'; feedback.textContent='❌ 請先輸入答案！'; return; }
+      st.input = val;
+      const isCorrect = item.answers.includes(normalize(val));
+      st.answered = true;
+      st.correct = isCorrect;
+      feedback.style.display = 'block';
+      if (isCorrect) {
+        feedback.className = 'feedback correct';
+        feedback.textContent = '✅ 太棒了！';
+      } else {
+        feedback.className = 'feedback incorrect';
+        let msg = '❌ 不太對喔。';
+        if (module === 'question' && !val.endsWith('?')) msg += ' 疑問句句尾要用問號！';
+        else if (module === 'negative' && val.endsWith('?')) msg += ' 這是否定句,不是問句,句尾要用句號！';
+        else if (module === 'negative' && !normalize(val).includes(' not ') && !/n't/.test(val)) msg += ' 別忘了在 be 動詞後面加 not！';
+        feedback.textContent = msg;
+      }
+      saveState();
+      updateScoreBar();
+    };
+    card.querySelector('.hint-btn').onclick = () => { hintBox.style.display='block'; hintBox.textContent = '💡 提示：' + item.hint; };
+    card.querySelector('.answer-btn').onclick = () => { answerBox.style.display='block'; answerBox.textContent = '📝 正確答案：' + item.display; };
+
+    container.appendChild(card);
+  });
+}
+
+/* ============ 句子重組模組 ============ */
+function renderScramble(container, items, level) {
+  items.forEach((item, idx) => {
+    const key = cacheKey('scramble', level, idx);
+    if (!runtimeCache[key]) runtimeCache[key] = shuffle(item.tokens.map((_, i) => i));
+    const order = runtimeCache[key];
+    const st = state.progress.scramble[level][idx];
+    if (!st.answer) st.answer = [];
+
+    const card = document.createElement('div');
+    card.className = 'scramble-card';
+    card.innerHTML = `
+      <span class="q-number">Q${idx+1}</span>
+      <div class="answer-strip" id="strip-${idx}"></div>
+      <div class="word-bank" id="bank-${idx}"></div>
+      <div class="btn-group">
+        <button class="action check-btn">✓ 檢查</button>
+        <button class="action hint-btn">💡 提示</button>
+        <button class="action answer-btn">👁️ 答案</button>
+      </div>
+      <div class="hint-box"></div>
+      <div class="answer-box-reveal"></div>
+      <div class="feedback"></div>
+    `;
+    const strip = card.querySelector('.answer-strip');
+    const bank = card.querySelector('.word-bank');
+    const feedback = card.querySelector('.feedback');
+    const hintBox = card.querySelector('.hint-box');
+    const answerBox = card.querySelector('.answer-box-reveal');
+
+    function redraw() {
+      strip.innerHTML = '';
+      strip.className = 'answer-strip' + (st.answer.length ? ' filled' : '');
+      st.answer.forEach((tokenIdx, pos) => {
+        const chip = document.createElement('span');
+        chip.className = 'word-chip';
+        chip.textContent = item.tokens[tokenIdx];
+        chip.onclick = () => {
+          st.answer.splice(pos, 1);
+          saveState();
+          redraw();
+        };
+        strip.appendChild(chip);
+      });
+      bank.innerHTML = '';
+      order.filter(i => !st.answer.includes(i)).forEach(tokenIdx => {
+        const chip = document.createElement('span');
+        chip.className = 'word-chip';
+        chip.textContent = item.tokens[tokenIdx];
+        chip.onclick = () => {
+          st.answer.push(tokenIdx);
+          saveState();
+          redraw();
+        };
+        bank.appendChild(chip);
+      });
+    }
+    redraw();
+
+    if (st.answered) {
+      feedback.style.display = 'block';
+      feedback.className = 'feedback ' + (st.correct ? 'correct' : 'incorrect');
+      feedback.textContent = st.correct ? '✅ 太棒了！' : '❌ 順序不太對,再排排看。';
+    }
+
+    card.querySelector('.check-btn').onclick = () => {
+      if (st.answer.length !== item.tokens.length) {
+        feedback.style.display='block'; feedback.className='feedback incorrect';
+        feedback.textContent = '❌ 還沒選完所有字卡喔！';
+        return;
+      }
+      const userStr = st.answer.map(i => item.tokens[i]).join(' ').toLowerCase();
+      const correctStr = item.tokens.join(' ').toLowerCase();
+      const isCorrect = userStr === correctStr;
+      st.answered = true;
+      st.correct = isCorrect;
+      feedback.style.display = 'block';
+      feedback.className = 'feedback ' + (isCorrect ? 'correct' : 'incorrect');
+      feedback.textContent = isCorrect ? '✅ 太棒了！' : '❌ 順序不太對,再排排看。';
+      saveState();
+      updateScoreBar();
+    };
+    card.querySelector('.hint-btn').onclick = () => { hintBox.style.display='block'; hintBox.textContent = '💡 提示：' + item.hint; };
+    card.querySelector('.answer-btn').onclick = () => { answerBox.style.display='block'; answerBox.textContent = '📝 正確答案：' + item.tokens.join(' '); };
+
+    container.appendChild(card);
+  });
+}
+
+/* ============ 總渲染 ============ */
+function renderExercise() {
+  const container = document.getElementById('exercise-container');
+  container.innerHTML = '';
+  const items = data[state.module][state.level];
+  if (state.module === 'matching') renderMatching(container, items, state.level);
+  else if (state.module === 'scramble') renderScramble(container, items, state.level);
+  else renderTextModule(container, items, state.level, state.module);
+}
+
+function renderAll() {
+  renderTabs();
+  renderLevels();
+  renderExercise();
+  updateScoreBar();
+}
+
+/* ============ 初始化 ============ */
+loadState();
+ensureProgress();
+renderAll();
+</script>
+</body>
+</html>
