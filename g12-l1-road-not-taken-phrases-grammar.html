@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>G12 L1 · 片語・文法練習</title>
+<style>
+:root{
+  --teal:#1a6b5f;--teal-mid:#2a9d8f;--teal-light:#52c9bb;
+  --teal-pale:#e0f5f3;--teal-bg:#f0faf9;
+  --green:#57cc99;--amber:#c9a227;--amber-pale:#fff8e1;--amber-dark:#8a6000;
+  --purple:#5e4b8b;--purple-pale:#ede8f8;
+  --coral:#e76f51;--gray:#6b8f8c;
+  --dark:#1a2e2c;--mid:#3a5552;--light:#7a9896;--white:#ffffff;
+  --shadow:0 2px 10px rgba(26,107,95,0.10);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Noto Sans TC',system-ui,sans-serif;background:var(--teal-bg);color:var(--dark);min-height:100vh;}
+header{background:var(--teal);padding:20px 18px 16px;text-align:center;}
+header h1{color:#fff;font-size:20px;font-weight:700;margin-bottom:4px;}
+header p{color:rgba(255,255,255,0.75);font-size:13px;}
+.progress-wrap{background:var(--white);padding:12px 18px;border-bottom:1px solid var(--teal-pale);}
+.prog-label{font-size:12px;color:var(--light);margin-bottom:6px;display:flex;justify-content:space-between;}
+.prog-bar{height:6px;background:#d0ecea;border-radius:99px;overflow:hidden;}
+.prog-fill{height:100%;background:var(--teal-mid);border-radius:99px;transition:width 0.4s;}
+.group-tabs{display:flex;overflow-x:auto;background:var(--white);border-bottom:1px solid var(--teal-pale);}
+.group-tab{flex:0 0 auto;padding:10px 16px;border:none;background:transparent;font-family:inherit;font-size:13px;font-weight:600;color:var(--gray);cursor:pointer;border-bottom:3px solid transparent;transition:all 0.2s;white-space:nowrap;}
+.group-tab.active{color:var(--teal);border-bottom-color:var(--teal-mid);background:var(--teal-pale);}
+.group-tab.locked{color:#ccc;cursor:not-allowed;}
+main{padding:16px 14px 56px;max-width:700px;margin:0 auto;}
+.phase-bar{display:flex;gap:6px;margin-bottom:16px;}
+.phase-step{flex:1;padding:8px 4px;border-radius:8px;text-align:center;font-size:12px;font-weight:700;}
+.phase-step.done{background:var(--green);color:#fff;}
+.phase-step.current{background:var(--teal);color:#fff;}
+.phase-step.pending{background:#e8f5f4;color:var(--gray);}
+.learn-card{background:var(--white);border-radius:14px;padding:16px;margin-bottom:12px;box-shadow:var(--shadow);}
+.learn-card.phrase{border-left:4px solid var(--amber);}
+.learn-card.grammar{border-left:4px solid var(--purple);}
+.card-label{font-size:11px;font-weight:700;letter-spacing:1.5px;margin-bottom:8px;}
+.card-label.phrase{color:var(--amber-dark);}
+.card-label.grammar{color:var(--purple);}
+.card-en{font-size:18px;font-weight:700;font-family:'Courier New',monospace;margin-bottom:4px;}
+.card-en.phrase{color:var(--amber-dark);}
+.card-en.grammar{color:var(--purple);}
+.card-zh{font-size:17px;font-weight:700;margin-bottom:8px;color:var(--dark);}
+.card-note{font-size:13px;color:var(--mid);padding:8px 12px;border-radius:8px;margin-bottom:8px;line-height:1.7;}
+.card-note.phrase{background:var(--amber-pale);border-left:3px solid var(--amber);}
+.card-note.grammar{background:var(--purple-pale);border-left:3px solid var(--purple);}
+.formula-box{font-family:'Courier New',monospace;font-size:13px;background:var(--purple);color:#fff;padding:8px 14px;border-radius:8px;margin-bottom:10px;word-break:break-all;}
+.card-ex{font-size:13px;color:var(--light);font-style:italic;margin-top:4px;}
+.card-ex b{font-style:normal;color:var(--teal);}
+.step-list{list-style:none;margin:6px 0 8px;padding-left:4px;}
+.step-list li{font-size:13px;color:var(--mid);margin-bottom:3px;padding-left:20px;position:relative;}
+.step-list li::before{content:'→';position:absolute;left:0;color:var(--purple);}
+.ex-block{background:#f5fffe;border-radius:8px;padding:8px 12px;margin-top:6px;border:1px solid #cce8e5;}
+.ex-block .en{font-size:13px;color:var(--mid);margin-bottom:2px;font-style:italic;}
+.ex-block .en b{font-style:normal;color:var(--purple);}
+.ex-block .zh{font-size:12px;color:var(--light);}
+.mcq-block{margin-bottom:14px;}
+.mcq-q{background:var(--white);border-radius:12px;padding:14px 16px 10px;box-shadow:var(--shadow);}
+.mcq-qtext{font-size:14px;font-weight:600;margin-bottom:10px;line-height:1.7;}
+.mcq-options{display:flex;flex-direction:column;gap:7px;}
+.mcq-opt{padding:10px 14px;border:2px solid var(--teal-pale);border-radius:10px;background:var(--white);font-family:inherit;font-size:13px;color:var(--dark);cursor:pointer;transition:all 0.15s;text-align:left;line-height:1.5;}
+.mcq-opt:hover:not(:disabled){background:var(--teal-pale);border-color:var(--teal-light);}
+.mcq-opt.correct{background:#d4f5e5;border-color:#57cc99;color:#1a5c35;}
+.mcq-opt.wrong{background:#fde4de;border-color:var(--coral);color:#7a2000;}
+.mcq-opt:disabled{cursor:default;}
+.feedback{font-size:13px;margin-top:6px;padding:6px 10px;border-radius:7px;line-height:1.6;display:none;}
+.feedback.ok{background:#d4f5e5;color:#1a5c35;display:block;}
+.feedback.ng{background:#fde4de;color:#7a2000;display:block;}
+.match-wrap{background:var(--white);border-radius:14px;padding:16px;box-shadow:var(--shadow);margin-bottom:14px;}
+.match-instruct{font-size:13px;color:var(--light);margin-bottom:14px;text-align:center;}
+.match-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:start;}
+.match-col-label{font-size:12px;font-weight:700;color:var(--teal);text-align:center;padding:4px 0 8px;letter-spacing:1px;}
+.match-col{display:flex;flex-direction:column;gap:7px;}
+.match-item{padding:10px 12px;border:2px solid var(--teal-pale);border-radius:10px;background:var(--white);font-family:inherit;font-size:13px;color:var(--dark);cursor:pointer;transition:all 0.15s;text-align:center;user-select:none;line-height:1.4;}
+.match-item:hover:not(.matched):not(.locked){background:var(--teal-pale);border-color:var(--teal-light);}
+.match-item.selected{background:var(--teal);color:#fff;border-color:var(--teal);}
+.match-item.matched{background:#d4f5e5;border-color:#57cc99;color:#1a5c35;cursor:default;}
+.match-item.wrong-flash{background:#fde4de;border-color:var(--coral);}
+.match-item.locked{cursor:default;}
+.match-score{text-align:center;font-size:14px;font-weight:700;color:var(--teal);margin-top:12px;min-height:22px;}
+.next-btn,.unlock-btn{display:block;width:100%;padding:14px;margin-top:16px;border:none;border-radius:12px;background:var(--teal);color:#fff;font-family:inherit;font-size:16px;font-weight:700;cursor:pointer;transition:background 0.2s;}
+.next-btn:hover,.unlock-btn:hover{background:var(--teal-mid);}
+.next-btn:disabled{background:#ccc;cursor:not-allowed;}
+.score-wrap{text-align:center;padding:28px 0 12px;}
+.score-circle{width:90px;height:90px;border-radius:50%;border:5px solid var(--teal-mid);display:inline-flex;align-items:center;justify-content:center;font-size:30px;font-weight:700;color:var(--teal);margin-bottom:10px;}
+</style>
+</head>
+<body>
+<header>
+  <h1>G12 L1 · 片語・文法練習</h1>
+  <p>片語 1 組（5個，課本原文）· 句型 1 組（本課句型）· 每組三關</p>
+</header>
+<div class="progress-wrap">
+  <div class="prog-label"><span>整體進度</span><span id="prog-text">0 / 2 組完成</span></div>
+  <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+</div>
+<div class="group-tabs">
+  <button class="group-tab active" id="tab-0">💬 片語</button>
+  <button class="group-tab" id="tab-1">📐 本課句型</button>
+</div>
+<main id="main-area"></main>
+<script>
+const PHRASES=[
+  {type:'phrase',en:'walk of life',zh:'行業；社會階層',
+   note:'指「某人在社會中的行業或階層」；複數用 all walks of life，指「各行各業」。',
+   ex:'People from all <b>walks of life</b> came to the event.',
+   mcq:[
+    {q:'People from all ______ came together to help after the flood.',
+     opts:['(A) walks of life','(B) walk of lives','(C) way of life','(D) works of life'],ans:0,
+     fb:'walk of life 為固定用法，複數要說 all walks of life（各行各業）；不可寫成 walk of lives 或 way of life。'},
+    {q:'"walk of life" 最接近哪個意思？',
+     opts:['(A) 生活方式','(B) 行業或社會階層','(C) 走路的方式','(D) 人生道路'],ans:1,
+     fb:'walk of life 指一個人在社會中所屬的行業或階層，並非字面上「走路」的意思。'},
+   ],
+   match:{left:'walk of life',right:'行業；社會階層'}},
+
+  {type:'phrase',en:'lay out',zh:'清楚說明',
+   note:'把事情或計畫講清楚、列出來，讓對方容易理解。',
+   ex:'The teacher <b>laid out</b> the plan for the trip.',
+   mcq:[
+    {q:'The manager ______ the new plan clearly before the meeting started.',
+     opts:['(A) laid out','(B) laid off','(C) laid down','(D) laid up'],ans:0,
+     fb:'lay out = 清楚說明、列出計畫；lay off 是「解僱」，lay down 是「放下／制定規則」，語意不同。'},
+    {q:'"lay out" 最常用在什麼情境？',
+     opts:['(A) 拒絕某件事','(B) 說明計畫或想法','(C) 責備某人','(D) 尋找答案'],ans:1,
+     fb:'lay out 常用於「把計畫、想法講清楚、列出來」，方便對方理解。'},
+   ],
+   match:{left:'lay out',right:'清楚說明'}},
+
+  {type:'phrase',en:'stem from',zh:'源自；由……造成',
+   note:'表示某件事的起因，同義片語為 result from。',
+   ex:'Her fear of dogs <b>stems from</b> a childhood accident.',
+   mcq:[
+    {q:'Her fear of dogs ______ a bad experience in childhood.',
+     opts:['(A) stems from','(B) stems to','(C) stems on','(D) stems with'],ans:0,
+     fb:'stem from = 源自於，固定搭配介系詞 from，同義詞為 result from。'},
+    {q:'下列哪句與 "stem from" 意思最接近？',
+     opts:['(A) His success results from hard work.','(B) His success leads to fame.','(C) His success depends on luck.','(D) His success contributes to the team.'],ans:0,
+     fb:'result from 與 stem from 都表示「源自於」，用來說明原因。'},
+   ],
+   match:{left:'stem from',right:'源自；由……造成'}},
+
+  {type:'phrase',en:'get at',zh:'點出；查明',
+   note:'透過調查或思考而發現真相，同義片語為 find out。',
+   ex:'The police tried to <b>get at</b> the truth.',
+   mcq:[
+    {q:'The detective tried hard to ______ the truth behind the case.',
+     opts:['(A) get at','(B) get over','(C) get through','(D) get along'],ans:0,
+     fb:'get at = 查明、找出（真相），get over 是「克服」，get through 是「通過」，get along 是「相處」。'},
+    {q:'"get at the truth" 最適合用在哪種情境？',
+     opts:['(A) 安慰別人','(B) 調查或思考後找出真相','(C) 拒絕某項提議','(D) 慶祝成功'],ans:1,
+     fb:'get at 常搭配 truth，表示經過調查或思考後找到真相。'},
+   ],
+   match:{left:'get at',right:'點出；查明'}},
+
+  {type:'phrase',en:'strike a chord (with sb.)',zh:'引起（某人的）共鳴',
+   note:'chord 指「和弦」，引申為引起別人的共鳴或同感。',
+   ex:'The movie <b>struck a chord with</b> many parents.',
+   mcq:[
+    {q:'The singer\'s song about loss ______ many listeners who had experienced grief.',
+     opts:['(A) struck a chord with','(B) struck a note to','(C) hit a note with','(D) played a chord for'],ans:0,
+     fb:'strike a chord (with sb.) 為固定片語，表示「引起某人共鳴」，不能替換成 hit a note 或 play a chord。'},
+    {q:'"strike a chord" 中的 chord 原本指的是？',
+     opts:['(A) 一種樂器','(B) 和弦','(C) 一首歌','(D) 一種情緒'],ans:1,
+     fb:'chord 原意是「和弦」，引申為觸動人心、引起共鳴的意思。'},
+   ],
+   match:{left:'strike a chord (with sb.)',right:'引起（某人的）共鳴'}},
+];
+
+const GRAMMAR=[
+  {type:'grammar',label:'本課句型',
+   en:'whoever／whatever／whichever',
+   zh:'任何……的人／事物／其中一個（複合關係代名詞）',
+   formula:'Whoever／Whatever／Whichever (+ S) + V… ≒ anyone who…／anything that…／any one of them that…',
+   steps:[
+     '① whoever 用於「人」，等於 anyone who',
+     '② whatever 用於「事物」，等於 anything that',
+     '③ whichever 用於「在特定範圍中任選其一」，等於 any one of them that',
+     '④ 這些字同時具有連接詞與代名詞兩種功能',
+   ],
+   examples:[
+     {en:'<b>Whoever</b> wants to enter this house should knock and ask for permission first.',zh:'任何想要進入這所房子的人都應該先敲門並徵得許可。'},
+     {en:'<b>Whatever</b> has been reported about the superstar is mere rumor.',                zh:'關於這位超級巨星的任何報導都只是謠言。'},
+     {en:'You can choose <b>whichever</b> you like as a birthday gift.',                        zh:'你可以選擇你喜歡的任何一個作為生日禮物。'},
+     {en:'課文：This poem offers insights for <b>whoever</b> is facing important decisions.',     zh:'這首詩為任何面臨重要決定的人提供了洞察。'},
+   ],
+   mcq:[
+    {q:'Mr. Baker pampers his daughter by giving her ______ she wants.',
+     opts:['(A) wherever','(B) whatever','(C) whichever','(D) anyone'],ans:1,
+     fb:'指「她想要的任何事物」，用 whatever，等於 anything that she wants。'},
+    {q:'I am lucky to have a family that supports me in ______.',
+     opts:['(A) what do I do','(B) whatever I do','(C) what to do','(D) anything can I do'],ans:1,
+     fb:'whatever I do = anything that I do，整個作介系詞 in 的受詞，句中須維持「S + V」語序。'},
+    {q:'These T-shirts come in several sizes. Choose ______ suits you best!',
+     opts:['(A) whoever','(B) whatever','(C) whichever','(D) wherever'],ans:2,
+     fb:'在多種尺寸（特定範圍）中挑選一個，用 whichever 表示「任選其中一個」。'},
+    {q:'I can\'t believe ______ she says because she is not trustworthy. (= anything that she says)',
+     opts:['(A) whoever','(B) whatever','(C) whichever','(D) whomever'],ans:1,
+     fb:'whatever = anything that，指「任何她說的話」，與題目提示的 anything that 對應。'},
+    {q:'「任何做出這些評論的人對這個情況知道得不多。」哪句正確？',
+     opts:[
+       '(A) Whoever makes such comments doesn\'t know much about the situation.',
+       '(B) Whatever makes such comments doesn\'t know much about the situation.',
+       '(C) Whichever makes such comments doesn\'t know much about the situation.',
+       '(D) Whom makes such comments doesn\'t know much about the situation.'
+     ],ans:0,
+     fb:'指「做出評論的人」，用 whoever，等於 anyone who makes such comments。'},
+   ],
+   match:[
+    {left:'whoever = anyone who',                right:'任何……的人'},
+    {left:'whatever = anything that',             right:'任何……的事物'},
+    {left:'whichever = any one of them that',     right:'（特定範圍中）任選其中一個'},
+    {left:'Whoever wants to enter should knock first.',right:'任何想要進入的人都應該先敲門。'},
+    {left:'Choose whichever you like as a gift.', right:'選擇你喜歡的任何一個作為禮物。'},
+   ]},
+];
+
+const GROUPS_CFG=[
+  {label:'💬 片語',tabLabel:'💬 片語',      items:PHRASES},
+  {label:'📐 本課句型',tabLabel:'📐 本課句型',items:[GRAMMAR[0]]},
+];
+
+const S={group:0,phase:0,done:[false,false],mcqAnswered:[0,0],matchState:[null,null]};
+function shuf(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
+function phaseBar(cur){return['📖 學習','❓ 選擇','🔗 配對'].map((s,i)=>{const c=i<cur?'done':i===cur?'current':'pending';return`<div class="phase-step ${c}">${i<cur?'✓ ':''}${s}</div>`;}).join('');}
+
+document.querySelectorAll('.group-tab').forEach((t,i)=>t.addEventListener('click',()=>{if(!t.classList.contains('locked'))setGroup(i);}));
+function setGroup(g){S.group=g;S.phase=S.done[g]?3:0;document.querySelectorAll('.group-tab').forEach((t,i)=>t.classList.toggle('active',i===g));render();}
+function setPhase(p){S.phase=p;render();}
+function updateProg(){const d=S.done.filter(Boolean).length;document.getElementById('prog-text').textContent=`${d} / 2 組完成`;document.getElementById('prog-fill').style.width=`${d*50}%`;}
+
+function render(){
+  const g=S.group,p=S.phase,area=document.getElementById('main-area'),items=GROUPS_CFG[g].items;
+  if(p===0)renderLearn(g,items,area);
+  else if(p===1)renderMcq(g,items,area);
+  else if(p===2)renderMatch(g,items,area);
+  else renderDone(g,area);
+}
+
+function renderLearn(g,items,area){
+  const cards=items.map(item=>{
+    if(item.type==='phrase'){
+      return`<div class="learn-card phrase">
+        <div class="card-label phrase">PHRASE · 片語</div>
+        <div class="card-en phrase">${item.en}</div>
+        <div class="card-zh">${item.zh}</div>
+        <div class="card-note phrase">${item.note}</div>
+        <div class="card-ex">📌 ${item.ex}</div>
+      </div>`;
+    }else{
+      const stepsHtml=item.steps?`<ul class="step-list">${item.steps.map(s=>`<li>${s}</li>`).join('')}</ul>`:'';
+      const exHtml=item.examples.map(e=>`<div class="ex-block"><div class="en">📌 ${e.en}</div><div class="zh">${e.zh}</div></div>`).join('');
+      return`<div class="learn-card grammar">
+        <div class="card-label grammar">GRAMMAR · ${item.label}</div>
+        <div class="formula-box">${item.formula}</div>
+        <div class="card-zh">${item.zh}</div>
+        <div class="card-note grammar">${item.note||''}${stepsHtml}</div>
+        <div style="margin-top:8px;">${exHtml}</div>
+      </div>`;
+    }
+  }).join('');
+  area.innerHTML=`<div class="phase-bar">${phaseBar(0)}</div>${cards}<button class="next-btn" onclick="setPhase(1)">記住了！去做選擇題 →</button>`;
+}
+
+function renderMcq(g,items,area){
+  const allQ=[];
+  items.forEach(item=>item.mcq.forEach(q=>allQ.push(q)));
+  S._mcqQ=S._mcqQ||[];S._mcqQ[g]=allQ;
+  const html=allQ.map((q,qi)=>{
+    const btns=q.opts.map((o,oi)=>`<button class="mcq-opt" onclick="pickMcq(${g},${qi},${oi})">${o}</button>`).join('');
+    return`<div class="mcq-block" id="mq${g}_${qi}"><div class="mcq-q">
+      <div class="mcq-qtext">Q${qi+1}. ${q.q}</div>
+      <div class="mcq-options">${btns}</div>
+      <div class="feedback" id="mfb${g}_${qi}"></div>
+    </div></div>`;
+  }).join('');
+  area.innerHTML=`<div class="phase-bar">${phaseBar(1)}</div>${html}<button class="next-btn" id="toMatch" onclick="setPhase(2)" disabled>全部作答後繼續 →</button>`;
+  S.mcqAnswered[g]=0;
+}
+
+function pickMcq(g,qi,chosen){
+  const allQ=S._mcqQ[g],block=document.getElementById(`mq${g}_${qi}`);
+  if(block.querySelector('.correct,.wrong'))return;
+  block.querySelectorAll('.mcq-opt').forEach(o=>o.disabled=true);
+  const isOk=chosen===allQ[qi].ans;
+  block.querySelectorAll('.mcq-opt')[chosen].classList.add(isOk?'correct':'wrong');
+  if(!isOk)block.querySelectorAll('.mcq-opt')[allQ[qi].ans].classList.add('correct');
+  const fb=document.getElementById(`mfb${g}_${qi}`);
+  fb.className=`feedback ${isOk?'ok':'ng'}`;
+  fb.textContent=isOk?'✓ 正確！':'✗ '+allQ[qi].fb;
+  S.mcqAnswered[g]++;
+  if(S.mcqAnswered[g]===allQ.length)document.getElementById('toMatch').disabled=false;
+}
+
+function renderMatch(g,items,area){
+  let allPairs=[];
+  items.forEach(item=>{
+    if(item.match&&!Array.isArray(item.match))allPairs.push(item.match);
+    else if(Array.isArray(item.match))allPairs=allPairs.concat(item.match);
+  });
+  const enItems=allPairs.map((p,i)=>({id:i,text:p.left}));
+  const zhItems=shuf(allPairs.map((p,i)=>({id:i,text:p.right})));
+  S.matchState[g]={enItems,zhItems,selectedEn:null,matched:new Set(),total:allPairs.length};
+  const enCol=enItems.map(item=>`<div class="match-item" id="men_${g}_${item.id}" onclick="pickEn(${g},${item.id})">${item.text}</div>`).join('');
+  const zhCol=zhItems.map(item=>`<div class="match-item" id="mzh_${g}_${item.id}" onclick="pickZh(${g},${item.id})">${item.text}</div>`).join('');
+  area.innerHTML=`<div class="phase-bar">${phaseBar(2)}</div>
+    <div class="match-wrap">
+      <div class="match-instruct">點選左欄，再點右欄完成配對</div>
+      <div class="match-grid">
+        <div><div class="match-col-label">英文</div><div class="match-col">${enCol}</div></div>
+        <div><div class="match-col-label">中文</div><div class="match-col">${zhCol}</div></div>
+      </div>
+      <div class="match-score" id="mscore_${g}"></div>
+    </div>
+    <button class="next-btn" id="toDone" onclick="finishGroup(${g})" disabled>完成本組！→</button>`;
+}
+
+function pickEn(g,id){const ms=S.matchState[g];if(!ms||ms.matched.has(id))return;ms.selectedEn=id;document.querySelectorAll(`[id^="men_${g}_"]`).forEach(el=>el.classList.toggle('selected',el.id===`men_${g}_${id}`&&!ms.matched.has(id)));}
+function pickZh(g,id){
+  const ms=S.matchState[g];if(!ms||ms.selectedEn===null)return;
+  const enId=ms.selectedEn;if(ms.matched.has(enId))return;
+  const enEl=document.getElementById(`men_${g}_${enId}`),zhEl=document.getElementById(`mzh_${g}_${id}`);
+  if(enId===id){
+    enEl.classList.remove('selected');enEl.classList.add('matched','locked');zhEl.classList.add('matched','locked');
+    ms.matched.add(enId);ms.selectedEn=null;
+    const sc=document.getElementById(`mscore_${g}`);sc.textContent=`✓ ${ms.matched.size} / ${ms.total} 配對完成`;
+    if(ms.matched.size===ms.total){sc.textContent='🎉 全部配對完成！';document.getElementById('toDone').disabled=false;}
+  }else{
+    enEl.classList.add('wrong-flash');zhEl.classList.add('wrong-flash');
+    setTimeout(()=>{enEl.classList.remove('wrong-flash');zhEl.classList.remove('wrong-flash');},600);
+  }
+}
+
+function finishGroup(g){S.done[g]=true;if(g<1){const nt=document.getElementById(`tab-${g+1}`);nt.classList.remove('locked');nt.textContent=GROUPS_CFG[g+1].tabLabel;}updateProg();S.phase=3;render();}
+function renderDone(g,area){
+  const allDone=S.done.every(Boolean);
+  area.innerHTML=`<div class="phase-bar">${phaseBar(3)}</div>
+    <div class="score-wrap">
+      <div class="score-circle">✓</div>
+      <div style="font-size:16px;font-weight:700;color:var(--mid);margin-bottom:8px;">${GROUPS_CFG[g].label} 完成！</div>
+      ${allDone?'<div style="font-size:15px;color:var(--teal);font-weight:700;margin-top:8px;">🎉 片語和句型全部完成！</div>':''}
+    </div>
+    ${g<1?`<button class="unlock-btn" onclick="setGroup(${g+1})">去${GROUPS_CFG[g+1].label} →</button>`:''}`;
+}
+
+updateProg();render();
+</script>
+</body>
+</html>
