@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>正弦函數的圖形｜轉圈的高度</title>
+<style>
+:root{--paper:#F5F8FC;--grid:#DCE6F1;--line:#B7C6D8;--ink:#1C2B45;--muted:#5B6B82;--pos:#E8742A;--neg:#17936A;--key:#F2B300;--blue:#4A6FA5;--card:#FFFFFF;--bad:#C0392B}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei","Heiti TC",sans-serif;color:var(--ink);background-color:var(--paper);background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:28px 28px;line-height:1.7;font-size:18px;padding-bottom:env(safe-area-inset-bottom,0px)}
+.wrap{max-width:880px;margin:0 auto;padding:20px 16px 40px}
+header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:8px 16px;margin-bottom:14px}
+header h1{margin:0;font-size:32px;line-height:1.2;letter-spacing:1px}
+header p{margin:4px 0 0;color:var(--muted);font-size:17px}
+.level{display:inline-block;background:var(--ink);color:#fff;font-size:14px;padding:2px 10px;border-radius:6px;margin-bottom:6px}
+nav{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.navbtn{display:flex;align-items:center;gap:8px;min-height:46px;padding:6px 14px 6px 6px;border:1.5px solid var(--line);background:#fff;border-radius:23px;font:inherit;font-size:16px;color:var(--ink);cursor:pointer}
+.navbtn .num{width:32px;height:32px;border-radius:50%;background:var(--paper);display:flex;align-items:center;justify-content:center;font-weight:700}
+.navbtn.on{border-color:var(--ink);background:var(--ink);color:#fff}
+.navbtn.on .num{background:#fff;color:var(--ink)}
+.navbtn.done .num{background:var(--key);color:var(--ink)}
+.step{display:none;background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:20px 22px 22px}
+.step.on{display:block}
+.step h2{margin:0 0 4px;font-size:25px}
+.lead{margin:0 0 12px;color:var(--ink)}
+.lead b,.note b{background:linear-gradient(transparent 60%,#FFE58A 60%)}
+.note{color:var(--muted);font-size:16px;margin:8px 0 0}
+svg{width:100%;height:auto;display:block;touch-action:manipulation}
+svg line,svg text,svg path{pointer-events:none}
+button{font:inherit;cursor:pointer}
+.btn{min-height:46px;padding:6px 18px;border:1.5px solid var(--ink);border-radius:10px;background:#fff;color:var(--ink);font-size:17px}
+.btn.primary{background:var(--ink);color:#fff}
+.btn:focus-visible,.chip:focus-visible,.navbtn:focus-visible,.opt:focus-visible{outline:3px solid var(--key);outline-offset:2px}
+.bar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:12px 0}
+input[type=range]{flex:1;min-width:200px;height:36px;accent-color:var(--ink)}
+.snap{display:flex;flex-wrap:wrap;gap:8px}
+.snap .btn{font-size:16px;padding:4px 12px;border-width:1px}
+.readout{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:14px 0 4px}
+.cell{background:var(--paper);border-radius:10px;padding:10px 14px}
+.cell small{display:block;color:var(--muted);font-size:14px}
+.cell strong{font-size:24px}
+.ref{width:100%;border-collapse:collapse;margin-top:14px;font-size:17px;text-align:center}
+.ref th,.ref td{border:1px solid var(--line);padding:6px 4px}
+.ref th{background:var(--paper);font-weight:600;color:var(--muted)}
+.tablebox{overflow-x:auto}
+.rows{display:grid;gap:8px;margin:12px 0}
+.row{display:grid;grid-template-columns:150px 1fr 40px;align-items:center;gap:10px;padding:8px 12px;border-radius:10px;background:var(--paper)}
+.rowlab b{font-size:20px;display:block;line-height:1.3}
+.rowlab span{font-size:14px;color:var(--muted)}
+.choices{display:flex;gap:8px;flex-wrap:wrap}
+.chip{min-width:64px;min-height:46px;border:1.5px solid var(--line);border-radius:10px;background:#fff;font-size:20px;color:var(--ink)}
+.chip.sel{border-color:var(--blue);background:#E3ECF8;font-weight:700}
+.mark{font-size:24px;font-weight:700;text-align:center}
+.mark.ok{color:var(--neg)}.mark.no{color:var(--bad)}
+.msg{min-height:1.7em;margin:10px 0 0;font-size:18px}
+.msg.ok{color:var(--neg);font-weight:600}.msg.no{color:var(--bad)}
+.rhyme{display:none;margin-top:10px;padding:12px 16px;border-radius:10px;background:#FFF3C4;font-size:22px;font-weight:700;text-align:center;letter-spacing:1px}
+.rhyme.on{display:block}
+.props{width:100%;border-collapse:collapse;margin:8px 0 18px}
+.props td{border-bottom:1px solid var(--grid);padding:10px 6px;vertical-align:top}
+.props td:first-child{font-weight:700;white-space:nowrap;width:80px}
+.props td:nth-child(2){white-space:nowrap;width:150px;color:var(--blue);font-weight:600}
+.quiz{border-top:2px dashed var(--line);padding-top:14px}
+.quiz h3{margin:0 0 8px;font-size:20px}
+.opts{display:grid;gap:8px;margin-bottom:16px}
+.opt{display:flex;align-items:center;gap:10px;text-align:left;min-height:48px;padding:8px 14px;border:1.5px solid var(--line);border-radius:10px;background:#fff;font-size:18px;color:var(--ink)}
+.opt .box{width:24px;height:24px;border:2px solid var(--line);border-radius:5px;flex:none;display:flex;align-items:center;justify-content:center;font-size:16px}
+.opt.sel{border-color:var(--blue);background:#E3ECF8}
+.opt.sel .box{background:var(--blue);border-color:var(--blue);color:#fff}
+.why{display:block;font-size:15px;margin-top:2px}
+.why.ok{color:var(--neg)}.why.no{color:var(--bad)}
+.tf{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:8px 12px;background:var(--paper);border-radius:10px}
+.tf .choices .chip{min-width:56px}
+.probs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.probs .btn{font-size:16px;border-width:1px}
+.probs .btn.on{background:var(--ink);color:#fff}
+.question{font-size:21px;font-weight:700;margin:4px 0}
+.answer{display:none;margin-top:10px;padding:12px 16px;border-radius:10px;background:#FFF3C4;font-size:20px}
+.answer.on{display:block}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:15px;color:var(--muted);margin-top:6px}
+.legend i{display:inline-block;width:14px;height:14px;border-radius:3px;margin-right:4px;vertical-align:-2px}
+.stepnav{display:flex;justify-content:space-between;gap:10px;margin-top:20px;padding-top:14px;border-top:1px solid var(--grid)}
+footer{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;margin-top:16px;font-size:15px;color:var(--muted)}
+footer .btn{font-size:15px;min-height:40px;border-width:1px}
+.gridl{stroke:var(--grid);stroke-width:1}
+.dash{stroke:var(--line);stroke-width:1.2;stroke-dasharray:5 5}
+.axis{stroke:var(--ink);stroke-width:1.6}
+.tick{font-size:16px;fill:var(--muted);text-anchor:middle}
+.ylab{font-size:16px;fill:var(--muted);text-anchor:end}
+.lbl{font-size:15px;fill:var(--muted);text-anchor:middle}
+.curve{fill:none;stroke:var(--ink);stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round}
+.curve.copy{stroke:var(--blue)}
+.curve.posc{stroke:var(--pos)}.curve.negc{stroke:var(--neg)}
+.wheel{fill:none;stroke:var(--ink);stroke-width:2}
+.band0{fill:#FFF3C4}.band1{fill:#E8EFF8}.band2{fill:#F2F6FB}
+.seg{fill:rgba(255,255,255,0);stroke:transparent;stroke-width:3;cursor:pointer}
+.seg:hover{fill:#F0F5FB}
+.seg.sel{fill:#E3ECF8;stroke:var(--blue)}
+.seg.good{fill:#FFF3C4;stroke:#C99700}
+.seg.bad{fill:#FBE3DE;stroke:var(--bad)}
+.seg.miss{stroke:var(--ink);stroke-dasharray:8 6}
+.pt-user{fill:var(--blue)}.pt-ok{fill:var(--ink)}
+.qmark{font-size:22px;fill:var(--muted);text-anchor:middle;font-weight:700}
+@media (max-width:560px){
+ header h1{font-size:26px}
+ .step{padding:16px 14px}
+ .row{grid-template-columns:1fr 34px}
+ .row .choices{grid-column:1/2}
+ .row .mark{grid-row:1/3;grid-column:2}
+ .props td:nth-child(2){white-space:normal;width:auto}
+ .tf{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+ <div>
+  <span class="level">三角函數 Level 2</span>
+  <h1>正弦函數的圖形</h1>
+  <p>sin 就是轉圈時的高度，把高度畫下來，就是波浪。</p>
+ </div>
+</header>
+<nav id="nav"></nav>
+<main>
+
+<section class="step" data-step="1">
+ <h2>摩天輪的高度</h2>
+ <p class="lead">點在半徑 1 的圓上<b>逆時針</b>轉。sin 就是這個點<b>離中心多高</b>：在上面是正的（橘色），在下面是負的（綠色）。</p>
+ <svg id="wheel" viewBox="0 0 760 320" role="img" aria-label="左邊是單位圓，右邊是 y 等於 sin x 的圖形，兩邊的高度同步"></svg>
+ <div class="bar">
+  <input type="range" id="ang" min="0" max="360" step="1" value="0" aria-label="轉了幾度">
+  <button class="btn primary" id="play">播放</button>
+ </div>
+ <div class="snap" id="snap"></div>
+ <div class="readout">
+  <div class="cell"><small>轉了</small><strong id="rTurn">出發</strong></div>
+  <div class="cell"><small>課本寫法</small><strong id="rPi">0</strong></div>
+  <div class="cell"><small>點在哪裡</small><strong id="rWhere" style="font-size:18px">最右邊</strong></div>
+  <div class="cell"><small>高度 sin</small><strong id="rH">0</strong></div>
+ </div>
+ <div class="tablebox">
+  <table class="ref" id="refTable"></table>
+ </div>
+ <p class="note">π 就是「半圈」。記住這個，其他都能推出來。</p>
+</section>
+
+<section class="step" data-step="2">
+ <h2>五點口訣</h2>
+ <p class="lead">轉到這五個位置時，高度是多少？每一列點一個答案，圖上會出現你選的點。全部選完按「檢查」。</p>
+ <svg id="fiveSvg" role="img" aria-label="五個關鍵點的高度"></svg>
+ <div class="rows" id="fiveRows"></div>
+ <div class="bar">
+  <button class="btn primary" id="fiveCheck">檢查</button>
+  <button class="btn" id="fiveRetry">重做一次</button>
+ </div>
+ <p class="msg" id="fiveMsg"></p>
+ <div class="rhyme" id="fiveRhyme">0 → 1 → 0 → −1 → 0<br><span style="font-size:16px;font-weight:400">中間、最高、中間、最低、中間</span></div>
+</section>
+
+<section class="step" data-step="3">
+ <h2>一直轉，就一直重複</h2>
+ <p class="lead">轉一圈回到原位，所以 0 到 2π 這段波浪可以<b>一直複製貼上</b>。每一段長 2π，這叫做<b>週期</b>。</p>
+ <svg id="perSvg" role="img" aria-label="正弦波浪向左右複製"></svg>
+ <div class="bar">
+  <button class="btn" id="perLeft">往左複製一圈</button>
+  <button class="btn" id="perRight">往右複製一圈</button>
+  <button class="btn" id="perReset">只留原本那段</button>
+ </div>
+ <p class="msg" id="perMsg"></p>
+</section>
+
+<section class="step" data-step="4">
+ <h2>五個特性</h2>
+ <p class="lead">課本的五個特性，都是從波浪圖「看」出來的。左邊是課本寫法，右邊是白話。</p>
+ <table class="props" id="propTable"></table>
+ <div class="quiz">
+  <h3 id="mqPrompt"></h3>
+  <div class="opts" id="mqOpts"></div>
+  <h3>是非題：對的選 O，錯的選 X</h3>
+  <div class="opts" id="tfList"></div>
+  <div class="bar"><button class="btn primary" id="quizCheck">檢查</button><button class="btn" id="quizRetry">重做一次</button></div>
+  <p class="msg" id="quizMsg"></p>
+ </div>
+</section>
+
+<section class="step" data-step="5">
+ <h2>找出範圍</h2>
+ <p class="lead">sin x &lt; 0 就是高度是負的，也就是波浪在 <b>x 軸下面</b>。sin x &gt; 0 就是在 <b>x 軸上面</b>。</p>
+ <div class="probs" id="probs"></div>
+ <p class="question" id="rngQ"></p>
+ <p class="note" id="rngHint" style="margin-top:0"></p>
+ <svg id="rngSvg" role="img" aria-label="可點選的正弦波浪區段"></svg>
+ <div class="legend" id="rngLegend" style="display:none">
+  <span><i style="background:#FFF3C4;border:2px solid #C99700"></i>選對</span>
+  <span><i style="background:#FBE3DE;border:2px solid var(--bad)"></i>選錯</span>
+  <span><i style="border:2px dashed var(--ink)"></i>漏掉</span>
+ </div>
+ <div class="bar">
+  <button class="btn primary" id="rngCheck">檢查</button>
+  <button class="btn" id="rngClear">清除選取</button>
+ </div>
+ <p class="msg" id="rngMsg"></p>
+ <div class="answer" id="rngAns"></div>
+</section>
+
+</main>
+<footer>
+ <span id="stats"></span>
+ <button class="btn" id="resetAll">清除紀錄重新開始</button>
+</footer>
+</div>
+
+<script>
+/* ===== 教材資料：改題目只要改這裡 ===== */
+const DATA = {
+  storageKey: 'arial_trig_L2_sine_v1',
+  steps: [
+    { id: 1, name: '摩天輪的高度' },
+    { id: 2, name: '五點口訣' },
+    { id: 3, name: '週期' },
+    { id: 4, name: '五個特性' },
+    { id: 5, name: '找出範圍' }
+  ],
+  keyPoints: [
+    { deg: 0,   pi: '0',    turn: '出發',   where: '最右邊', y: 0 },
+    { deg: 90,  pi: 'π/2',  turn: '1/4 圈', where: '最上面', y: 1 },
+    { deg: 180, pi: 'π',    turn: '半圈',   where: '最左邊', y: 0 },
+    { deg: 270, pi: '3π/2', turn: '3/4 圈', where: '最下面', y: -1 },
+    { deg: 360, pi: '2π',   turn: '一整圈', where: '回到出發點', y: 0 }
+  ],
+  heightChoices: [1, 0, -1],
+  properties: [
+    { name: '定義域', book: '全體實數 ℝ',     plain: '想轉多少都可以，倒著轉也行，所以 x 放什麼數字都可以。' },
+    { name: '值域',   book: '−1 ≤ y ≤ 1',     plain: '最高到 1，最低到 −1，不會超過。' },
+    { name: '週期',   book: '2π',             plain: '轉一圈回到原位，波浪每 2π 重複一次。' },
+    { name: '振幅',   book: '1',              plain: '波浪離中間那條線（x 軸），最遠是 1。' },
+    { name: '對稱性', book: '對稱於原點',      plain: '正著轉和倒著轉，高度剛好相反：sin(−x) = −sin x。' }
+  ],
+  multiQuiz: {
+    prompt: '課本隨堂練習：對於 y = sin x 的敘述，選出所有正確的選項。',
+    options: [
+      { text: '(1) y = sin x 的最大值是 1',      ok: true,  why: '對，最高點是 1。' },
+      { text: '(2) y = sin x 的最小值是 0',      ok: false, why: '錯，最低點是 −1。' },
+      { text: '(3) y = sin x 的週期是 2π',       ok: true,  why: '對，轉一圈就重複。' },
+      { text: '(4) y = sin x 的圖形對稱於 y 軸', ok: false, why: '錯，是對稱於「原點」。' }
+    ]
+  },
+  tfQuiz: [
+    { text: 'sin x 的值有可能等於 2。',          ok: false, why: '最高只到 1。' },
+    { text: 'sin x 的振幅是 1。',                ok: true,  why: '波浪離 x 軸最遠是 1。' },
+    { text: 'sin(2π + x) 和 sin x 一樣大。',     ok: true,  why: '多轉一圈回到同一個位置。' },
+    { text: 'x 只能放 0 到 2π 之間的數。',       ok: false, why: '定義域是全體實數，倒著轉、多轉幾圈都可以。' }
+  ],
+  rangeProblems: [
+    { from: 0,  to: 2, sign: '<', note: '例題 1' },
+    { from: -1, to: 3, sign: '<', note: '例題 1 練習' },
+    { from: 0,  to: 2, sign: '>', note: '延伸 1' },
+    { from: -2, to: 2, sign: '<', note: '延伸 2' }
+  ]
+};
+</script>
+
+<script>
+/* ===== 介面邏輯 ===== */
+(function () {
+  const $ = s => document.querySelector(s);
+  const NS = 'http://www.w3.org/2000/svg';
+  function el(tag, attrs, parent) { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; }
+  function txt(x, y, s, attrs, parent) { const t = el('text', Object.assign({ x: x, y: y }, attrs || {}), parent); t.textContent = s; return t; }
+  function shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+  function fmt(n) { return n < 0 ? '−' + Math.abs(n) : String(n); }
+  function piLabel(k) {
+    if (Math.abs(k) < 1e-9) return '0';
+    const neg = k < 0, a = Math.abs(k); let s;
+    if (a === 1) s = 'π'; else if (a === 0.5) s = 'π/2';
+    else if (Number.isInteger(a)) s = a + 'π'; else s = (a * 2) + 'π/2';
+    return (neg ? '−' : '') + s;
+  }
+
+  /* --- 狀態保存 --- */
+  function fresh() { return { step: 1, wrong: { s2: 0, s4: 0, s5: 0 }, done: {}, rdone: {} }; }
+  let state;
+  function load() {
+    state = fresh();
+    try { const r = localStorage.getItem(DATA.storageKey); if (r) { const o = JSON.parse(r); Object.assign(state, o); state.wrong = Object.assign(fresh().wrong, o.wrong || {}); state.done = o.done || {}; state.rdone = o.rdone || {}; } } catch (e) {}
+  }
+  function save() { try { localStorage.setItem(DATA.storageKey, JSON.stringify(state)); } catch (e) {} }
+  function addWrong(k) { state.wrong[k] = (state.wrong[k] || 0) + 1; save(); renderStats(); }
+  function markDone(n) { if (!state.done[n]) { state.done[n] = true; save(); renderNav(); } }
+  function renderStats() { $('#stats').textContent = '錯誤紀錄：五點口訣 ' + state.wrong.s2 + ' 次｜五個特性 ' + state.wrong.s4 + ' 次｜找出範圍 ' + state.wrong.s5 + ' 次'; }
+
+  /* --- 導覽 --- */
+  function renderNav() {
+    const nav = $('#nav'); nav.innerHTML = '';
+    DATA.steps.forEach(s => {
+      const b = document.createElement('button');
+      b.className = 'navbtn' + (state.step === s.id ? ' on' : '') + (state.done[s.id] ? ' done' : '');
+      b.innerHTML = '<span class="num">' + (state.done[s.id] ? '✓' : s.id) + '</span>' + s.name;
+      b.onclick = () => go(s.id);
+      nav.appendChild(b);
+    });
+  }
+  function go(n) {
+    state.step = n; save();
+    document.querySelectorAll('.step').forEach(x => x.classList.toggle('on', +x.dataset.step === n));
+    renderNav();
+    if (n !== 1) stopPlay();
+    window.scrollTo(0, 0);
+  }
+  function addStepNav() {
+    document.querySelectorAll('.step').forEach(sec => {
+      const n = +sec.dataset.step, box = document.createElement('div'); box.className = 'stepnav';
+      const prev = DATA.steps.find(s => s.id === n - 1), next = DATA.steps.find(s => s.id === n + 1);
+      box.innerHTML = '<span></span><span></span>';
+      if (prev) { const b = document.createElement('button'); b.className = 'btn'; b.textContent = '上一步'; b.onclick = () => go(prev.id); box.replaceChild(b, box.children[0]); }
+      if (next) { const b = document.createElement('button'); b.className = 'btn primary'; b.textContent = '下一步：' + next.name; b.onclick = () => go(next.id); box.replaceChild(b, box.children[1]); }
+      sec.appendChild(box);
+    });
+  }
+
+  /* --- 通用坐標圖 --- */
+  function makeGraph(svg, xmin, xmax, o) {
+    o = o || {};
+    const W = 760, H = o.H || 260, pl = 46, pr = 26, cy = H / 2 - 6, A = o.A || 90;
+    svg.innerHTML = ''; svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+    const sx = x => pl + (x - xmin) / (xmax - xmin) * (W - pl - pr);
+    const sy = y => cy - y * A;
+    const bands = el('g', {}, svg), back = el('g', {}, svg), mid = el('g', {}, svg), top = el('g', {}, svg), lab = el('g', {}, svg);
+    for (let x = xmin; x <= xmax + 1e-9; x += 0.5) {
+      el('line', { x1: sx(x), y1: sy(1) - 14, x2: sx(x), y2: sy(-1) + 14, class: 'gridl' }, back);
+      const isInt = Math.abs(x - Math.round(x)) < 1e-9;
+      if (isInt || o.half) txt(sx(x), H - 6, piLabel(x), { class: 'tick' }, lab);
+    }
+    el('line', { x1: pl - 6, y1: sy(1), x2: W - pr, y2: sy(1), class: 'dash' }, back);
+    el('line', { x1: pl - 6, y1: sy(-1), x2: W - pr, y2: sy(-1), class: 'dash' }, back);
+    el('line', { x1: pl - 6, y1: cy, x2: W - pr + 8, y2: cy, class: 'axis' }, back);
+    if (xmin <= 0 && xmax >= 0) el('line', { x1: sx(0), y1: sy(1) - 18, x2: sx(0), y2: sy(-1) + 18, class: 'axis' }, back);
+    txt(pl - 12, sy(1) + 6, '1', { class: 'ylab' }, lab);
+    txt(pl - 12, sy(-1) + 6, '−1', { class: 'ylab' }, lab);
+    txt(pl - 12, cy + 6, '0', { class: 'ylab' }, lab);
+    return { sx: sx, sy: sy, cy: cy, A: A, bands: bands, back: back, mid: mid, top: top, lab: lab, W: W, H: H };
+  }
+  function curve(G, a, b, cls) {
+    let d = ''; const n = Math.max(30, Math.round((b - a) * 80));
+    for (let i = 0; i <= n; i++) { const x = a + (b - a) * i / n; d += (i ? 'L' : 'M') + G.sx(x).toFixed(1) + ' ' + G.sy(Math.sin(x * Math.PI)).toFixed(1); }
+    return el('path', { d: d, class: cls }, G.mid);
+  }
+
+  /* --- 第 1 步：摩天輪 --- */
+  const WH = { cx: 140, cy: 160, R: 100, x0: 300, gw: 430 };
+  const W1 = {};
+  let playing = false, raf = null;
+  function initWheel() {
+    const svg = $('#wheel'), back = el('g', {}, svg);
+    for (let i = 0; i <= 8; i++) { const X = WH.x0 + WH.gw * i / 8; el('line', { x1: X, y1: 46, x2: X, y2: 274, class: 'gridl' }, back); }
+    [1, -1].forEach(v => el('line', { x1: 24, y1: WH.cy - v * WH.R, x2: WH.x0 + WH.gw + 10, y2: WH.cy - v * WH.R, class: 'dash' }, back));
+    el('line', { x1: 24, y1: WH.cy, x2: 256, y2: WH.cy, class: 'axis' }, back);
+    el('line', { x1: WH.cx, y1: 40, x2: WH.cx, y2: 280, class: 'axis' }, back);
+    el('line', { x1: WH.x0, y1: WH.cy, x2: WH.x0 + WH.gw + 16, y2: WH.cy, class: 'axis' }, back);
+    el('line', { x1: WH.x0, y1: 40, x2: WH.x0, y2: 280, class: 'axis' }, back);
+    el('circle', { cx: WH.cx, cy: WH.cy, r: WH.R, class: 'wheel' }, back);
+    txt(WH.cx - 12, WH.cy + 20, 'O', { class: 'ylab' }, back);
+    txt(WH.x0 - 8, WH.cy - WH.R + 6, '1', { class: 'ylab' }, back);
+    txt(WH.x0 - 8, WH.cy + WH.R + 6, '−1', { class: 'ylab' }, back);
+    DATA.keyPoints.forEach(k => {
+      const X = WH.x0 + WH.gw * k.deg / 360;
+      el('line', { x1: X, y1: WH.cy - 6, x2: X, y2: WH.cy + 6, class: 'axis' }, back);
+      txt(X, 306, k.pi, { class: 'tick' }, back);
+      if (k.deg < 360) { const a = k.deg * Math.PI / 180; el('circle', { cx: WH.cx + WH.R * Math.cos(a), cy: WH.cy - WH.R * Math.sin(a), r: 4, fill: '#B7C6D8' }, back); }
+    });
+    txt(WH.cx, 306, '轉圈', { class: 'lbl' }, back);
+    W1.trace = el('path', { class: 'curve' }, svg);
+    W1.guide = el('line', { stroke: '#8A9BB2', 'stroke-width': 1.5, 'stroke-dasharray': '5 5' }, svg);
+    W1.radius = el('line', { x1: WH.cx, y1: WH.cy, stroke: '#5B6B82', 'stroke-width': 2 }, svg);
+    W1.bar1 = el('line', { 'stroke-width': 6, 'stroke-linecap': 'round' }, svg);
+    W1.bar2 = el('line', { 'stroke-width': 6, 'stroke-linecap': 'round' }, svg);
+    W1.pt = el('circle', { r: 9, fill: '#1C2B45' }, svg);
+    W1.gp = el('circle', { r: 9, fill: '#1C2B45' }, svg);
+
+    const snap = $('#snap');
+    DATA.keyPoints.forEach(k => {
+      const b = document.createElement('button'); b.className = 'btn'; b.textContent = k.pi + '（' + k.turn + '）';
+      b.onclick = () => { stopPlay(); $('#ang').value = k.deg; drawWheel(); };
+      snap.appendChild(b);
+    });
+    const tb = $('#refTable');
+    tb.innerHTML = '<tr><th>課本寫</th>' + DATA.keyPoints.map(k => '<td>' + k.pi + '</td>').join('') + '</tr>'
+      + '<tr><th>轉了</th>' + DATA.keyPoints.map(k => '<td>' + k.turn + '</td>').join('') + '</tr>'
+      + '<tr><th>角度</th>' + DATA.keyPoints.map(k => '<td>' + k.deg + '°</td>').join('') + '</tr>';
+    $('#ang').addEventListener('input', () => { stopPlay(); drawWheel(); });
+    $('#play').addEventListener('click', () => { playing ? stopPlay() : startPlay(); });
+    drawWheel();
+  }
+  function drawWheel() {
+    const d = +$('#ang').value, a = d * Math.PI / 180, s = Math.sin(a);
+    const sv = Math.abs(s) < 0.005 ? 0 : s;
+    const px = WH.cx + WH.R * Math.cos(a), py = WH.cy - WH.R * sv, X = WH.x0 + WH.gw * d / 360;
+    const c = sv > 0 ? '#E8742A' : (sv < 0 ? '#17936A' : 'transparent');
+    W1.pt.setAttribute('cx', px); W1.pt.setAttribute('cy', py);
+    W1.gp.setAttribute('cx', X); W1.gp.setAttribute('cy', py);
+    W1.radius.setAttribute('x2', px); W1.radius.setAttribute('y2', py);
+    [[W1.bar1, px], [W1.bar2, X]].forEach(p => { p[0].setAttribute('x1', p[1]); p[0].setAttribute('x2', p[1]); p[0].setAttribute('y1', WH.cy); p[0].setAttribute('y2', py); p[0].setAttribute('stroke', c); });
+    W1.guide.setAttribute('x1', px); W1.guide.setAttribute('y1', py); W1.guide.setAttribute('x2', X); W1.guide.setAttribute('y2', py);
+    let path = 'M' + WH.x0 + ' ' + WH.cy;
+    for (let i = 1; i <= d; i++) path += 'L' + (WH.x0 + WH.gw * i / 360).toFixed(1) + ' ' + (WH.cy - WH.R * Math.sin(i * Math.PI / 180)).toFixed(1);
+    W1.trace.setAttribute('d', path);
+    const k = DATA.keyPoints.find(p => p.deg === d);
+    $('#rTurn').textContent = k ? k.turn : (d / 360).toFixed(2) + ' 圈';
+    $('#rPi').textContent = k ? k.pi : '約 ' + (d / 180).toFixed(2) + 'π';
+    $('#rWhere').textContent = k ? k.where : (sv > 0 ? '中心上面' : '中心下面');
+    const h = $('#rH'); h.textContent = sv === 0 ? '0' : fmt(+sv.toFixed(2));
+    h.style.color = sv > 0 ? 'var(--pos)' : (sv < 0 ? 'var(--neg)' : 'var(--ink)');
+    if (d === 360) markDone(1);
+  }
+  function startPlay() {
+    const r = $('#ang'); if (+r.value >= 360) r.value = 0;
+    playing = true; $('#play').textContent = '暫停';
+    let last = null;
+    const tick = t => {
+      if (!playing) return;
+      if (last === null) last = t;
+      const step = Math.max(1, Math.round((t - last) / 16 * 1.2)); last = t;
+      r.value = Math.min(360, +r.value + step); drawWheel();
+      if (+r.value >= 360) { stopPlay(); return; }
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+  }
+  function stopPlay() { playing = false; if (raf) cancelAnimationFrame(raf); raf = null; const b = $('#play'); if (b) b.textContent = '播放'; }
+
+  /* --- 第 2 步：五點口訣 --- */
+  let five = [], fiveChecked = false;
+  function initFive() {
+    five = DATA.keyPoints.map(() => null); fiveChecked = false;
+    $('#fiveMsg').textContent = ''; $('#fiveMsg').className = 'msg'; $('#fiveRhyme').classList.remove('on');
+    const rows = $('#fiveRows'); rows.innerHTML = '';
+    DATA.keyPoints.forEach((k, i) => {
+      const r = document.createElement('div'); r.className = 'row';
+      r.innerHTML = '<div class="rowlab"><b>x = ' + k.pi + '</b><span>' + k.turn + '，高度是？</span></div><div class="choices"></div><span class="mark"></span>';
+      const c = r.querySelector('.choices');
+      shuffle(DATA.heightChoices).forEach(v => {
+        const b = document.createElement('button'); b.className = 'chip'; b.textContent = fmt(v);
+        b.onclick = () => {
+          if (fiveChecked) { fiveChecked = false; $('#fiveRhyme').classList.remove('on'); }
+          five[i] = v; c.querySelectorAll('.chip').forEach(x => x.classList.toggle('sel', x === b));
+          const m = r.querySelector('.mark'); m.textContent = ''; m.className = 'mark';
+          $('#fiveMsg').textContent = ''; drawFive(false);
+        };
+        c.appendChild(b);
+      });
+      rows.appendChild(r);
+    });
+    drawFive(false);
+  }
+  function drawFive(showCurve) {
+    const G = makeGraph($('#fiveSvg'), 0, 2, { H: 250, A: 85, half: true });
+    if (showCurve) curve(G, 0, 2, 'curve');
+    DATA.keyPoints.forEach((k, i) => {
+      const X = G.sx(k.deg / 180);
+      if (five[i] === null) txt(X, G.sy(1) - 2, '?', { class: 'qmark' }, G.top);
+      else el('circle', { cx: X, cy: G.sy(five[i]), r: 10, class: showCurve ? 'pt-ok' : 'pt-user' }, G.top);
+    });
+  }
+  function checkFive() {
+    const msg = $('#fiveMsg');
+    if (five.some(v => v === null)) { msg.className = 'msg no'; msg.textContent = '還有位置沒選，每一列都要點一個答案。'; return; }
+    let wrong = 0;
+    document.querySelectorAll('#fiveRows .row').forEach((r, i) => {
+      const ok = five[i] === DATA.keyPoints[i].y, m = r.querySelector('.mark');
+      m.textContent = ok ? '✓' : '✗'; m.className = 'mark ' + (ok ? 'ok' : 'no'); if (!ok) wrong++;
+    });
+    fiveChecked = true;
+    if (wrong === 0) {
+      drawFive(true); msg.className = 'msg ok'; msg.textContent = '全對！把五個點用平滑曲線連起來，就是波浪。';
+      $('#fiveRhyme').classList.add('on'); markDone(2);
+    } else {
+      addWrong('s2'); msg.className = 'msg no';
+      msg.textContent = '有 ' + wrong + ' 個不對。回到第 1 步，按那個位置的按鈕，看點在圓的哪裡。';
+    }
+  }
+
+  /* --- 第 3 步：週期 --- */
+  let perL = 0, perR = 0;
+  function drawPer() {
+    const G = makeGraph($('#perSvg'), -4, 6, { H: 260, A: 80 });
+    for (let k = -perL; k <= perR; k++) {
+      const a = 2 * k, b = a + 2;
+      el('rect', { x: G.sx(a), y: G.sy(1) - 14, width: G.sx(b) - G.sx(a), height: G.sy(-1) - G.sy(1) + 28, class: k === 0 ? 'band0' : (Math.abs(k) % 2 ? 'band1' : 'band2') }, G.bands);
+      curve(G, a, b, k === 0 ? 'curve' : 'curve copy');
+    }
+    txt((G.sx(0) + G.sx(2)) / 2, 16, '原本這一段：長 2π', { class: 'lbl' }, G.lab);
+    const n = perL + perR + 1, m = $('#perMsg');
+    m.className = 'msg';
+    m.textContent = n === 1 ? '這是 0 到 2π，轉一圈的波浪。按上面的按鈕，把它往左右複製。'
+      : '現在有 ' + n + ' 段，每一段長 2π，形狀完全一樣。所以 sin x 的週期是 2π。';
+    if (perL > 0 && perR > 0) markDone(3);
+  }
+
+  /* --- 第 4 步：特性與測驗 --- */
+  let mqSel = new Set(), tfAns = [];
+  function initProps() {
+    $('#propTable').innerHTML = DATA.properties.map(p => '<tr><td>' + p.name + '</td><td>' + p.book + '</td><td>' + p.plain + '</td></tr>').join('');
+    $('#mqPrompt').textContent = DATA.multiQuiz.prompt;
+    initQuiz();
+  }
+  function initQuiz() {
+    mqSel = new Set(); tfAns = DATA.tfQuiz.map(() => null);
+    $('#quizMsg').textContent = ''; $('#quizMsg').className = 'msg';
+    const box = $('#mqOpts'); box.innerHTML = '';
+    DATA.multiQuiz.options.forEach((o, i) => {
+      const b = document.createElement('button'); b.className = 'opt';
+      b.innerHTML = '<span class="box"></span><span><span>' + o.text + '</span><span class="why"></span></span>';
+      b.onclick = () => { mqSel.has(i) ? mqSel.delete(i) : mqSel.add(i); b.classList.toggle('sel', mqSel.has(i)); b.querySelector('.box').textContent = mqSel.has(i) ? '✓' : ''; clearWhy(); };
+      box.appendChild(b);
+    });
+    const tl = $('#tfList'); tl.innerHTML = '';
+    DATA.tfQuiz.forEach((q, i) => {
+      const r = document.createElement('div'); r.className = 'tf';
+      r.innerHTML = '<span><span>' + q.text + '</span><span class="why"></span></span><div class="choices"></div>';
+      const c = r.querySelector('.choices');
+      shuffle([true, false]).forEach(v => {
+        const b = document.createElement('button'); b.className = 'chip'; b.textContent = v ? 'O' : 'X';
+        b.onclick = () => { tfAns[i] = v; c.querySelectorAll('.chip').forEach(x => x.classList.toggle('sel', x === b)); clearWhy(); };
+        c.appendChild(b);
+      });
+      tl.appendChild(r);
+    });
+  }
+  function clearWhy() { document.querySelectorAll('#s4why, .step[data-step="4"] .why').forEach(w => { w.textContent = ''; w.className = 'why'; }); $('#quizMsg').textContent = ''; }
+  function checkQuiz() {
+    const msg = $('#quizMsg');
+    if (tfAns.some(v => v === null)) { msg.className = 'msg no'; msg.textContent = '是非題還有沒選的。'; return; }
+    let wrong = 0;
+    document.querySelectorAll('#mqOpts .opt').forEach((b, i) => {
+      const o = DATA.multiQuiz.options[i], ok = mqSel.has(i) === o.ok, w = b.querySelector('.why');
+      if (!ok) wrong++;
+      if (mqSel.has(i) || o.ok) { w.textContent = o.why; w.className = 'why ' + (ok ? 'ok' : 'no'); }
+    });
+    document.querySelectorAll('#tfList .tf').forEach((r, i) => {
+      const q = DATA.tfQuiz[i], ok = tfAns[i] === q.ok, w = r.querySelector('.why');
+      if (!ok) wrong++;
+      w.textContent = (ok ? '✓ ' : '✗ ') + (q.ok ? '這句是對的。' : '這句是錯的：') + (q.ok ? q.why : q.why);
+      w.className = 'why ' + (ok ? 'ok' : 'no');
+    });
+    if (wrong === 0) { msg.className = 'msg ok'; msg.textContent = '全對！隨堂練習的答案是 (1)(3)。'; markDone(4); }
+    else { addWrong('s4'); msg.className = 'msg no'; msg.textContent = '有 ' + wrong + ' 題不對，看紅字的說明，再對照上面的白話表。'; }
+  }
+
+  /* --- 第 5 步：找範圍 --- */
+  let rp = 0, rsel = new Set(), rChecked = false;
+  const isNeg = k => Math.abs(k) % 2 === 1;
+  const isTarget = (p, k) => p.sign === '<' ? isNeg(k) : !isNeg(k);
+  function initRange() {
+    const box = $('#probs'); box.innerHTML = '';
+    DATA.rangeProblems.forEach((p, i) => {
+      const b = document.createElement('button');
+      b.className = 'btn' + (i === rp ? ' on' : '');
+      b.textContent = (state.rdone[i] ? '✓ ' : '') + p.note;
+      b.onclick = () => { rp = i; rsel = new Set(); rChecked = false; initRange(); };
+      box.appendChild(b);
+    });
+    const p = DATA.rangeProblems[rp];
+    $('#rngQ').textContent = '已知 ' + piLabel(p.from) + ' ≤ x ≤ ' + piLabel(p.to) + '，求 sin x ' + p.sign + ' 0 的 x 範圍。';
+    $('#rngHint').textContent = '點選波浪在 x 軸' + (p.sign === '<' ? '下面' : '上面') + '的區段（每一格長 π），可以選很多格。';
+    $('#rngMsg').textContent = ''; $('#rngMsg').className = 'msg';
+    $('#rngAns').classList.remove('on');
+    $('#rngLegend').style.display = 'none';
+    drawRange();
+  }
+  function drawRange() {
+    const p = DATA.rangeProblems[rp];
+    const G = makeGraph($('#rngSvg'), p.from, p.to, { H: 260, A: 80, half: (p.to - p.from) <= 2 });
+    for (let k = p.from; k < p.to; k++) {
+      let cls = 'seg' + (rsel.has(k) ? ' sel' : '');
+      if (rChecked) {
+        const t = isTarget(p, k), s = rsel.has(k);
+        cls = 'seg' + (t && s ? ' good' : (!t && s ? ' bad' : (t && !s ? ' miss' : '')));
+      }
+      const r = el('rect', { x: G.sx(k) + 3, y: G.sy(1) - 16, width: G.sx(k + 1) - G.sx(k) - 6, height: G.sy(-1) - G.sy(1) + 32, rx: 10, class: cls, tabindex: 0, role: 'button', 'aria-label': piLabel(k) + ' 到 ' + piLabel(k + 1) }, G.bands);
+      const toggle = () => {
+        rsel.has(k) ? rsel.delete(k) : rsel.add(k);
+        if (rChecked) { rChecked = false; $('#rngLegend').style.display = 'none'; $('#rngAns').classList.remove('on'); }
+        $('#rngMsg').textContent = ''; drawRange();
+      };
+      r.addEventListener('click', toggle);
+      r.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } });
+    }
+    if (rChecked) { for (let k = p.from; k < p.to; k++) curve(G, k, k + 1, 'curve ' + (isNeg(k) ? 'negc' : 'posc')); }
+    else curve(G, p.from, p.to, 'curve');
+  }
+  function checkRange() {
+    const p = DATA.rangeProblems[rp], msg = $('#rngMsg');
+    if (rsel.size === 0) { msg.className = 'msg no'; msg.textContent = '先點選至少一格。'; return; }
+    let ok = true;
+    for (let k = p.from; k < p.to; k++) if (isTarget(p, k) !== rsel.has(k)) ok = false;
+    rChecked = true; drawRange();
+    if (ok) {
+      const parts = []; for (let k = p.from; k < p.to; k++) if (isTarget(p, k)) parts.push(piLabel(k) + ' < x < ' + piLabel(k + 1));
+      msg.className = 'msg ok'; msg.textContent = '全對！';
+      const a = $('#rngAns');
+      a.innerHTML = '答案：<b>' + parts.join('　或　') + '</b><br><span style="font-size:16px;color:var(--muted)">' + parts.length + ' 段要全部寫出來。端點高度是 0，不算「' + (p.sign === '<' ? '小於' : '大於') + ' 0」，所以不加等號。</span>';
+      a.classList.add('on');
+      state.rdone[rp] = true; save();
+      if (DATA.rangeProblems.every((_, i) => state.rdone[i])) markDone(5);
+      const btn = $('#probs').children[rp]; if (btn) btn.textContent = '✓ ' + p.note;
+    } else {
+      addWrong('s5'); msg.className = 'msg no';
+      msg.textContent = '還不對。橘色線在 x 軸上面，綠色線在 x 軸下面，對照一下再改。';
+      $('#rngLegend').style.display = 'flex';
+    }
+  }
+
+  /* --- 啟動 --- */
+  load();
+  addStepNav();
+  initWheel();
+  initFive();
+  drawPer();
+  initProps();
+  initRange();
+  renderStats();
+  $('#fiveCheck').onclick = checkFive;
+  $('#fiveRetry').onclick = initFive;
+  $('#perLeft').onclick = () => { if (perL < 2) { perL++; drawPer(); } };
+  $('#perRight').onclick = () => { if (perR < 2) { perR++; drawPer(); } };
+  $('#perReset').onclick = () => { perL = 0; perR = 0; drawPer(); };
+  $('#quizCheck').onclick = checkQuiz;
+  $('#quizRetry').onclick = initQuiz;
+  $('#rngCheck').onclick = checkRange;
+  $('#rngClear').onclick = () => { rsel = new Set(); rChecked = false; $('#rngLegend').style.display = 'none'; $('#rngAns').classList.remove('on'); $('#rngMsg').textContent = ''; drawRange(); };
+  $('#resetAll').onclick = () => {
+    if (!confirm('確定要清除所有紀錄嗎？')) return;
+    try { localStorage.removeItem(DATA.storageKey); } catch (e) {}
+    location.reload();
+  };
+  go(state.step || 1);
+})();
+</script>
+</body>
+</html>
