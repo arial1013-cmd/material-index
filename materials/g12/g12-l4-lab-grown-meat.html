@@ -1,0 +1,715 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>G12 L4 Lab-Grown Meat 練習</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: one centered column for tablets; petri-dish cell strip on top, tabbed sections (文法→片語→單字→錯題本), one question per card. */
+:root{
+  --bg:#F2F6F6; --surface:#FFFFFF; --ink:#14232A; --muted:#566870; --line:#D8E3E5;
+  --marigold:#0F766E; --marigold-ink:#0B5A54; --marigold-bg:#D4F1EC;
+  --rose:#B9461A; --rose-bg:#FCE3D6; --violet:#3B5BA9; --violet-bg:#E1E8F8;
+  --good:#1F7A4D; --good-bg:#DDF2E6; --bad:#B42318; --bad-bg:#FBE1DE;
+  --shadow:0 1px 2px rgba(20,35,42,.06),0 4px 14px rgba(20,35,42,.06);
+  --f-ui:system-ui,-apple-system,"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;
+  --f-word:"Avenir Next","Segoe UI","Helvetica Neue",Arial,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0F1A1D; --surface:#172428; --ink:#E8F1F2; --muted:#9DB0B5; --line:#2B3B40;
+  --marigold:#4FD1C0; --marigold-ink:#7EE0D2; --marigold-bg:#12332F;
+  --rose:#FF9B6A; --rose-bg:#3A1E12; --violet:#9DB4F0; --violet-bg:#1C2640;
+  --good:#6FD3A0; --good-bg:#173326; --bad:#FF8A80; --bad-bg:#3F1714;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.25); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0F1A1D; --surface:#172428; --ink:#E8F1F2; --muted:#9DB0B5; --line:#2B3B40;
+  --marigold:#4FD1C0; --marigold-ink:#7EE0D2; --marigold-bg:#12332F;
+  --rose:#FF9B6A; --rose-bg:#3A1E12; --violet:#9DB4F0; --violet-bg:#1C2640;
+  --good:#6FD3A0; --good-bg:#173326; --bad:#FF8A80; --bad-bg:#3F1714;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.25); color-scheme:dark}
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-ui);font-size:17px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 48px}
+.wrap{max-width:820px;margin:0 auto}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:3px solid var(--marigold);outline-offset:2px}
+
+/* petri-dish cells */
+.picado{display:flex;gap:12px;justify-content:center;align-items:center;margin:0 auto;padding:14px 0 2px;max-width:820px;overflow:hidden;height:52px}
+.flag{flex:0 0 auto;width:var(--s,26px);height:var(--s,26px);border-radius:50%;border:2px solid var(--c);
+  background:radial-gradient(circle at 44% 44%,var(--c) 0 22%,transparent 25%),var(--cb)}
+.flag:nth-child(4n+1){--c:var(--marigold);--cb:var(--marigold-bg)} .flag:nth-child(4n+2){--c:var(--rose);--cb:var(--rose-bg)}
+.flag:nth-child(4n+3){--c:var(--violet);--cb:var(--violet-bg)} .flag:nth-child(4n+4){--c:var(--good);--cb:var(--good-bg)}
+.flag:nth-child(3n+1){--s:20px} .flag:nth-child(3n+2){--s:32px} .flag:nth-child(5n){--s:16px}
+.formula .chiprow{display:flex;flex-wrap:wrap;gap:6px}
+.formula .chiprow span{background:var(--surface);border-radius:999px;padding:2px 12px;font-family:var(--f-word)}
+
+header.top{padding:14px 0 8px}
+.eyebrow{font-size:13px;letter-spacing:.08em;color:var(--muted);text-transform:uppercase}
+h1{font-family:var(--f-word);font-size:clamp(26px,5vw,36px);line-height:1.2;margin:2px 0 4px;text-wrap:balance}
+.sub{color:var(--muted);margin:0}
+
+nav.tabs{display:flex;gap:6px;margin:16px 0 12px;border-bottom:2px solid var(--line);overflow-x:auto}
+nav.tabs button{background:none;border:0;padding:10px 16px;font-weight:600;color:var(--muted);border-bottom:3px solid transparent;margin-bottom:-2px;white-space:nowrap}
+nav.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--marigold)}
+.badge{display:inline-block;min-width:22px;padding:0 6px;border-radius:11px;background:var(--rose-bg);color:var(--rose);font-size:13px;margin-left:4px;text-align:center}
+
+.steps{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 16px}
+.chip{border:1.5px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 16px;font-size:15px}
+.chip[aria-pressed="true"]{background:var(--marigold-bg);border-color:var(--marigold);color:var(--marigold-ink);font-weight:700}
+.row-label{font-size:13px;color:var(--muted);letter-spacing:.06em;margin:0 0 6px}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;box-shadow:var(--shadow)}
+.stack{display:grid;gap:14px}
+.muted{color:var(--muted)}
+.formula{background:var(--marigold-bg);color:var(--ink);border-radius:10px;padding:10px 14px;font-weight:600;margin:10px 0}
+.card h3{margin:0;font-size:19px}
+.card ul{margin:8px 0 0;padding-left:22px}
+.ex{display:flex;gap:8px;align-items:flex-start;margin-top:10px}
+.ex .en{font-family:var(--f-word)}
+.ex .zh{color:var(--muted);font-size:15px}
+mark{background:var(--rose-bg);color:var(--rose);padding:0 3px;border-radius:4px;font-style:normal;font-weight:700}
+
+.say{flex:0 0 auto;width:36px;height:36px;border-radius:50%;border:1.5px solid var(--line);background:var(--surface);display:inline-grid;place-items:center;padding:0}
+.say svg{width:18px;height:18px;fill:none;stroke:var(--marigold-ink);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* quiz */
+.qhead{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums}
+.bar{height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin:8px 0 16px}
+.bar i{display:block;height:100%;background:var(--marigold);transition:width .3s}
+.prompt{font-size:20px;line-height:1.55;margin:0 0 4px;display:flex;gap:10px;align-items:flex-start}
+.prompt .big{font-family:var(--f-word);font-size:34px;font-weight:700}
+.opts{display:grid;gap:10px;margin-top:16px}
+.opt{text-align:left;border:2px solid var(--line);background:var(--surface);border-radius:12px;padding:12px 16px;min-height:52px;display:flex;gap:12px;align-items:center}
+.opt .k{flex:0 0 28px;height:28px;border-radius:50%;background:var(--bg);display:grid;place-items:center;font-size:14px;font-weight:700;color:var(--muted)}
+.opt:hover:not(:disabled){border-color:var(--marigold)}
+.opt.ok{border-color:var(--good);background:var(--good-bg)} .opt.ok .k{background:var(--good);color:var(--surface)}
+.opt.no{border-color:var(--bad);background:var(--bad-bg)} .opt.no .k{background:var(--bad);color:var(--surface)}
+.opt:disabled{cursor:default}
+.fb{margin-top:14px;padding:12px 14px;border-radius:10px;font-size:16px}
+.fb.ok{background:var(--good-bg);color:var(--good)} .fb.no{background:var(--bad-bg);color:var(--bad)}
+.fb b{display:block}
+.fb span{color:var(--ink)}
+.hint{margin-top:12px;padding:10px 14px;border-left:4px solid var(--violet);background:var(--bg);border-radius:0 8px 8px 0;font-size:15px}
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+.btn{border:0;border-radius:10px;padding:11px 20px;font-weight:700;background:var(--marigold);color:#fff}
+:root[data-theme="dark"] .btn{color:#0b1f1c}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .btn{color:#0b1f1c}}
+.btn.ghost{background:var(--surface);color:var(--ink);border:1.5px solid var(--line)}
+.btn:disabled{opacity:.45;cursor:default}
+
+.done{text-align:center}
+.score{font-family:var(--f-word);font-size:56px;font-weight:700;color:var(--marigold-ink);font-variant-numeric:tabular-nums;line-height:1.1}
+
+/* match */
+.match{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.match .col{display:grid;gap:10px;align-content:start;min-width:0}
+.tile{border:2px solid var(--line);background:var(--surface);border-radius:12px;padding:12px;min-height:56px;text-align:center;overflow-wrap:anywhere}
+.tile.en{font-family:var(--f-word);font-weight:700;font-size:18px}
+.tile.sel{border-color:var(--marigold);background:var(--marigold-bg)}
+.tile.ok{border-color:var(--good);background:var(--good-bg);color:var(--good);cursor:default}
+.tile.no{animation:shake .35s;border-color:var(--bad)}
+@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+
+/* flashcards */
+.fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.flip{position:relative;min-height:170px;border:1px solid var(--line);border-radius:14px;background:var(--surface);box-shadow:var(--shadow);padding:16px;text-align:left;display:flex;flex-direction:column;gap:6px}
+.flip .w{font-family:var(--f-word);font-size:26px;font-weight:700}
+.flip .pos{font-size:14px;color:var(--muted)}
+.flip .back{display:none}
+.flip.open{background:var(--marigold-bg);border-color:var(--marigold)}
+.flip.open .back{display:block}
+.flip.open .tap{display:none}
+.flip .tap{margin-top:auto;font-size:13px;color:var(--muted)}
+.flip .say{position:absolute;top:12px;right:12px}
+.back .zh{font-weight:700;font-size:18px}
+.back .exs{font-family:var(--f-word);font-size:15px;margin-top:4px}
+.coll{display:inline-block;margin-top:6px;font-size:14px;padding:1px 10px;border-radius:999px;background:var(--rose-bg);color:var(--rose);font-family:var(--f-word)}
+.back .exz{font-size:14px;color:var(--muted)}
+
+/* tiles (sentence building) */
+.zone{min-height:64px;border:2px dashed var(--line);border-radius:12px;padding:10px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.zone.pool{border-style:solid;background:var(--bg)}
+.wtile{border:1.5px solid var(--line);background:var(--surface);border-radius:8px;padding:6px 12px;font-family:var(--f-word);font-size:18px}
+.wtile.hl{border-color:var(--violet);box-shadow:0 0 0 3px var(--rose-bg)}
+.zone.ok{border-color:var(--good);background:var(--good-bg)}
+
+/* spelling */
+.spell-in{width:100%;font:inherit;font-size:22px;font-family:var(--f-word);padding:10px 14px;border:2px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);margin-top:14px}
+.letters{font-family:var(--f-word);font-size:26px;letter-spacing:.18em;color:var(--marigold-ink);font-weight:700}
+
+/* wrong book */
+.wlist{display:grid;gap:8px;margin-top:12px}
+.witem{display:flex;justify-content:space-between;gap:12px;padding:10px 14px;border:1px solid var(--line);border-radius:10px;background:var(--surface);min-width:0}
+.witem .t{min-width:0;overflow-wrap:anywhere}
+.tag{font-size:12px;padding:2px 8px;border-radius:6px;background:var(--rose-bg);color:var(--rose);white-space:nowrap;align-self:flex-start}
+.empty{text-align:center;padding:36px 16px;color:var(--muted)}
+
+@media (max-width:480px){body{font-size:16px}.prompt{font-size:18px}.prompt .big{font-size:28px}.card{padding:16px}.tile.en{font-size:16px}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+
+<div class="picado" aria-hidden="true" id="picado"></div>
+<div class="wrap">
+  <header class="top">
+    <div class="eyebrow">G12 English · Lesson 4</div>
+    <h1>Lab-Grown Meat 練習</h1>
+    <p class="sub">複合形容詞只看最後一個字。先練文法，再練片語和單字，答錯的題目會自動收進錯題本。</p>
+  </header>
+  <nav class="tabs" role="tablist" id="tabs"></nav>
+  <main id="main"></main>
+</div>
+
+<script>
+/* ===================== 資料 DATA ===================== */
+const DATA = {
+  grammar: {
+    // 看重點的卡片（formula 與 rules 可放 HTML）
+    points: [
+      {
+        title: '先記住：只看「最後一個字」',
+        formula: '① 數字開頭 → 名詞不加 s<br>② 最後是動詞 → -ing 或 p.p.<br>③ 最後是名詞 → 加 -ed',
+        rules: [
+          '複合形容詞是兩個以上的字用「-」連起來，放在名詞前面形容它。',
+          '課本列了 11 種，但考試只考一件事：<mark>最後一個字要變成什麼形狀</mark>。',
+          '不在三個判斷裡的，就當單字整組背（看最後一張卡）。',
+        ],
+      },
+      {
+        title: '判斷①　數字開頭',
+        formula: '數字 - 名詞（單數）＋ 名詞',
+        rules: [
+          '看到 ten-、five-、three- 開頭，後面的名詞<mark>不加 s</mark>。',
+          '因為整個字變成形容詞了，形容詞沒有單複數。',
+        ],
+        examples: [
+          ['We live in a ten-story building.', '我們住在一棟十層樓的建築裡。'],
+          ['She stayed at a five-star hotel.', '她住在一間五星級飯店。'],
+        ],
+      },
+      {
+        title: '判斷②　最後是動詞',
+        formula: '這個東西「會去做」→ V-ing　｜　這個東西「被做」→ p.p.',
+        rules: [
+          '問自己一句話：<mark>這個東西會去做這件事嗎？</mark>',
+          '會 → <b>-ing</b>：工作會耗時間 → time-consum<b>ing</b>',
+          '是被做的 → <b>p.p.</b>：蛋糕不會自己做 → hand-<b>made</b>',
+          '中英倒序小技巧：英文常常是中文倒過來。省時 → time-saving；手工做 → hand-made；心碎 → heart-broken。',
+        ],
+        examples: [
+          ['Applying to a university is time-consuming.', '申請大學很耗時。'],
+          ['The freshly-baked cake smells great.', '剛烤好的蛋糕聞起來好香。'],
+        ],
+      },
+      {
+        title: '判斷③　最後是名詞',
+        formula: '形容詞／數字 - 名詞 ＋ ed ＝「有……的」',
+        rules: [
+          'mind、heart、leg、eye 這些是名詞，加 <mark>-ed</mark>，意思變成「有……的」。',
+          'open-mind<b>ed</b> ＝ 有開放的心的；three-legg<b>ed</b> ＝ 有三隻腳的。',
+        ],
+        examples: [
+          ['Ms. Ford is an open-minded teacher.', 'Ford 老師是一位心胸開放的老師。（課本）'],
+          ['I saw a three-legged dog.', '我看到一隻三隻腳的狗。'],
+        ],
+      },
+      {
+        title: '長句縮成複合形容詞（課本第 4 題）',
+        formula: '① 找 who／which 後面那段 → ② 拿掉動詞留關鍵字 → ③ 用三個判斷決定最後一個字',
+        rules: [
+          'a teacher <u>who has an open mind</u> → open mind → mind 是名詞 → <b>an open-minded teacher</b>',
+          'a scholar <u>who is well respected</u> → well respected → 學者被尊敬 → <b>a well-respected scholar</b>',
+        ],
+      },
+      {
+        title: '不套規則：整組記',
+        formula: '<div class="chiprow"><span>sugar-free 無糖的</span><span>user-friendly 容易使用的</span><span>all-you-can-eat 吃到飽的</span><span>once-in-a-lifetime 一生一次的</span><span>long-lasting 持久的</span></div>',
+        rules: ['這些直接當單字背，不用想規則。long-lasting 在課本第 2 題出現過。'],
+      },
+    ],
+    // book: true 的是課本原題，在「3 課本原題」裡照順序出現
+    mcq: [
+      { q: 'We live in a ten-______ building.', a: 'story', d: ['stories', 'storys', 'storied'],
+        hint: '開頭是數字 ten，後面的名詞要加 s 嗎？', ex: '判斷①：數字開頭，名詞用單數 → story。' },
+      { q: 'She stayed at a five-______ hotel.', a: 'star', d: ['stars', 'starred', 'starring'],
+        hint: '開頭是數字 five。', ex: '判斷①：數字開頭，名詞用單數 → star。' },
+      { q: 'This is a ______ job. It takes me three hours.', a: 'time-consuming', d: ['time-consumed', 'times-consuming', 'time-consume'],
+        hint: '這份工作「會」花時間，還是「被」花掉？', ex: '判斷②：工作會耗時間 → -ing。' },
+      { q: 'My grandma made a ______ cake for me.', a: 'home-made', d: ['home-making', 'home-make', 'homes-made'],
+        hint: '蛋糕會自己做嗎？', ex: '判斷②：蛋糕是被做的 → p.p.' },
+      { q: 'He was ______ after his dog died.', a: 'heart-broken', d: ['heart-breaking', 'heart-break', 'hearts-broken'],
+        hint: '是他讓別人心碎，還是他的心被弄碎？', ex: '判斷②：他的心被弄碎 → p.p.' },
+      { q: 'That was a ______ movie. Everyone cried.', a: 'heart-breaking', d: ['heart-broken', 'heart-break', 'hearts-breaking'],
+        hint: '是電影讓人心碎，還是電影被弄碎？', ex: '判斷②：電影會讓人心碎 → -ing。' },
+      { q: 'My sister is ______. She listens to new ideas.', a: 'open-minded', d: ['open-minding', 'open-mind', 'opened-mind'],
+        hint: 'mind 在這裡是名詞還是動詞？', ex: '判斷③：mind 是名詞 → 加 -ed，「有開放的心的」。' },
+      { q: 'Tom is a ______ boy. He always helps others.', a: 'kind-hearted', d: ['kind-hearting', 'kind-heart', 'kindly-heart'],
+        hint: 'heart 是名詞。', ex: '判斷③：heart 是名詞 → 加 -ed，「有好心的」。' },
+      { q: 'I saw a ______ cat. It has only three legs.', a: 'three-legged', d: ['three-legs', 'three-leg', 'three-legging'],
+        hint: '「有三隻腳的」，leg 是名詞。', ex: '判斷③：名詞 leg 加 -ed（g 要重複）。' },
+      { q: 'This app is ______. It saves me a lot of time.', a: 'time-saving', d: ['time-saved', 'times-saving', 'time-save'],
+        hint: '這個 app 會去省時間嗎？', ex: '判斷②：app 會省時間 → -ing。' },
+      { q: 'The ______ students got good grades.', a: 'hard-working', d: ['hard-worked', 'hard-work', 'hardly-working'],
+        hint: '學生自己會努力嗎？', ex: '判斷②：學生自己會努力 → -ing。' },
+      { q: 'Please drink ______ tea. Too much sugar is bad for you.', a: 'sugar-free', d: ['sugar-freed', 'sugar-freeing', 'sugars-free'],
+        hint: '這個字在「整組記」那張卡片裡。', ex: '整組記：sugar-free（無糖的）不套規則。' },
+
+      { book: true, q: 'In most countries, the process of applying to a university is often very ______.', a: 'time-consuming', d: ['time-consumed', 'times-consumed', 'times-consuming'],
+        hint: '申請的過程「會」花時間嗎？time 要加 s 嗎？', ex: '判斷②：過程會耗時 → -ing；time 不加 s。（課本第 1 題）' },
+      { book: true, q: 'It is believed that experiences in early childhood can have ______ effects on one’s life.', a: 'long-lasting', d: ['long-lasts', 'long-last', 'long-lasted'],
+        hint: '影響是「會」持續很久，還是「被」持續？', ex: '判斷②：影響會持續 → -ing。（課本第 2 題）' },
+      { book: true, q: 'The freshly-______ cake has a mouth-watering aroma of chocolate and strawberries.', zh: '這個剛烤好的蛋糕有一股令人口水直流的巧克力與草莓香味。', a: 'baked', d: ['baking', 'bake', 'bakes'],
+        hint: '蛋糕會自己烤嗎？', ex: '判斷②：蛋糕是被烤的 → baked。（課本第 3 題）' },
+      { book: true, q: 'The freshly-baked cake has a mouth-______ aroma of chocolate and strawberries.', zh: '這個剛烤好的蛋糕有一股令人口水直流的巧克力與草莓香味。', a: 'watering', d: ['watered', 'water', 'waters'],
+        hint: '香味「會讓」口水流嗎？', ex: '判斷②：香味會讓人流口水 → watering。（課本第 3 題）' },
+      { book: true, q: 'Ms. Ford is a teacher who has an open mind. → Ms. Ford is an ______ teacher.', a: 'open-minded', d: ['open-minding', 'open-mind', 'opened-mind'],
+        hint: 'mind 是名詞。', ex: '判斷③：名詞 mind 加 -ed。（課本第 4 題）' },
+      { book: true, q: 'Ms. Ford is a scholar who is well respected. → Ms. Ford is a ______ scholar.', a: 'well-respected', d: ['well-respecting', 'well-respect', 'respected-well'],
+        hint: '學者是去尊敬別人，還是被尊敬？', ex: '判斷②：學者被尊敬 → p.p.（課本第 4 題）' },
+    ],
+  },
+  sentences: [
+    { zh: 'Ford 老師不僅是一位心胸開放的老師，也是一位備受尊敬的學者。（課本第 4 題）', en: 'Ms. Ford is not only an open-minded teacher but also a well-respected scholar.' },
+    { zh: '這個剛烤好的蛋糕有一股令人口水直流的香味。（課本第 3 題）', en: 'The freshly-baked cake has a mouth-watering aroma.' },
+    { zh: '這位音樂家的作品以結構嚴謹的編排而聞名。（課本第 5 題・挑戰）', en: 'The musician’s works are known for their well-structured arrangements.' },
+    { zh: '申請大學很耗時。', en: 'Applying to a university is time-consuming.' },
+    { zh: '我們住在一棟十層樓的建築裡。', en: 'We live in a ten-story building.' },
+    { zh: '我姊姊是一個心胸開放的人。', en: 'My sister is an open-minded person.' },
+  ],
+  phrases: [
+    { p: 'have … at heart', zh: '在意；關心', note: '把某事「放在心上」。常用 have sb.’s best interests at heart。', ex: 'Rebecca’s father has her best interests at heart.', exZh: 'Rebecca 的父親把她的最佳利益放在心上。' },
+    { p: 'rest assured', zh: '儘管放心', note: '讓對方不用擔心，後面常接 that 子句。', ex: 'Rest assured that I’ll have this job finished for you by 5 p.m.', exZh: '儘管放心，我會在下午五點前幫你把這件工作做完。' },
+    { p: 'better still', zh: '更好的是；何不', note: '＝ even better。是副詞，前面要先有連接詞，例如 or better still。', ex: 'Give her a call to apologize, or better still, go and say sorry in person.', exZh: '打電話跟她道歉，或者親自去跟她說對不起更好。' },
+    { p: 'take a … toll (on)', zh: '造成惡果；造成傷害', note: '常用 take a heavy toll on，「造成嚴重傷害」。', ex: 'Drinking too much alcohol takes a heavy toll on a person’s health.', exZh: '喝太多酒會對一個人的健康造成嚴重傷害。' },
+    { p: 'in theory', zh: '理論上；按理說', note: '相反詞是 in practice（實際上），兩個常一起出現。', ex: 'In theory, the plan has many benefits, but in practice, it would cause many problems.', exZh: '理論上，這個計畫有許多好處，但實際上會造成很多問題。' },
+    { p: 'at a price', zh: '付出代價', note: '得到某樣東西，也要接受不好的結果。常用 come at a price。', ex: 'John’s pursuit of fame came at a price.', exZh: 'John 為了追求成名付出了代價。' },
+    { p: 'jump to conclusions', zh: '匆忙下結論；貿然斷定', note: '也可以寫成 jump to the conclusion that ＋ 子句。', ex: 'You should avoid jumping to conclusions. Get some information before you decide.', exZh: '你應該避免匆忙下結論。在決定前先取得一些資訊。' },
+    { p: 'keep a(n) (…) eye on', zh: '照看；留意', note: 'a 和 eye 中間可以加形容詞，例如 keep a close eye on（緊盯）。', ex: 'Tim’s parents have kept a close eye on his test scores.', exZh: 'Tim 的父母一直緊盯著他的考試成績。' },
+  ],
+  // pid = 對應的片語（0–7），用來挑選干擾選項
+  phraseQs: [
+    { pid: 0, q: 'My mom always has my best interests ______.', a: 'at heart', zh: '我媽媽總是把我的利益放在心上。' },
+    { pid: 1, q: 'You can ______ that your dog will be safe with us.', a: 'rest assured', zh: '你可以儘管放心，你的狗跟我們在一起會很安全。' },
+    { pid: 2, q: 'You can take the bus, or ______, ride a bike with me.', a: 'better still', zh: '你可以搭公車，或者更好的是，跟我一起騎腳踏車。' },
+    { pid: 3, q: 'Staying up late every night will ______ on your health.', a: 'take a heavy toll', zh: '每天熬夜會對你的健康造成嚴重傷害。' },
+    { pid: 4, q: 'The plan sounds good ______, but in practice it is hard to do.', a: 'in theory', zh: '這個計畫理論上聽起來很好，但實際上很難做到。' },
+    { pid: 5, q: 'He won the game, but it came ______: he hurt his leg.', a: 'at a price', zh: '他贏了比賽，但付出了代價：他的腳受傷了。' },
+    { pid: 6, q: 'Don’t ______. Listen to the whole story first.', a: 'jump to conclusions', zh: '不要匆忙下結論，先聽完整件事。' },
+    { pid: 7, q: 'Can you ______ my bag? I’ll be right back.', a: 'keep an eye on', zh: '你可以幫我看一下包包嗎？我馬上回來。' },
+    { pid: 0, q: 'A good doctor has the patients’ interests ______.', a: 'at heart', zh: '好醫生會把病人的利益放在心上。' },
+    { pid: 3, q: 'The long war ______ on the country.', a: 'took a heavy toll', zh: '長期的戰爭對這個國家造成嚴重的傷害。' },
+    { pid: 6, q: 'We shouldn’t ______ before we know all the facts.', a: 'jump to conclusions', zh: '在知道所有事實之前，我們不應該匆忙下結論。' },
+    { pid: 7, q: 'The teacher ______ the students during the field trip.', a: 'kept a close eye on', zh: '校外教學時，老師緊緊看著學生。' },
+  ],
+  // [單字, 詞性, 中文, 例句, 例句中譯, 例句中出現的字形, 搭配詞]
+  // 例句採用課本 Part F 的句子，拼字練習也用這些
+  vocab: [
+    ['recent', 'adj.', '最近的；近來的', 'Have you read any recent news about the election?', '你有讀到最近關於選舉的新聞嗎？', 'recent', ''],
+    ['livestock', 'n.[U]', '牲畜；家畜', 'Farmers here raise livestock such as cows and sheep.', '這裡的農夫養牛、羊之類的家畜。', 'livestock', 'livestock market'],
+    ['vitamin', 'n.[C]', '維他命', 'Oranges are rich in vitamin C.', '柳橙富含維他命 C。', 'vitamin', ''],
+    ['mineral', 'n.[C]', '礦物質', 'This soil lacks the minerals plants need to grow well.', '這塊土壤缺乏植物生長所需的礦物質。', 'minerals', 'rich in minerals'],
+    ['concern', 'n./vt.', '擔心（的事）；憂慮', 'Parents often have a concern about their children’s safety.', '父母常常擔心孩子的安全。', 'concern', 'concern about sth.'],
+    ['estimate', 'vt.', '估計；估算', 'Can you estimate how long the project will take?', '你可以估計這個計畫要花多久時間嗎？', 'estimate', 'It is estimated that + S + V'],
+    ['quantity', 'n.[C]', '數量', 'The factory produces a large quantity of goods every day.', '這間工廠每天生產大量的商品。', 'quantity', 'large quantities'],
+    ['switch', 'vi./vt.', '（使）改變；轉變', 'Please remember to switch off the lights before you leave.', '離開前請記得關燈。', 'switch', 'switch between A and B'],
+    ['allergic', 'adj.', '過敏的', 'My brother is allergic to peanuts.', '我弟弟對花生過敏。', 'allergic', 'be allergic to sth.'],
+    ['reaction', 'n.[C]', '生理反應；副作用', 'She had an unexpected reaction to the new medicine.', '她對新藥產生了意料之外的反應。', 'reaction', 'have an allergic reaction to sth.'],
+  ],
+  groups: ['第一組', '第二組'],
+};
+
+
+/* ===================== 工具 ===================== */
+const $ = (s, el = document) => el.querySelector(s);
+const h = (html) => { const t = document.createElement('template'); t.innerHTML = html.trim(); return t.content.firstElementChild; };
+const esc = (s) => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const shuffle = (arr) => { const a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const pick = (arr, n) => shuffle(arr).slice(0, n);
+const LETTERS = 'ABCD';
+
+const store = {
+  get(k, d) { try { const v = localStorage.getItem('g12l4_' + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem('g12l4_' + k, JSON.stringify(v)); } catch (e) {} },
+};
+let wrong = new Set(store.get('wrong', []));
+const saveWrong = () => { store.set('wrong', [...wrong]); updateBadge(); };
+const addWrong = (k) => { if (k) { wrong.add(k); saveWrong(); } };
+const removeWrong = (k) => { if (k && wrong.delete(k)) saveWrong(); };
+
+const SPEAK_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7"/><path d="M19 6a8.5 8.5 0 0 1 0 12"/></svg>';
+function speak(text) {
+  try {
+    const synth = window.speechSynthesis; if (!synth) return;
+    synth.cancel();
+    const u = new SpeechSynthesisUtterance(text.replace(/…/g, ' '));
+    u.lang = 'en-US'; u.rate = 0.85;
+    const v = synth.getVoices().find(v => /^en[-_]US/i.test(v.lang)); if (v) u.voice = v;
+    synth.speak(u);
+  } catch (e) {}
+}
+const sayBtn = (text, label = '朗讀') => `<button class="say" type="button" data-say="${esc(text)}" aria-label="${label}">${SPEAK_SVG}</button>`;
+document.addEventListener('click', (e) => { const b = e.target.closest('[data-say]'); if (b) { e.stopPropagation(); speak(b.dataset.say); } });
+
+/* ===================== 題目產生 ===================== */
+function grammarQ(i) {
+  const it = DATA.grammar.mcq[i];
+  return { key: `g-${i}`, tag: it.book ? '課本原題' : '複合形容詞',
+    prompt: esc(it.q) + (it.zh ? `<div class="muted" style="font-size:15px">${esc(it.zh)}</div>` : ''),
+    options: shuffle([it.a, ...it.d]), answer: it.a, hint: it.hint, explain: it.ex };
+}
+function phraseQ(i) {
+  const it = DATA.phraseQs[i];
+  const others = DATA.phraseQs.filter(x => x.pid !== it.pid);
+  const seen = new Set(); const ds = [];
+  for (const x of shuffle(others)) { if (!seen.has(x.pid)) { seen.add(x.pid); ds.push(x.a); } if (ds.length === 3) break; }
+  return { key: `p-${i}`, tag: '片語', prompt: `${esc(it.q)}<div class="muted" style="font-size:15px">${esc(it.zh)}</div>`,
+    options: shuffle([it.a, ...ds]), answer: it.a, hint: '先看中文，找出關鍵意思。', explain: `答案：${it.a}` };
+}
+function distractors(i, n, field) {
+  const pos = DATA.vocab[i][1][0];
+  const same = DATA.vocab.map((v, j) => j).filter(j => j !== i && DATA.vocab[j][1][0] === pos);
+  const rest = DATA.vocab.map((v, j) => j).filter(j => j !== i && !same.includes(j));
+  return [...pick(same, n), ...pick(rest, n)].slice(0, n).map(j => DATA.vocab[j][field]);
+}
+function vocabQ(i, type) {
+  const [w, pos, zh, ex, exZh, form] = DATA.vocab[i];
+  const base = { key: `v-${i}`, tag: '單字' };
+  if (type === 'en') return { ...base, prompt: `<span class="big">${w}</span>`, speak: w, options: shuffle([zh, ...distractors(i, 3, 2)]), answer: zh,
+    hint: `詞性是 ${pos}`, explain: `${w}（${pos}）${zh}` };
+  if (type === 'zh') return { ...base, prompt: `「${zh}」<span class="muted">（${pos}）</span>`, options: shuffle([w, ...distractors(i, 3, 0)]), answer: w,
+    hint: `開頭字母是 ${w[0]}`, explain: `${zh} ＝ ${w}` };
+  const blanked = esc(ex).replace(form, '______');
+  return { ...base, prompt: `${blanked}<div class="muted" style="font-size:15px">${esc(exZh)}</div>`, options: shuffle([form, ...distractors(i, 3, 5)]), answer: form,
+    hint: `答案的意思是「${zh}」`, explain: `${ex}` };
+}
+function qFromKey(k) {
+  let m;
+  if ((m = k.match(/^g-(\d+)$/))) return grammarQ(+m[1]);
+  if ((m = k.match(/^p-(\d+)$/))) return phraseQ(+m[1]);
+  if ((m = k.match(/^v-(\d+)$/))) return vocabQ(+m[1], ['en', 'zh', 'cloze'][Math.floor(Math.random() * 3)]);
+  return null;
+}
+
+/* ===================== 選擇題引擎 ===================== */
+function runQuiz(root, build, opts = {}) {
+  let qs = build(), idx = 0, score = 0, missed = [];
+  const render = () => {
+    if (idx >= qs.length) return finish();
+    const q = qs[idx];
+    root.innerHTML = '';
+    const card = h(`<div class="card">
+      <div class="qhead"><span>${esc(q.tag || '')}</span><span>第 ${idx + 1} / ${qs.length} 題　答對 ${score}</span></div>
+      <div class="bar"><i style="width:${(idx / qs.length) * 100}%"></i></div>
+      <div class="prompt"><div style="min-width:0">${q.prompt}</div>${q.speak ? sayBtn(q.speak) : ''}</div>
+      <div class="opts">${q.options.map((o, i) => `<button class="opt" type="button" data-i="${i}"><span class="k">${LETTERS[i]}</span><span>${esc(o)}</span></button>`).join('')}</div>
+      <div class="slot"></div>
+      <div class="actions">${q.hint ? '<button class="btn ghost" type="button" data-act="hint">看提示</button>' : ''}<button class="btn" type="button" data-act="next" hidden>下一題</button></div>
+    </div>`);
+    root.append(card);
+    const slot = $('.slot', card), next = $('[data-act="next"]', card), hintB = $('[data-act="hint"]', card);
+    if (hintB) hintB.onclick = () => { if (!$('.hint', slot)) slot.prepend(h(`<div class="hint">${esc(q.hint)}</div>`)); hintB.hidden = true; };
+    card.querySelectorAll('.opt').forEach(b => b.onclick = () => {
+      const chosen = q.options[+b.dataset.i], ok = chosen === q.answer;
+      card.querySelectorAll('.opt').forEach(x => { x.disabled = true; if (q.options[+x.dataset.i] === q.answer) x.classList.add('ok'); });
+      if (!ok) b.classList.add('no');
+      if (ok) { score++; if (opts.review) removeWrong(q.key); }
+      else { addWrong(q.key); missed.push(q); }
+      slot.append(h(`<div class="fb ${ok ? 'ok' : 'no'}"><b>${ok ? '答對了！' : '再想想看。'}</b><span>${esc(q.explain || '')}</span></div>`));
+      if (hintB) hintB.hidden = true;
+      next.hidden = false; next.textContent = idx + 1 < qs.length ? '下一題' : '看結果'; next.focus();
+    });
+    next.onclick = () => { idx++; render(); };
+  };
+  const finish = () => {
+    const pct = Math.round(score / qs.length * 100);
+    if (opts.id) { const best = store.get('best', {}); if (!best[opts.id] || pct > best[opts.id]) { best[opts.id] = pct; store.set('best', best); } }
+    root.innerHTML = '';
+    const card = h(`<div class="card done">
+      <div class="muted">這一回答對</div>
+      <div class="score">${score} / ${qs.length}</div>
+      <p>${pct === 100 ? '全部答對，可以換下一個練習了。' : pct >= 70 ? '大部分都會了，錯的再練一次。' : '先回去看重點，再試一次。'}</p>
+      <div class="actions" style="justify-content:center">
+        ${missed.length ? '<button class="btn" type="button" data-act="miss">只練錯的</button>' : ''}
+        <button class="btn ghost" type="button" data-act="again">再做一次</button>
+      </div></div>`);
+    root.append(card);
+    const m = $('[data-act="miss"]', card);
+    if (m) m.onclick = () => { const again = missed.map(q => ({ ...q, options: shuffle(q.options) })); qs = again; idx = 0; score = 0; missed = []; render(); };
+    $('[data-act="again"]', card).onclick = () => { qs = build(); idx = 0; score = 0; missed = []; render(); };
+  };
+  render();
+}
+
+/* ===================== 配對引擎 ===================== */
+function runMatch(root, buildPairs, size = 5) {
+  let rounds = [], r = 0, mistakes = 0;
+  const start = () => { const all = shuffle(buildPairs()); rounds = []; for (let i = 0; i < all.length; i += size) rounds.push(all.slice(i, i + size)); r = 0; mistakes = 0; render(); };
+  const render = () => {
+    if (r >= rounds.length) return finish();
+    const pairs = rounds[r], rights = shuffle(pairs);
+    root.innerHTML = '';
+    const card = h(`<div class="card">
+      <div class="qhead"><span>點左邊，再點右邊的對應意思</span><span>第 ${r + 1} / ${rounds.length} 組</span></div>
+      <div class="bar"><i style="width:${(r / rounds.length) * 100}%"></i></div>
+      <div class="match"><div class="col L"></div><div class="col R"></div></div></div>`);
+    root.append(card);
+    let sel = null, left = pairs.length;
+    pairs.forEach((p, i) => { const b = h(`<button class="tile en" type="button">${esc(p.l)}</button>`); b.dataset.i = i; $('.L', card).append(b); });
+    rights.forEach(p => { const b = h(`<button class="tile" type="button">${esc(p.r)}</button>`); b.dataset.i = pairs.indexOf(p); $('.R', card).append(b); });
+    $('.L', card).onclick = (e) => { const b = e.target.closest('.tile'); if (!b || b.classList.contains('ok')) return;
+      card.querySelectorAll('.L .tile').forEach(x => x.classList.remove('sel')); b.classList.add('sel'); sel = b; if (pairs[+b.dataset.i].speak) speak(pairs[+b.dataset.i].speak); };
+    $('.R', card).onclick = (e) => { const b = e.target.closest('.tile'); if (!b || b.classList.contains('ok') || !sel) return;
+      if (b.dataset.i === sel.dataset.i) { b.classList.add('ok'); sel.classList.add('ok'); sel.classList.remove('sel'); b.disabled = sel.disabled = true; sel = null;
+        if (--left === 0) { r++; setTimeout(render, 450); } }
+      else { mistakes++; addWrong(pairs[+sel.dataset.i].key); [b, sel].forEach(x => { x.classList.remove('no'); void x.offsetWidth; x.classList.add('no'); }); } };
+  };
+  const finish = () => {
+    root.innerHTML = '';
+    const card = h(`<div class="card done"><div class="muted">配對完成，配錯</div><div class="score">${mistakes} 次</div>
+      <p>${mistakes === 0 ? '一次都沒配錯！' : '配錯的字已經收進錯題本。'}</p>
+      <div class="actions" style="justify-content:center"><button class="btn" type="button">再玩一次</button></div></div>`);
+    root.append(card); $('button', card).onclick = start;
+  };
+  start();
+}
+
+/* ===================== 句子重組 ===================== */
+function runTiles(root) {
+  let order = shuffle(DATA.sentences.map((s, i) => i)), n = 0, score = 0;
+  const render = () => {
+    if (n >= order.length) {
+      root.innerHTML = '';
+      const c = h(`<div class="card done"><div class="muted">重組完成</div><div class="score">${score} / ${order.length}</div><p>一次就排對的題數</p>
+        <div class="actions" style="justify-content:center"><button class="btn" type="button">再練一次</button></div></div>`);
+      root.append(c); $('button', c).onclick = () => { order = shuffle(order); n = 0; score = 0; render(); }; return;
+    }
+    const s = DATA.sentences[order[n]], words = s.en.split(' ');
+    let pool = shuffle(words.map((w, i) => ({ w, i })));
+    if (pool.every((x, k) => x.i === k)) pool = pool.reverse();
+    let ans = [], tries = 0;
+    root.innerHTML = '';
+    const card = h(`<div class="card">
+      <div class="qhead"><span>點字卡排出英文句子</span><span>第 ${n + 1} / ${order.length} 題</span></div>
+      <div class="bar"><i style="width:${(n / order.length) * 100}%"></i></div>
+      <p class="prompt">${esc(s.zh)}</p>
+      <p class="row-label">你的句子</p><div class="zone ans"></div>
+      <p class="row-label" style="margin-top:14px">字卡</p><div class="zone pool"></div>
+      <div class="slot"></div>
+      <div class="actions"><button class="btn ghost" type="button" data-act="hint">提示下一個字</button><button class="btn" type="button" data-act="check">檢查</button><button class="btn" type="button" data-act="next" hidden>下一題</button></div></div>`);
+    root.append(card);
+    const zA = $('.ans', card), zP = $('.pool', card), slot = $('.slot', card);
+    const draw = () => {
+      zA.innerHTML = ans.map((x, k) => `<button class="wtile" type="button" data-a="${k}">${esc(x.w)}</button>`).join('');
+      zP.innerHTML = pool.map((x, k) => `<button class="wtile" type="button" data-p="${k}">${esc(x.w)}</button>`).join('');
+    };
+    draw();
+    zP.onclick = (e) => { const b = e.target.closest('[data-p]'); if (!b) return; ans.push(pool.splice(+b.dataset.p, 1)[0]); slot.innerHTML = ''; draw(); };
+    zA.onclick = (e) => { const b = e.target.closest('[data-a]'); if (!b || zA.classList.contains('ok')) return; pool.push(ans.splice(+b.dataset.a, 1)[0]); slot.innerHTML = ''; draw(); };
+    $('[data-act="hint"]', card).onclick = () => {
+      let k = 0; while (k < ans.length && ans[k].w === words[k]) k++;
+      while (ans.length > k) pool.push(ans.pop());
+      draw();
+      const target = words[k]; const idx = pool.findIndex(x => x.w === target);
+      if (idx >= 0) zP.querySelector(`[data-p="${idx}"]`).classList.add('hl');
+      tries++;
+    };
+    $('[data-act="check"]', card).onclick = () => {
+      if (pool.length) { slot.innerHTML = '<div class="fb no"><b>還有字卡沒用到。</b></div>'; return; }
+      const ok = ans.map(x => x.w).join(' ') === s.en;
+      if (ok) {
+        if (tries === 0) score++;
+        zA.classList.add('ok'); slot.innerHTML = `<div class="fb ok"><b>排對了！</b><span>${esc(s.en)}</span></div>`;
+        $('[data-act="check"]', card).hidden = $('[data-act="hint"]', card).hidden = true;
+        const nx = $('[data-act="next"]', card); nx.hidden = false; nx.focus(); nx.onclick = () => { n++; render(); }; speak(s.en);
+      } else { tries++; slot.innerHTML = '<div class="fb no"><b>順序還不對。</b><span>點自己的句子可以把字卡放回去，或按「提示下一個字」。</span></div>'; }
+    };
+  };
+  render();
+}
+
+/* ===================== 拼字 ===================== */
+function runSpell(root, ids) {
+  let order = shuffle(ids), n = 0, score = 0;
+  const render = () => {
+    if (n >= order.length) {
+      root.innerHTML = '';
+      const c = h(`<div class="card done"><div class="muted">拼字完成</div><div class="score">${score} / ${order.length}</div><p>沒看提示、第一次就拼對的題數</p>
+        <div class="actions" style="justify-content:center"><button class="btn" type="button">再練一次</button></div></div>`);
+      root.append(c); $('button', c).onclick = () => { order = shuffle(order); n = 0; score = 0; render(); }; return;
+    }
+    const i = order[n], [w, pos, zh, ex, exZh, form] = DATA.vocab[i];
+    let shown = 1, tries = 0, helped = 0;
+    const maxShown = Math.max(1, form.length - 2); // 至少留一個空格讓學生自己拼
+    const hintStr = () => form.split('').map((c, k) => (k < shown || k === form.length - 1) ? c : '_').join('');
+    root.innerHTML = '';
+    const card = h(`<div class="card">
+      <div class="qhead"><span>看首尾字母，拼出正確的字（注意字形變化）</span><span>第 ${n + 1} / ${order.length} 題</span></div>
+      <div class="bar"><i style="width:${(n / order.length) * 100}%"></i></div>
+      <p class="prompt">${esc(ex).replace(form, '______')}</p>
+      <p class="muted" style="margin:0">${esc(exZh)}　｜　${esc(zh)}（${pos}）</p>
+      <div class="letters" aria-label="字母提示">${hintStr()}</div>
+      <label class="row-label" for="spell-in" style="display:block;margin-top:10px">輸入答案</label>
+      <input id="spell-in" class="spell-in" autocomplete="off" autocapitalize="off" spellcheck="false">
+      <div class="slot"></div>
+      <div class="actions"><button class="btn ghost" type="button" data-act="more">多一個字母</button><button class="btn" type="button" data-act="check">檢查</button><button class="btn" type="button" data-act="next" hidden>下一題</button></div></div>`);
+    root.append(card);
+    const more = $('[data-act="more"]', card);
+    const syncMore = () => { more.disabled = shown >= maxShown; };
+    more.onclick = () => { if (shown < maxShown) { shown++; helped++; $('.letters', card).textContent = hintStr(); } syncMore(); inp.focus({ preventScroll: true }); };
+    syncMore();
+    const inp = $('#spell-in', card), slot = $('.slot', card), chk = $('[data-act="check"]', card), nx = $('[data-act="next"]', card);
+    const end = () => { chk.hidden = true; more.hidden = true; inp.disabled = true; nx.hidden = false; nx.focus(); nx.onclick = () => { n++; render(); }; };
+    const check = () => {
+      const v = inp.value.trim().toLowerCase(); if (!v) return;
+      if (v === form.toLowerCase()) { if (tries === 0 && helped === 0) { score++; removeWrong(`v-${i}`); } slot.innerHTML = `<div class="fb ok"><b>拼對了！</b><span>${esc(ex)}</span></div>`; speak(form); end(); return; }
+      tries++;
+      if (tries < 2) { shown = Math.min(maxShown, shown + 2); $('.letters', card).textContent = hintStr(); syncMore(); slot.innerHTML = '<div class="fb no"><b>差一點。</b><span>多給你兩個字母，再試一次。</span></div>'; inp.select(); }
+      else { addWrong(`v-${i}`); slot.innerHTML = `<div class="fb no"><b>正確答案是 ${esc(form)}</b><span>原形是 ${esc(w)}，記下來，等一下會再出現。</span></div>`; end(); }
+    };
+    chk.onclick = check; inp.onkeydown = (e) => { if (e.key === 'Enter') { e.preventDefault(); nx.hidden ? check() : nx.click(); } };
+    inp.focus({ preventScroll: true });
+  };
+  render();
+}
+
+/* ===================== 各頁面 ===================== */
+const TABS = [
+  { id: 'grammar', name: '文法' }, { id: 'phrase', name: '片語' }, { id: 'vocab', name: '單字' }, { id: 'wrong', name: '錯題本' },
+];
+let ui = store.get('ui', { tab: 'grammar', gstep: 'learn', pstep: 'learn', vstep: 'learn', vgroup: 0 });
+const saveUi = () => store.set('ui', ui);
+
+function stepper(steps, current, onPick, label) {
+  const el = h(`<div><p class="row-label">${label || '步驟'}</p><div class="steps"></div></div>`);
+  steps.forEach(([id, name]) => { const b = h(`<button class="chip" type="button" aria-pressed="${id === current}">${name}</button>`); b.onclick = () => onPick(id); $('.steps', el).append(b); });
+  return el;
+}
+
+function pageGrammar(main) {
+  main.append(stepper([['learn', '1 看重點'], ['quiz', '2 判斷練習'], ['book', '3 課本原題'], ['tiles', '4 句子重組']], ui.gstep, (s) => { ui.gstep = s; saveUi(); renderPage(); }));
+  const area = h('<div class="stack"></div>'); main.append(area);
+  if (ui.gstep === 'learn') {
+    DATA.grammar.points.forEach(g => area.append(h(`<section class="card">
+      <h3>${esc(g.title)}</h3>
+      <div class="formula">${g.formula}</div>
+      <ul>${g.rules.map(r => `<li>${r}</li>`).join('')}</ul>
+      ${(g.examples || []).map(([en, zh]) => `<div class="ex">${sayBtn(en)}<div><div class="en">${esc(en)}</div><div class="zh">${esc(zh)}</div></div></div>`).join('')}
+    </section>`)));
+  } else if (ui.gstep === 'quiz' || ui.gstep === 'book') {
+    const book = ui.gstep === 'book';
+    runQuiz(area, () => {
+      const ids = DATA.grammar.mcq.map((x, i) => i).filter(i => !!DATA.grammar.mcq[i].book === book);
+      const qs = ids.map(grammarQ);
+      return book ? qs : shuffle(qs); // 課本題照課本順序
+    }, { id: 'g-' + ui.gstep });
+  } else if (ui.gstep === 'tiles') runTiles(area);
+  else { ui.gstep = 'learn'; saveUi(); renderPage(); }
+}
+
+function pagePhrase(main) {
+  main.append(stepper([['learn', '1 看片語'], ['quiz', '2 選擇題'], ['match', '3 配對']], ui.pstep, (s) => { ui.pstep = s; saveUi(); renderPage(); }));
+  const area = h('<div class="stack"></div>'); main.append(area);
+  if (ui.pstep === 'learn') {
+    DATA.phrases.forEach((p, i) => area.append(h(`<section class="card">
+      <div style="display:flex;gap:10px;align-items:center;justify-content:space-between">
+        <h3><span style="font-family:var(--f-word)">${i + 1}. ${esc(p.p)}</span>　<span class="muted" style="font-size:17px">${esc(p.zh)}</span></h3>${sayBtn(p.p)}</div>
+      <p style="margin:8px 0 0">${esc(p.note)}</p>
+      <div class="ex">${sayBtn(p.ex)}<div><div class="en">${esc(p.ex)}</div><div class="zh">${esc(p.exZh)}</div></div></div>
+    </section>`)));
+  } else if (ui.pstep === 'quiz') runQuiz(area, () => shuffle(DATA.phraseQs.map((x, i) => phraseQ(i))), { id: 'phrase' });
+  else runMatch(area, () => DATA.phrases.map((p, i) => ({ l: p.p, r: p.zh, speak: p.p, key: `p-${DATA.phraseQs.findIndex(q => q.pid === i)}` })), 4);
+}
+
+function pageVocab(main) {
+  const groupBar = stepper([...DATA.groups.map((g, i) => [i, `${g}（${i * 5 + 1}–${Math.min(i * 5 + 5, DATA.vocab.length)}）`]), [-1, `全部 ${DATA.vocab.length} 個`]], ui.vgroup, (g) => { ui.vgroup = g; saveUi(); renderPage(); }, '選擇範圍');
+  main.append(groupBar);
+  main.append(stepper([['learn', '1 認識'], ['quiz', '2 選擇題'], ['match', '3 配對'], ['spell', '4 拼字']], ui.vstep, (s) => { ui.vstep = s; saveUi(); renderPage(); }));
+  const ids = ui.vgroup < 0 ? DATA.vocab.map((v, i) => i) : [0, 1, 2, 3, 4].map(k => ui.vgroup * 5 + k).filter(i => i < DATA.vocab.length);
+  const area = h('<div class="stack"></div>'); main.append(area);
+  if (ui.vstep === 'learn') {
+    const grid = h('<div class="fgrid"></div>'); area.append(h('<p class="muted" style="margin:0">點卡片看中文和例句，再點一次蓋回去。</p>')); area.append(grid);
+    ids.forEach(i => {
+      const [w, pos, zh, ex, exZh, , coll] = DATA.vocab[i];
+      const c = h(`<div class="flip" role="button" tabindex="0" aria-label="${esc(w)}">
+        ${sayBtn(w, '朗讀 ' + w)}
+        <div class="w">${esc(w)}</div><div class="pos">${esc(pos)}</div>
+        <div class="back"><div class="zh">${esc(zh)}</div>${coll ? `<div class="coll">${esc(coll)}</div>` : ''}<div class="exs">${esc(ex)}</div><div class="exz">${esc(exZh)}</div></div>
+        <div class="tap">點一下看意思</div></div>`);
+      const toggle = () => { c.classList.toggle('open'); if (c.classList.contains('open')) speak(w); };
+      c.onclick = (e) => { if (!e.target.closest('[data-say]')) toggle(); };
+      c.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } };
+      grid.append(c);
+    });
+  } else if (ui.vstep === 'quiz') {
+    runQuiz(area, () => {
+      if (ids.length <= 5) return shuffle(ids.flatMap(i => [vocabQ(i, 'en'), vocabQ(i, 'cloze')]));
+      return shuffle(ids.map(i => vocabQ(i, ['en', 'zh', 'cloze'][Math.floor(Math.random() * 3)])));
+    }, { id: 'v' + ui.vgroup });
+  } else if (ui.vstep === 'match') runMatch(area, () => ids.map(i => ({ l: DATA.vocab[i][0], r: DATA.vocab[i][2], speak: DATA.vocab[i][0], key: `v-${i}` })), 5);
+  else runSpell(area, ids);
+}
+
+function describeKey(k) {
+  let m;
+  if ((m = k.match(/^g-(\d+)$/))) { const it = DATA.grammar.mcq[+m[1]]; return it ? { tag: it.book ? '課本原題' : '複合形容詞', t: it.q.replace('______', `【${it.a}】`) } : null; }
+  if ((m = k.match(/^p-(\d+)$/))) { const it = DATA.phraseQs[+m[1]]; return it ? { tag: '片語', t: it.q.replace('______', `【${it.a}】`) } : null; }
+  if ((m = k.match(/^v-(\d+)$/))) { const v = DATA.vocab[+m[1]]; return { tag: '單字', t: `${v[0]}（${v[1]}）${v[2]}` }; }
+  return null;
+}
+
+function pageWrong(main) {
+  const keys = [...wrong].filter(k => describeKey(k));
+  if (!keys.length) { main.append(h('<div class="card empty">錯題本是空的。<br>做練習時答錯的題目會自動收到這裡。</div>')); return; }
+  const area = h('<div class="stack"></div>'); main.append(area);
+  const showList = () => {
+    area.innerHTML = '';
+    const cur = [...wrong].filter(k => describeKey(k));
+    if (!cur.length) { area.append(h('<div class="card empty">錯題都練完了！</div>')); return; }
+    const card = h(`<div class="card"><h3>目前有 ${cur.length} 題要複習</h3>
+      <p class="muted" style="margin:4px 0 0">在這裡答對的題目會從錯題本移除。</p>
+      <div class="actions"><button class="btn" type="button" data-act="go">練習錯題</button><button class="btn ghost" type="button" data-act="clear">清空錯題本</button></div>
+      <div class="wlist">${cur.map(k => { const d = describeKey(k); return `<div class="witem"><span class="t">${esc(d.t)}</span><span class="tag">${esc(d.tag)}</span></div>`; }).join('')}</div></div>`);
+    area.append(card);
+    $('[data-act="go"]', card).onclick = () => { area.innerHTML = ''; runQuiz(area, () => shuffle([...wrong].map(qFromKey).filter(Boolean)), { review: true }); };
+    const clr = $('[data-act="clear"]', card);
+    clr.onclick = () => {
+      if (clr.dataset.confirm) { wrong.clear(); saveWrong(); renderPage(); return; }
+      clr.dataset.confirm = '1'; clr.textContent = '再按一次確定清空';
+    };
+  };
+  showList();
+}
+
+function updateBadge() {
+  const b = document.getElementById('wbadge'); if (!b) return;
+  const n = [...wrong].filter(k => describeKey(k)).length; b.textContent = n; b.hidden = n === 0;
+}
+
+function renderTabs() {
+  const nav = $('#tabs'); nav.innerHTML = '';
+  TABS.forEach(t => {
+    const b = h(`<button type="button" role="tab" aria-selected="${t.id === ui.tab}">${t.name}${t.id === 'wrong' ? '<span class="badge" id="wbadge" hidden></span>' : ''}</button>`);
+    b.onclick = () => { ui.tab = t.id; saveUi(); try { speechSynthesis.cancel(); } catch (e) {} renderTabs(); renderPage(); };
+    nav.append(b);
+  });
+  updateBadge();
+}
+function renderPage() {
+  const main = $('#main'); main.innerHTML = '';
+  ({ grammar: pageGrammar, phrase: pagePhrase, vocab: pageVocab, wrong: pageWrong }[ui.tab] || pageGrammar)(main);
+  updateBadge();
+}
+
+$('#picado').innerHTML = '<span class="flag"></span>'.repeat(18);
+try { speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged = () => {}; } catch (e) {}
+renderTabs(); renderPage();
+</script>
+
+</body>
+</html>

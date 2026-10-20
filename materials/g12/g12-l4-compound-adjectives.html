@@ -1,0 +1,371 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>複合形容詞三判斷</title>
+<style>
+:root{
+  --bg:#f7f5f0; --card:#ffffff; --ink:#22262a; --muted:#6b7177; --line:#dcd8cf;
+  --c1:#e3f0fc; --c1i:#1f5f99; --c2:#fbe6ee; --c2i:#a12d5a; --c3:#e6f4e8; --c3i:#2e7d40;
+  --ok:#2e7d40; --okbg:#e6f4e8; --no:#c0392b; --nobg:#fdecea; --hl:#fff3b0; --accent:#37474f;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#16181a; --card:#212427; --ink:#ecebe8; --muted:#a3a8ad; --line:#3a3e42;
+    --c1:#1d3247; --c1i:#9cc8f2; --c2:#45212f; --c2i:#f2a6c2; --c3:#1f3a25; --c3i:#9bd6a8;
+    --ok:#9bd6a8; --okbg:#1f3a25; --no:#f2a097; --nobg:#4a2420; --hl:#4d4520; --accent:#cfd8dc;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#16181a; --card:#212427; --ink:#ecebe8; --muted:#a3a8ad; --line:#3a3e42;
+  --c1:#1d3247; --c1i:#9cc8f2; --c2:#45212f; --c2i:#f2a6c2; --c3:#1f3a25; --c3i:#9bd6a8;
+  --ok:#9bd6a8; --okbg:#1f3a25; --no:#f2a097; --nobg:#4a2420; --hl:#4d4520; --accent:#cfd8dc;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Microsoft JhengHei","PingFang TC","Noto Sans TC",system-ui,sans-serif;
+  font-size:19px;line-height:1.7}
+.wrap{max-width:860px;margin:0 auto;padding:20px 16px 60px}
+header h1{font-size:26px;margin:0 0 4px}
+header p{margin:0;color:var(--muted);font-size:16px}
+nav{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 22px;position:sticky;top:0;background:var(--bg);padding:8px 0;z-index:5}
+nav button{flex:1 1 auto;min-width:110px;padding:10px 12px;border:2px solid var(--line);background:var(--card);
+  color:var(--ink);border-radius:12px;font:inherit;font-size:16px;cursor:pointer}
+nav button[aria-selected="true"]{background:var(--accent);color:var(--bg);border-color:var(--accent);font-weight:700}
+section{display:none} section.on{display:block}
+h2{font-size:22px;margin:0 0 12px}
+.hint{color:var(--muted);font-size:16px;margin:0 0 16px}
+.rule{border-radius:16px;padding:16px 18px;margin-bottom:14px;border-left:8px solid}
+.rule h3{margin:0 0 6px;font-size:21px}
+.rule .q{font-weight:700}
+.rule.r1{background:var(--c1);border-color:var(--c1i)} .rule.r1 h3{color:var(--c1i)}
+.rule.r2{background:var(--c2);border-color:var(--c2i)} .rule.r2 h3{color:var(--c2i)}
+.rule.r3{background:var(--c3);border-color:var(--c3i)} .rule.r3 h3{color:var(--c3i)}
+.rule ul{margin:6px 0 0;padding-left:22px}
+.en{font-family:Arial,Helvetica,sans-serif}
+b.key{background:var(--hl);padding:0 4px;border-radius:4px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 18px;margin-bottom:12px}
+.flip-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}
+.chip{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 12px}
+.match{display:grid;grid-template-columns:44px 1fr minmax(150px,1.4fr) 36px;gap:10px;align-items:center;
+  padding:10px 0;border-bottom:1px solid var(--line)}
+.num{font-weight:700;color:var(--muted);text-align:center}
+select{font:inherit;font-size:17px;padding:8px;border-radius:10px;border:2px solid var(--line);background:var(--card);color:var(--ink);width:100%}
+.mark{font-size:22px;font-weight:700;text-align:center}
+.mark.o{color:var(--ok)} .mark.x{color:var(--no)}
+.btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.btn{font:inherit;font-size:17px;padding:10px 18px;border-radius:12px;border:2px solid var(--accent);
+  background:var(--card);color:var(--ink);cursor:pointer}
+.btn.main{background:var(--accent);color:var(--bg);font-weight:700}
+.score{font-size:20px;font-weight:700;margin-top:12px}
+.qtext{font-size:20px;margin:4px 0 12px}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.opt{font:inherit;font-size:19px;padding:12px;border-radius:12px;border:2px solid var(--line);
+  background:var(--card);color:var(--ink);cursor:pointer;font-family:Arial,Helvetica,sans-serif}
+.opt.right{background:var(--okbg);border-color:var(--ok)}
+.opt.wrong{background:var(--nobg);border-color:var(--no)}
+.fb{margin-top:10px;padding:10px 12px;border-radius:10px;font-size:17px;display:none}
+.fb.show{display:block}
+.fb.good{background:var(--okbg)} .fb.bad{background:var(--nobg)}
+.step{display:none;margin:8px 0;padding:10px 14px;border-radius:12px}
+.step.show{display:block}
+.step.s1{background:var(--c1)} .step.s2{background:var(--c2)} .step.s3{background:var(--c3)}
+.step.ans{background:var(--hl);font-weight:700}
+.src{font-size:14px;color:var(--muted)}
+.flash{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.fc{min-height:120px;border-radius:16px;border:2px solid var(--line);background:var(--card);color:var(--ink);
+  padding:14px;cursor:pointer;font:inherit;text-align:center;display:flex;flex-direction:column;justify-content:center;gap:4px}
+.fc .w{font-family:Arial,Helvetica,sans-serif;font-size:21px;font-weight:700}
+.fc .tag{font-size:13px;align-self:center;padding:1px 8px;border-radius:8px;background:var(--hl)}
+.fc.back{background:var(--c1)}
+.fc .ex{font-size:15px;color:var(--muted);font-family:Arial,Helvetica,sans-serif}
+.foot{margin-top:30px;font-size:14px;color:var(--muted);text-align:center}
+@media (max-width:560px){
+  body{font-size:18px}
+  .match{grid-template-columns:34px 1fr 30px}
+  .match select{grid-column:2/4}
+  .opts{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>複合形容詞：三個判斷</h1>
+    <p>G12 L4 Lab-Grown Meat 文法｜只看「最後一個字」要變成什麼形狀</p>
+  </header>
+
+  <nav role="tablist" id="nav"></nav>
+
+  <!-- 1 三個判斷 -->
+  <section id="t-rules">
+    <h2>三個判斷</h2>
+    <p class="hint">遇到複合形容詞，先看最後一個字。不在這三個判斷裡的，到「整組記」當單字背。</p>
+    <div id="rules"></div>
+    <div class="card">
+      <h3 style="margin:0 0 6px">中英倒序技巧</h3>
+      英文常常是<b class="key">中文倒過來</b>：先寫中文 → 把順序倒過來 → 再用判斷 ② 決定 -ing 或 p.p.
+      <div class="flip-row en" id="flips"></div>
+    </div>
+  </section>
+
+  <!-- 2 中英配對 -->
+  <section id="t-match">
+    <h2>中英倒序配對</h2>
+    <p class="hint">替每個中文選出對應的英文，全部選完按「檢查」。</p>
+    <div id="matchList"></div>
+    <div class="btns">
+      <button class="btn main" id="matchCheck">檢查</button>
+      <button class="btn" id="matchReset">重新作答</button>
+    </div>
+    <div class="score" id="matchScore"></div>
+  </section>
+
+  <!-- 3 判斷練習 -->
+  <section id="t-quiz">
+    <h2>判斷練習</h2>
+    <p class="hint">點選正確的答案，會立刻告訴你用到哪一個判斷。</p>
+    <div id="quizList"></div>
+    <div class="score" id="quizScore"></div>
+    <div class="btns"><button class="btn" id="quizReset">重新作答</button></div>
+  </section>
+
+  <!-- 4 長句縮寫 -->
+  <section id="t-shrink">
+    <h2>長句縮成複合形容詞</h2>
+    <p class="hint">固定三步驟：① 找 who／which 後面那段 → ② 拿掉動詞留關鍵字 → ③ 判斷最後一個字的形狀。先自己想，再按「下一步」。</p>
+    <div id="shrinkList"></div>
+  </section>
+
+  <!-- 5 整組記 -->
+  <section id="t-chunks">
+    <h2>整組記</h2>
+    <p class="hint">這些不套規則，直接當單字背。點卡片翻面看中文和例子。標「段考」的優先。</p>
+    <div class="btns" style="margin:0 0 14px">
+      <button class="btn" id="flipAll">全部翻面</button>
+    </div>
+    <div class="flash" id="flash"></div>
+  </section>
+
+  <p class="foot">作答紀錄會保存在這台裝置的瀏覽器裡。</p>
+</div>
+
+<!-- ===== 資料區：要改題目只改這裡 ===== -->
+<script>
+const DATA = {
+  tabs: [
+    {id:"t-rules",  name:"① 三個判斷"},
+    {id:"t-match",  name:"② 中英配對"},
+    {id:"t-quiz",   name:"③ 判斷練習"},
+    {id:"t-shrink", name:"④ 長句縮寫"},
+    {id:"t-chunks", name:"⑤ 整組記"}
+  ],
+  rules: [
+    {cls:"r1", title:"① 數字開頭", see:"ten-、five-、three-", todo:"後面名詞<b class='key'>不加 s</b>",
+     ex:["a ten-<b>story</b> building","a five-<b>star</b> hotel"]},
+    {cls:"r2", title:"② 最後是動詞", see:"動詞變化",
+     todo:"問自己：<span class='q'>「這個東西會去做這件事嗎？」</span><br>會 → <b class='key'>-ing</b>　被做的 → <b class='key'>p.p.</b>",
+     ex:["time-consum<b>ing</b>（這件事會耗時間）","hand-<b>made</b>（蛋糕不會自己做，是被做的）"]},
+    {cls:"r3", title:"③ 最後是名詞", see:"mind、heart、leg", todo:"加 <b class='key'>-ed</b>，意思是「有…的」",
+     ex:["open-mind<b>ed</b>（有開放的心）","three-legg<b>ed</b>（有三隻腳）"]}
+  ],
+  flips: [["省時","time-saving"],["手工做的","hand-made"],["心碎","heart-broken"],["愛好和平","peace-loving"],["耗時","time-consuming"]],
+  // 配對：選項會在畫面上打亂順序
+  match: [
+    ["省時的","time-saving"],["手工做的","hand-made"],["心碎的","heart-broken"],["愛好和平的","peace-loving"],
+    ["耗時的","time-consuming"],["自製的（在家做的）","home-made"],["人造的","man-made"],
+    ["省錢的","money-saving"],["節能的","energy-saving"],["吃人的","man-eating"]
+  ],
+  quiz: [
+    {q:"This is a ______ job. It takes me three hours.", a:"time-consuming", b:"time-consumed", ans:"a", why:"判斷 ②：這份工作會耗時間 → -ing"},
+    {q:"My grandma made a ______ cake for me.", a:"home-making", b:"home-made", ans:"b", why:"判斷 ②：蛋糕是被做的 → p.p."},
+    {q:"We live in a ten-______ building.", a:"story", b:"stories", ans:"a", why:"判斷 ①：數字開頭，名詞不加 s"},
+    {q:"He was a ______ man after his dog died.", a:"heart-breaking", b:"heart-broken", ans:"b", why:"判斷 ②：他的心是被傷的 → p.p."},
+    {q:"That was a ______ movie. Everyone cried.", a:"heart-breaking", b:"heart-broken", ans:"a", why:"判斷 ②：電影會讓人心碎 → -ing"},
+    {q:"My sister is ______. She listens to new ideas.", a:"open-minding", b:"open-minded", ans:"b", why:"判斷 ③：mind 是名詞 → 加 -ed"},
+    {q:"This app is ______. It saves me a lot of time.", a:"time-saved", b:"time-saving", ans:"b", why:"判斷 ②：這個 app 會省時間 → -ing"},
+    {q:"She stayed at a five-______ hotel.", a:"stars", b:"star", ans:"b", why:"判斷 ①：數字開頭，名詞不加 s"},
+    {q:"I saw a ______ cat. It has only three legs.", a:"three-legged", b:"three-leg", ans:"a", why:"判斷 ③：leg 是名詞 → 加 -ed"},
+    {q:"This bag is ______. No factory made it.", a:"hand-made", b:"hand-making", ans:"a", why:"判斷 ②：包包是被手做的 → p.p."}
+  ],
+  shrink: [
+    {from:"a teacher <u>who has an open mind</u>", s1:"who has an open mind", s2:"open mind", s3:"mind 是名詞 → 判斷 ③ 加 -ed", ans:"an open-minded teacher", src:"課本第 4 題"},
+    {from:"a scholar <u>who is well respected</u>", s1:"who is well respected", s2:"well respected", s3:"學者是被尊敬的 → 判斷 ② p.p.", ans:"a well-respected scholar", src:"課本第 4 題"},
+    {from:"a job <u>which consumes time</u>", s1:"which consumes time", s2:"consume time → 倒過來 time consume", s3:"工作會耗時間 → 判斷 ② -ing", ans:"a time-consuming job", src:"課本第 1 題"},
+    {from:"a building <u>which has ten stories</u>", s1:"which has ten stories", s2:"ten stories", s3:"數字開頭 → 判斷 ① 名詞不加 s", ans:"a ten-story building", src:"文法說明"},
+    {from:"a cake <u>which was freshly baked</u>", s1:"which was freshly baked", s2:"freshly baked", s3:"蛋糕是被烤的 → 判斷 ② p.p.", ans:"a freshly-baked cake", src:"課本第 3 題"},
+    {from:"an aroma <u>which makes your mouth water</u>", s1:"which makes your mouth water", s2:"mouth water", s3:"香味會讓口水流 → 判斷 ② -ing", ans:"a mouth-watering aroma", src:"課本第 3 題"}
+  ],
+  chunks: [
+    ["sugar-free","無糖的","a sugar-free soda",true],
+    ["user-friendly","容易使用的","a user-friendly app",true],
+    ["all-you-can-eat","吃到飽的","an all-you-can-eat restaurant",true],
+    ["once-in-a-lifetime","一生一次的","a once-in-a-lifetime experience",true],
+    ["long-lasting","持久的","long-lasting effects",true],
+    ["best-selling","暢銷的","a best-selling novel",false],
+    ["hard-working","努力的","a hard-working employee",false],
+    ["kind-hearted","好心的","a kind-hearted lady",false],
+    ["well-educated","受過良好教育的","a well-educated person",false],
+    ["nice-looking","好看的","a nice-looking girl",false]
+  ]
+};
+</script>
+
+<!-- ===== 介面邏輯 ===== -->
+<script>
+(function(){
+  const KEY = "g12l4_compound_v1";
+  const load = () => { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch(e){ return {}; } };
+  let S = load();
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} };
+  const $ = id => document.getElementById(id);
+  const el = (tag, attrs={}, html="") => { const e=document.createElement(tag); Object.assign(e, attrs); if(html) e.innerHTML=html; return e; };
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+  // 分頁
+  function showTab(id){
+    DATA.tabs.forEach(t => {
+      $(t.id).classList.toggle("on", t.id===id);
+      $("nav").querySelector(`[data-id="${t.id}"]`).setAttribute("aria-selected", t.id===id);
+    });
+    S.tab = id; save(); window.scrollTo(0,0);
+  }
+  DATA.tabs.forEach(t => {
+    const b = el("button", {role:"tab"}, t.name); b.dataset.id = t.id;
+    b.onclick = () => showTab(t.id); $("nav").appendChild(b);
+  });
+
+  // ① 三個判斷
+  DATA.rules.forEach(r => {
+    $("rules").appendChild(el("div", {className:"rule "+r.cls},
+      `<h3>${r.title}</h3><div>看到：<span class="en">${r.see}</span></div><div>怎麼做：${r.todo}</div>
+       <ul class="en">${r.ex.map(x=>`<li>${x}</li>`).join("")}</ul>`));
+  });
+  DATA.flips.forEach(([zh,en]) => $("flips").appendChild(el("span",{className:"chip"}, `${esc(zh)} → <b>${esc(en)}</b>`)));
+
+  // ② 配對（選項順序打亂，打亂結果固定保存，避免每次重整都變）
+  const letters = "ABCDEFGHIJKLMNOP";
+  function shuffled(n){
+    const a=[...Array(n).keys()];
+    for(let i=n-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+    // 避免任何一題的正解剛好在同一個位置
+    for(let i=0;i<n;i++) if(a[i]===i){ const j=(i+1)%n; [a[i],a[j]]=[a[j],a[i]]; }
+    return a;
+  }
+  if(!S.mOrder || S.mOrder.length!==DATA.match.length) S.mOrder = shuffled(DATA.match.length);
+  S.mAns = S.mAns || {};
+  function renderMatch(checked){
+    const box=$("matchList"); box.innerHTML="";
+    let right=0;
+    DATA.match.forEach(([zh,en],i) => {
+      const row = el("div",{className:"match"});
+      row.appendChild(el("div",{className:"num"}, i+1));
+      row.appendChild(el("div",{}, esc(zh)));
+      const sel = el("select",{"aria-label":`第${i+1}題答案`});
+      sel.appendChild(el("option",{value:""},"— 選擇 —"));
+      S.mOrder.forEach((k,pos) => {
+        const o = el("option",{value:String(k)}, `(${letters[pos]}) ${DATA.match[k][1]}`);
+        sel.appendChild(o);
+      });
+      sel.value = S.mAns[i] ?? "";
+      sel.onchange = () => { S.mAns[i]=sel.value; save(); };
+      row.appendChild(sel);
+      const m = el("div",{className:"mark"});
+      if(checked && sel.value!==""){
+        const ok = Number(sel.value)===i; if(ok) right++;
+        m.textContent = ok?"O":"X"; m.classList.add(ok?"o":"x");
+      }
+      row.appendChild(m); box.appendChild(row);
+    });
+    $("matchScore").textContent = checked ? `得分：${right} / ${DATA.match.length}` : "";
+  }
+  $("matchCheck").onclick = () => renderMatch(true);
+  $("matchReset").onclick = () => { S.mAns={}; S.mOrder=shuffled(DATA.match.length); save(); renderMatch(false); };
+  renderMatch(false);
+
+  // ③ 判斷練習
+  S.qAns = S.qAns || {};
+  function renderQuiz(){
+    const box=$("quizList"); box.innerHTML="";
+    DATA.quiz.forEach((q,i) => {
+      const c = el("div",{className:"card"});
+      c.appendChild(el("div",{className:"num",style:"text-align:left"}, `第 ${i+1} 題`));
+      c.appendChild(el("div",{className:"qtext en"}, esc(q.q)));
+      const opts = el("div",{className:"opts"});
+      const fb = el("div",{className:"fb"});
+      ["a","b"].forEach(k => {
+        const b = el("button",{className:"opt"}, `(${k.toUpperCase()}) ${esc(q[k])}`);
+        const picked = S.qAns[i];
+        if(picked){
+          if(k===q.ans) b.classList.add("right");
+          else if(k===picked) b.classList.add("wrong");
+          b.disabled = true;
+        }
+        b.onclick = () => { S.qAns[i]=k; save(); renderQuiz(); };
+        opts.appendChild(b);
+      });
+      if(S.qAns[i]){
+        const ok = S.qAns[i]===q.ans;
+        fb.className = "fb show " + (ok?"good":"bad");
+        fb.innerHTML = (ok?"✔ 答對了！":"✘ 再想想看。") + "　" + esc(q.why);
+      }
+      c.appendChild(opts); c.appendChild(fb); box.appendChild(c);
+    });
+    const done = Object.keys(S.qAns).length;
+    const right = DATA.quiz.filter((q,i)=>S.qAns[i]===q.ans).length;
+    $("quizScore").textContent = done ? `已作答 ${done} / ${DATA.quiz.length}　答對 ${right} 題` : "";
+  }
+  $("quizReset").onclick = () => { S.qAns={}; save(); renderQuiz(); };
+  renderQuiz();
+
+  // ④ 長句縮寫：逐步揭露
+  S.sStep = S.sStep || {};
+  function renderShrink(){
+    const box=$("shrinkList"); box.innerHTML="";
+    DATA.shrink.forEach((s,i) => {
+      const n = S.sStep[i] || 0;
+      const c = el("div",{className:"card"});
+      c.appendChild(el("div",{className:"qtext en"}, s.from + ` <span class="src">（${s.src}）</span>`));
+      const steps = [
+        ["s1","步驟 1｜who／which 後面：", s.s1],
+        ["s2","步驟 2｜留下關鍵字：", s.s2],
+        ["s3","步驟 3｜判斷：", s.s3],
+        ["ans","答案：", s.ans]
+      ];
+      steps.forEach(([cls,label,txt],k) => {
+        c.appendChild(el("div",{className:`step ${cls}${k<n?" show":""}`}, `${label}<span class="en">${esc(txt)}</span>`));
+      });
+      const bs = el("div",{className:"btns"});
+      if(n<4){ const b=el("button",{className:"btn main"}, "下一步"); b.onclick=()=>{S.sStep[i]=n+1;save();renderShrink();}; bs.appendChild(b); }
+      if(n>0){ const b=el("button",{className:"btn"}, "收起"); b.onclick=()=>{S.sStep[i]=0;save();renderShrink();}; bs.appendChild(b); }
+      c.appendChild(bs); box.appendChild(c);
+    });
+  }
+  renderShrink();
+
+  // ⑤ 整組記：翻牌
+  let allBack = false;
+  function renderFlash(){
+    const box=$("flash"); box.innerHTML="";
+    DATA.chunks.forEach(([w,zh,ex,hot]) => {
+      const b = el("button",{className:"fc"});
+      let back = allBack;
+      const draw = () => {
+        b.classList.toggle("back", back);
+        b.innerHTML = back
+          ? `<div style="font-size:21px;font-weight:700">${esc(zh)}</div><div class="ex">${esc(ex)}</div>`
+          : `<div class="w">${esc(w)}</div>${hot?'<span class="tag">段考</span>':""}`;
+      };
+      b.onclick = () => { back=!back; draw(); };
+      draw(); box.appendChild(b);
+    });
+  }
+  $("flipAll").onclick = () => { allBack=!allBack; $("flipAll").textContent = allBack?"全部翻回英文":"全部翻面"; renderFlash(); };
+  renderFlash();
+
+  showTab(DATA.tabs.some(t=>t.id===S.tab) ? S.tab : DATA.tabs[0].id);
+})();
+</script>
+</body>
+</html>
