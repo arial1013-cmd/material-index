@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>G12 L5 Venice 練習系統</title>
+<style>
+:root{--teal:#1B6B70;--teal2:#2A8A8F;--light:#E8F4F3;--pale:#F4F9F9;--line:#BFD8D8;--ink:#1F2A2B;--grey:#5E6B6C;--ok:#1E8E5A;--okbg:#E5F5EC;--bad:#C0392B;--badbg:#FBEAEA;--amber:#C98A12;--amberbg:#FFF5DE}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;font-family:"Noto Sans TC","Microsoft JhengHei","PingFang TC",system-ui,sans-serif;background:var(--pale);color:var(--ink);font-size:18px;line-height:1.6}
+header{background:var(--teal);color:#fff;padding:14px 20px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:5}
+header h1{font-size:20px;margin:0;font-weight:700;flex:1}
+header small{opacity:.8;font-weight:400;font-size:14px;margin-left:6px}
+.back{background:rgba(255,255,255,.18);border:0;color:#fff;font-size:16px;padding:8px 14px;border-radius:10px;cursor:pointer}
+.back[hidden]{display:none}
+main{max-width:860px;margin:0 auto;padding:20px 16px 60px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px}
+.mod{cursor:pointer;transition:transform .1s}
+.mod:active{transform:scale(.98)}
+.mod h2{margin:0 0 4px;color:var(--teal);font-size:21px}
+.mod p{margin:0;color:var(--grey);font-size:15px}
+.mod .bar{height:8px;background:var(--light);border-radius:4px;margin-top:12px;overflow:hidden}
+.mod .bar i{display:block;height:100%;background:var(--teal2)}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.tab{border:2px solid var(--teal);background:#fff;color:var(--teal);padding:10px 16px;border-radius:12px;font-size:17px;cursor:pointer;font-weight:600}
+.tab.on{background:var(--teal);color:#fff}
+.tab .best{font-size:13px;font-weight:400;margin-left:4px;opacity:.85}
+.btn{border:0;background:var(--teal);color:#fff;font-size:18px;padding:12px 22px;border-radius:12px;cursor:pointer;font-weight:600}
+.btn.ghost{background:#fff;color:var(--teal);border:2px solid var(--teal)}
+.btn.amber{background:var(--amber)}
+.btn:disabled{opacity:.4;cursor:default}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.spk{border:0;background:var(--light);color:var(--teal);border-radius:50%;width:42px;height:42px;font-size:20px;cursor:pointer;flex:none}
+.flash{min-height:260px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;cursor:pointer;user-select:none}
+.flash .w{font-size:40px;font-weight:700;color:var(--teal)}
+.flash .pos{color:var(--grey);font-size:16px}
+.flash .zh{font-size:26px;font-weight:700;margin:6px 0}
+.flash .col{background:var(--light);color:var(--teal);padding:4px 12px;border-radius:8px;font-size:16px;margin:6px 0}
+.flash .ex{font-style:italic;margin-top:8px}
+.flash .cn{color:var(--grey);font-size:16px}
+.flash .tap{color:var(--grey);font-size:14px;margin-top:14px}
+.note{background:var(--pale);border-left:4px solid var(--teal2);padding:8px 12px;border-radius:6px;font-size:16px;text-align:left;margin-top:10px}
+.prog{display:flex;justify-content:space-between;color:var(--grey);font-size:15px;margin-bottom:8px}
+.pbar{height:8px;background:var(--light);border-radius:4px;overflow:hidden;margin-bottom:16px}
+.pbar i{display:block;height:100%;background:var(--teal2);transition:width .3s}
+.q{font-size:22px;font-weight:600;margin:4px 0 6px}
+.qsub{color:var(--grey);font-size:16px;margin-bottom:12px}
+.opts{display:grid;gap:10px;margin:14px 0}
+.opt{text-align:left;border:2px solid var(--line);background:#fff;padding:14px 16px;border-radius:12px;font-size:19px;cursor:pointer;color:var(--ink)}
+.opt.ok{border-color:var(--ok);background:var(--okbg)}
+.opt.bad{border-color:var(--bad);background:var(--badbg)}
+.opt:disabled{cursor:default}
+.fb{padding:12px 14px;border-radius:12px;margin:10px 0;font-size:17px}
+.fb.ok{background:var(--okbg);color:#14603D}
+.fb.bad{background:var(--badbg);color:#8E2A20}
+.hintbox{background:var(--amberbg);color:#7A5300;padding:10px 14px;border-radius:12px;margin:8px 0;font-size:16px}
+input.type{font-size:22px;padding:10px 14px;border:2px solid var(--line);border-radius:12px;width:min(320px,100%);font-family:inherit}
+input.type:focus{outline:none;border-color:var(--teal2)}
+.blank{display:inline-block;min-width:110px;border-bottom:2px solid var(--teal);text-align:center;color:var(--teal);font-weight:700;padding:0 6px}
+.lh{color:var(--amber);font-weight:700;letter-spacing:2px}
+.match{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.match .col{display:grid;gap:10px;align-content:start}
+.mi{border:2px solid var(--line);background:#fff;padding:14px;border-radius:12px;font-size:18px;cursor:pointer;text-align:center;color:var(--ink)}
+.mi.sel{border-color:var(--teal2);background:var(--light)}
+.mi.done{border-color:var(--ok);background:var(--okbg);color:var(--ok);cursor:default}
+.mi.shake{animation:sh .35s}
+@keyframes sh{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.tiles{display:flex;flex-wrap:wrap;gap:8px;min-height:56px;padding:10px;border-radius:12px}
+.tiles.ans{background:#fff;border:2px dashed var(--line)}
+.tile{border:2px solid var(--teal2);background:#fff;color:var(--teal);padding:8px 14px;border-radius:10px;font-size:19px;cursor:pointer}
+.tile.used{visibility:hidden}
+.tbl{width:100%;border-collapse:collapse;font-size:16px;background:#fff}
+.tbl th{background:var(--teal);color:#fff;padding:8px;text-align:left}
+.tbl td{border:1px solid var(--line);padding:8px;vertical-align:top}
+.tbl td:first-child{color:var(--teal);font-weight:700;white-space:nowrap}
+.tbl .g{color:var(--grey);font-size:14px}
+.result{text-align:center;padding:30px 10px}
+.result .big{font-size:56px;font-weight:800;color:var(--teal)}
+.wl{display:grid;gap:8px}
+.wl .it{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 14px;display:flex;justify-content:space-between;gap:10px;align-items:center}
+.wl .cnt{background:var(--badbg);color:var(--bad);border-radius:8px;padding:2px 10px;font-size:14px;white-space:nowrap}
+.toggle{display:inline-flex;align-items:center;gap:6px;font-size:15px;color:var(--grey);cursor:pointer;user-select:none}
+.toggle input{width:20px;height:20px}
+.bank{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.bank span{background:var(--light);color:var(--teal);padding:3px 10px;border-radius:8px;font-size:16px}
+h3{color:var(--teal);margin:18px 0 8px}
+.muted{color:var(--grey);font-size:15px}
+</style>
+</head>
+<body>
+<header>
+  <button class="back" id="back" hidden onclick="go('home')">← 回首頁</button>
+  <h1>G12 L5 Venice: A Sinking City<small>練習系統</small></h1>
+</header>
+<main id="app"></main>
+
+<!-- ===================== 資料區（換課時只改這裡） ===================== -->
+<script>
+const DATA = {
+  storageKey: "g12_l5_venice_v1",
+  words: [
+    { w:"vast", pos:"adj.", zh:"龐大的；大量的", col:"a vast amount of sth.", en:"Tom spends a vast amount of time on his phone.", cn:"Tom 花大量的時間在手機上。" },
+    { w:"tide", pos:"n.[C,U]", zh:"潮汐", col:"the tide is in / out", en:"We can walk on the beach when the tide is out.", cn:"退潮的時候，我們可以在沙灘上散步。" },
+    { w:"solid", pos:"adj.", zh:"堅固的；堅硬的", col:"a solid foundation", en:"A tall building needs a solid foundation.", cn:"高樓需要堅固的地基。" },
+    { w:"shift", pos:"vi./vt./n.", zh:"移動；改變", col:"shift from A to B", en:"Lisa shifted her eyes from the TV to her phone.", cn:"Lisa 把目光從電視移到手機上。" },
+    { w:"sustain", pos:"vt.", zh:"維持；使保持", col:"sustain one's interest", en:"The funny story sustained the kids' interest until the end.", cn:"這個有趣的故事讓孩子們一直保持興趣到最後。" },
+    { w:"fuel", pos:"n.[C,U]", zh:"燃料", col:"fossil fuels / run out of fuel", en:"Our car ran out of fuel on the highway.", cn:"我們的車在高速公路上沒油了。" },
+    { w:"excessive", pos:"adj.", zh:"過量的；過度的", col:"an excessive amount of", en:"Eating an excessive amount of sugar is bad for your teeth.", cn:"吃過量的糖對牙齒不好。" },
+    { w:"melt", pos:"vi./vt.", zh:"融化", col:"melt away", en:"The ice cream melted quickly in the sun.", cn:"冰淇淋在太陽下很快就融化了。" },
+    { w:"confirm", pos:"vt.", zh:"證實；確認", col:"confirm that + S + V", en:"The doctor confirmed that my leg was broken.", cn:"醫生證實我的腿骨折了。" },
+    { w:"acknowledge", pos:"vt.", zh:"承認", col:"acknowledge that + S + V", en:"Ben acknowledged that he was wrong.", cn:"Ben 承認他錯了。" }
+  ],
+  // 拼字填空：a = 要填的形式，base = 原形（字庫用），zh = 句意提示
+  spell: [
+    { pre:"It was so hot that my chocolate", a:"melted", base:"melt", post:"in my bag.", zh:"天氣太熱，我的巧克力在包包裡融化了。" },
+    { pre:"The news", a:"confirmed", base:"confirm", post:"that the singer will come to Taiwan.", zh:"新聞證實那位歌手會來台灣。" },
+    { pre:"Don't sit on that old chair. It isn't", a:"solid", base:"solid", post:"enough.", zh:"別坐那張舊椅子，它不夠堅固。" },
+    { pre:"Playing games for", a:"excessive", base:"excessive", post:"hours can hurt your eyes.", zh:"過度長時間打電動會傷眼睛。" },
+    { pre:"Be careful! The", a:"tide", base:"tide", post:"is coming in, and the water is rising fast.", zh:"小心！漲潮了，水位上升得很快。" },
+    { pre:"Amy finally", a:"acknowledged", base:"acknowledge", post:"that she broke the vase.", zh:"Amy 終於承認是她打破花瓶的。" },
+    { pre:"The Pacific Ocean is", a:"vast", base:"vast", post:"and deep.", zh:"太平洋又廣大又深。" },
+    { pre:"The man", a:"shifted", base:"shift", post:"his bag from his left hand to his right hand.", zh:"那個男人把包包從左手換到右手。" },
+    { pre:"Cars need", a:"fuel", base:"fuel", post:"to run.", zh:"汽車需要燃料才能跑。" },
+    { pre:"Eating breakfast helps you", a:"sustain", base:"sustain", post:"your energy all morning.", zh:"吃早餐能幫你整個早上維持體力。" }
+  ],
+  phrases: [
+    { p:"set...apart (from...)", zh:"使……與眾不同", note:"set sb./sth. apart (from...)：某個特質讓人或事物和別人不一樣。", en:"Her beautiful voice sets her apart from other singers.", cn:"她美妙的歌聲讓她和其他歌手與眾不同。" },
+    { p:"in consequence", zh:"結果；因此", note:"意同 as a result，常放句首，後面加逗點。", en:"Tom didn't study for the test. In consequence, he failed it.", cn:"Tom 沒有準備考試，結果他考不及格。" },
+    { p:"contend with", zh:"處理；應付", note:"必須處理不愉快的事情、狀況或人，意同 deal with。", en:"Farmers have to contend with bad weather every year.", cn:"農夫每年都得應付惡劣的天氣。" },
+    { p:"result in", zh:"導致", note:"意同 lead to。和 result from（起因於）方向相反：A result in B ＝ B result from A。", en:"The heavy rain resulted in a big flood.", cn:"這場大雨導致了嚴重的水災。" },
+    { p:"as a matter of fact", zh:"事實上", note:"意同 in fact，補充更多訊息，強調前面說的話。", en:"I'm not tired. As a matter of fact, I feel great.", cn:"我不累。事實上，我覺得很好。" },
+    { p:"owing to", zh:"因為；由於", note:"介系詞片語，後接名詞或 V-ing，不能接句子；意同 because of、due to。", en:"The game was canceled owing to the rain.", cn:"因為下雨，比賽被取消了。" },
+    { p:"far from", zh:"完全不……；一點也不……", note:"後面可接名詞、形容詞或動名詞。", en:"The test was far from easy.", cn:"這次考試一點也不簡單。" }
+  ],
+  // 片語句子填空：opts 第一個為正解，系統會自動打亂
+  phraseSent: [
+    { s:"Her bright smile ___ her ___ from the other girls.", opts:["sets / apart","results / in","contends / with","owing / to"], zh:"她燦爛的笑容讓她和其他女孩與眾不同。", hint:"哪個片語中間可以放「人」？" },
+    { s:"Ken missed the bus. ___, he was late for school.", opts:["In consequence","Owing to","Far from","Contend with"], zh:"Ken 錯過公車，結果上學遲到了。", hint:"前面是原因、後面是結果。" },
+    { s:"Nurses often have to ___ long working hours.", opts:["contend with","result in","far from","set apart"], zh:"護理師常常得應付很長的工時。", hint:"「長工時」是一件不愉快、要去處理的事。" },
+    { s:"Too much screen time can ___ poor sleep.", opts:["result in","owing to","as a matter of fact","in consequence"], zh:"太多螢幕時間會導致睡眠品質差。", hint:"空格後面是「結果」。" },
+    { s:"I don't hate math. ___, it's my favorite subject.", opts:["As a matter of fact","Owing to","Result in","Far from"], zh:"我不討厭數學。事實上，那是我最喜歡的科目。", hint:"後面這句在補充、強調前一句。" },
+    { s:"The flight was delayed ___ the typhoon.", opts:["owing to","result in","contend with","in consequence"], zh:"班機因為颱風而延誤。", hint:"空格後面只有一個名詞 the typhoon。" },
+    { s:"His room is ___ clean. There are clothes everywhere.", opts:["far from","owing to","result in","set apart"], zh:"他的房間一點也不乾淨，到處都是衣服。", hint:"衣服到處都是，房間到底乾不乾淨？" },
+    { s:"The big flood ___ the heavy rain.", opts:["resulted from","resulted in","owing to","far from"], zh:"這場大水災是大雨造成的。", hint:"先想清楚：誰是原因？誰是結果？" }
+  ],
+  grammar: {
+    title:"as if + 假設語氣",
+    rows:[
+      ["as if + S + were / V-ed","與「現在事實」相反","Sandy dresses as if she were a superstar.","（她不是超級巨星）"],
+      ["as if + S + had + p.p.","與「過去事實」相反","Laura talked as if she had gone to the concert.","（她其實沒去）"],
+      ["as if + 一般時態","有可能是真的","It looks as if it is going to rain.","（天色暗，真的可能下雨）"]
+    ],
+    tip:"be 動詞一律用 were（I / he / she 也用 were）。",
+    // opts 第一個為正解
+    mcq: [
+      { q:"Leo acted ______ nothing had happened.", opts:["as if","if","that","though"], hint:"「彷彿、好像」要用哪個連接詞？", ex:"as if = 彷彿；Leo 表現得好像什麼事都沒發生。" },
+      { q:"Lauren described the accident as if she ______ on the scene herself, but in fact, she was at home.", opts:["had been","were","was","has been"], hint:"她「當時」在不在現場？那是比 described 更早的事。", ex:"與過去事實相反 → had + p.p.。" },
+      { q:"Jeff looks as if he ______ everything.（其實他不知道）", opts:["knew","knows","had known","know"], hint:"和「現在」的事實相反，動詞要往過去推一格。", ex:"與現在事實相反 → 過去式 knew。" },
+      { q:"Sandy dresses as if she ______ a Hollywood superstar.", opts:["were","is","be","has been"], hint:"她現在是不是超級巨星？", ex:"與現在事實相反，be 動詞一律用 were。" },
+      { q:"It looks as if it ______ going to rain. The sky is very dark.", opts:["is","were","had been","be"], hint:"天空很暗，下雨「有可能是真的」嗎？", ex:"可能為真 → 用一般時態 is，不用假設語氣。" },
+      { q:"The child talks as if he ______ an adult.", opts:["were","is","had","be"], hint:"這個孩子是大人嗎？", ex:"與現在事實相反 → were。" },
+      { q:"Zoe dances as if she ______ professionally trained.（其實她沒受過訓練）", opts:["had been","is","were being","has"], hint:"「受過訓練」是更早以前的事。", ex:"比主要子句更早、且不是事實 → had been。" },
+      { q:"My father stared at me angrily as if I ______ something wrong.", opts:["had done","did","do","have done"], hint:"「做錯事」發生在「瞪我」之前。", ex:"比主要子句 stared 更早 → had done。" },
+      { q:"I felt as if I ______ flying in the sky.", opts:["were","am","had","have been"], hint:"「感覺」和「在飛」是同時發生的嗎？你真的在飛嗎？", ex:"同時發生且不是事實 → were。" },
+      { q:"He talks about Japan as if he ______ there many times.（其實他從沒去過）", opts:["had been","went","has been","goes"], hint:"「去過」是比現在更早的經驗。", ex:"比主要子句更早、且不是事實 → had been。" }
+    ],
+    order: [
+      { zh:"Jeff 看起來好像他知道所有的事。", s:"Jeff looked as if he knew everything." },
+      { zh:"這孩子說起話來彷彿是個大人。", s:"The child talks as if he were an adult." },
+      { zh:"Zoe 跳起舞來彷彿受過專業訓練。", s:"Zoe dances as if she had been professionally trained." },
+      { zh:"我爸生氣地瞪著我，彷彿我做錯了什麼事。", s:"My father stared at me angrily as if I had done something wrong." }
+    ]
+  }
+};
+</script>
+
+<!-- ===================== 程式區 ===================== -->
+<script>
+const $ = s => document.querySelector(s);
+const app = $("#app");
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; };
+
+/* ---------- 儲存 ---------- */
+const store = (() => {
+  let s = { wrong:{}, best:{}, hint:true };
+  try { const t = localStorage.getItem(DATA.storageKey); if (t) s = Object.assign(s, JSON.parse(t)); } catch (e) {}
+  const save = () => { try { localStorage.setItem(DATA.storageKey, JSON.stringify(s)); } catch (e) {} };
+  return {
+    get s() { return s; },
+    wrong(id) { s.wrong[id] = (s.wrong[id] || 0) + 1; save(); },
+    right(id, inReview) { if (inReview && s.wrong[id]) { delete s.wrong[id]; save(); } },
+    best(k, v) { if (v > (s.best[k] || 0)) { s.best[k] = v; save(); } },
+    setHint(v) { s.hint = v; save(); },
+    clearWrong() { s.wrong = {}; save(); },
+    reset() { s = { wrong:{}, best:{}, hint:true }; save(); }
+  };
+})();
+
+/* 按兩次才執行（取代 confirm） */
+function twice(btn, fn) {
+  if (btn.dataset.arm) return fn();
+  btn.dataset.arm = 1; const t = btn.textContent; btn.textContent = "再按一次確認"; btn.style.color = "var(--bad)";
+  setTimeout(() => { if (document.body.contains(btn)) { delete btn.dataset.arm; btn.textContent = t; btn.style.color = ""; } }, 3000);
+}
+
+/* ---------- 語音 ---------- */
+function speak(t) {
+  if (!("speechSynthesis" in window)) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(t.replace(/___+/g, "blank").replace(/\.\.\./g, " "));
+  u.lang = "en-US"; u.rate = 0.85;
+  const v = speechSynthesis.getVoices().find(v => /en[-_]US/i.test(v.lang));
+  if (v) u.voice = v;
+  speechSynthesis.speak(u);
+}
+const spk = t => `<button class="spk" onclick="event.stopPropagation();speak(this.dataset.t)" data-t="${esc(t)}" aria-label="朗讀">🔊</button>`;
+
+/* ---------- 題目產生器（每題有唯一 id，錯題本靠 id 重建） ---------- */
+const W = DATA.words, P = DATA.phrases, G = DATA.grammar;
+const others = (arr, i, f, n = 3) => shuffle(arr.filter((_, k) => k !== i)).slice(0, n).map(f);
+const LABEL = { we:"單字 英→中", wz:"單字 中→英", sp:"拼字填空", pm:"片語意思", ps:"片語填空", gm:"文法選擇" };
+
+function makeQ(id) {
+  const [t, n] = id.split(":"); const i = +n;
+  if (t === "we") { const x = W[i]; return { id, kind:"mcq", prompt:x.w, sub:x.pos + "　這個字的意思是？", say:x.w, answer:x.zh, options:shuffle([x.zh, ...others(W, i, y => y.zh)]), ex:x.en + "　" + x.cn, say2:x.en }; }
+  if (t === "wz") { const x = W[i]; return { id, kind:"mcq", prompt:x.zh, sub:"哪一個英文單字是這個意思？", answer:x.w, options:shuffle([x.w, ...others(W, i, y => y.w)]), ex:x.w + "：" + x.col, say2:x.w }; }
+  if (t === "sp") { const x = DATA.spell[i]; return { id, kind:"type", spell:x, answer:x.a, ex:x.pre + " " + x.a + " " + x.post, say2:x.pre + " " + x.a + " " + x.post }; }
+  if (t === "pm") { const x = P[i]; return { id, kind:"mcq", prompt:x.p, sub:"這個片語的意思是？", say:x.p, answer:x.zh, options:shuffle([x.zh, ...others(P, i, y => y.zh)]), ex:x.note, say2:x.en }; }
+  if (t === "ps") { const x = DATA.phraseSent[i]; const [a1, a2] = x.opts[0].split(" / "); const full = x.s.replace("___", a1).replace("___", a2 || ""); return { say2:full, id, kind:"mcq", prompt:x.s, sub:x.zh, answer:x.opts[0], options:shuffle(x.opts), hint:x.hint, ex:full }; }
+  if (t === "gm") { const x = G.mcq[i]; return { say2:x.q.replace(/（.*?）/, "").replace("______", x.opts[0]), id, kind:"mcq", prompt:x.q, sub:"選出正確的答案", answer:x.opts[0], options:shuffle(x.opts), hint:x.hint, ex:x.ex }; }
+}
+const ids = (t, n) => shuffle([...Array(n).keys()].map(i => t + ":" + i));
+
+/* ---------- 路由 ---------- */
+let view = { name:"home" };
+function go(name, opt = {}) { view = Object.assign({ name }, opt); speechSynthesis && speechSynthesis.cancel(); render(); window.scrollTo(0, 0); }
+function render() {
+  $("#back").hidden = view.name === "home";
+  ({ home, vocab, phrase, grammar, wrongbook })[view.name]();
+}
+
+/* ---------- 首頁 ---------- */
+function pct(keys) { const b = store.s.best; return Math.round(keys.reduce((a, k) => a + (b[k] || 0), 0) / keys.length); }
+function home() {
+  const wc = Object.keys(store.s.wrong).length;
+  const mods = [
+    { k:"vocab", t:"單字練習", d:`${W.length} 個核心單字｜卡片・選擇・配對・拼字`, p:pct(["vmcq","vmatch","vspell"]) },
+    { k:"phrase", t:"片語練習", d:`${P.length} 個課本片語｜卡片・意思・句子填空`, p:pct(["pmcq","psent"]) },
+    { k:"grammar", t:"文法 as if", d:"假設語氣｜說明・選擇・句子重組", p:pct(["gmcq","gorder"]) }
+  ];
+  app.innerHTML = `<div class="grid">${mods.map(m => `
+    <div class="card mod" onclick="go('${m.k}')"><h2>${m.t}</h2><p>${m.d}</p>
+    <div class="bar"><i style="width:${m.p}%"></i></div><p style="margin-top:6px">最佳表現 ${m.p}%</p></div>`).join("")}
+    <div class="card mod" onclick="go('wrongbook')" style="border-color:${wc ? "var(--bad)" : "var(--line)"}">
+      <h2 style="color:${wc ? "var(--bad)" : "var(--teal)"}">錯題本</h2><p>${wc ? `目前有 ${wc} 題要再練` : "目前沒有錯題"}</p></div>
+  </div>
+  <p class="muted" style="margin-top:24px;text-align:center">進度會自動存在這台裝置上。
+  <button class="btn ghost" style="font-size:14px;padding:4px 10px" onclick="twice(this,()=>{store.reset();render()})">清除進度</button></p>`;
+}
+
+/* ---------- 共用：頁籤 ---------- */
+function tabs(list, cur, mod) {
+  return `<div class="tabs">${list.map(([k, t, bk]) => `<button class="tab ${k === cur ? "on" : ""}" onclick="go('${mod}',{tab:'${k}'})">${t}${bk && store.s.best[bk] ? `<span class="best">${store.s.best[bk]}%</span>` : ""}</button>`).join("")}</div>`;
+}
+function hintToggle() {
+  return `<label class="toggle"><input type="checkbox" ${store.s.hint ? "checked" : ""} onchange="store.setHint(this.checked);render()"> 顯示首尾字母提示</label>`;
+}
+
+/* ---------- 單字模組 ---------- */
+function vocab() {
+  const tab = view.tab || "learn";
+  const head = `<h2 style="color:var(--teal);margin:0 0 12px">單字練習</h2>` + tabs([["learn","① 單字卡"],["mcq","② 選擇題","vmcq"],["match","③ 配對","vmatch"],["spell","④ 拼字填空","vspell"]], tab, "vocab");
+  if (tab === "learn") return flashcards(head, W.map(x => ({ front:`<div class="w">${esc(x.w)}</div><div class="pos">${x.pos}</div>`, back:`<div class="w" style="font-size:30px">${esc(x.w)}</div><div class="zh">${x.zh}</div><div class="col">${esc(x.col)}</div><div class="ex">${esc(x.en)}</div><div class="cn">${x.cn}</div>`, say:x.w, sayEx:x.en })));
+  if (tab === "mcq") return quiz(head, [...ids("we", W.length).slice(0, 5), ...ids("wz", W.length).slice(0, 5)].sort(() => Math.random() - .5), "vmcq", "vocab");
+  if (tab === "match") return matching(head, W.map(x => [x.w, x.zh]), "vmatch", "vocab");
+  if (tab === "spell") return quiz(head + `<div class="row" style="margin-bottom:12px">${hintToggle()}</div>`, ids("sp", DATA.spell.length), "vspell", "vocab");
+}
+
+/* ---------- 片語模組 ---------- */
+function phrase() {
+  const tab = view.tab || "learn";
+  const head = `<h2 style="color:var(--teal);margin:0 0 12px">片語練習</h2>` + tabs([["learn","① 片語卡"],["mcq","② 片語意思","pmcq"],["sent","③ 句子填空","psent"]], tab, "phrase");
+  if (tab === "learn") return flashcards(head, P.map(x => ({ front:`<div class="w" style="font-size:32px">${esc(x.p)}</div>`, back:`<div class="w" style="font-size:26px">${esc(x.p)}</div><div class="zh">${x.zh}</div><div class="ex">${esc(x.en)}</div><div class="cn">${x.cn}</div><div class="note">📝 ${esc(x.note)}</div>`, say:x.p, sayEx:x.en })));
+  if (tab === "mcq") return quiz(head, ids("pm", P.length), "pmcq", "phrase");
+  if (tab === "sent") return quiz(head, ids("ps", DATA.phraseSent.length), "psent", "phrase");
+}
+
+/* ---------- 文法模組 ---------- */
+function grammar() {
+  const tab = view.tab || "learn";
+  const head = `<h2 style="color:var(--teal);margin:0 0 12px">文法：${G.title}</h2>` + tabs([["learn","① 文法說明"],["mcq","② 選擇題","gmcq"],["order","③ 句子重組","gorder"]], tab, "grammar");
+  if (tab === "learn") {
+    app.innerHTML = head + `<div class="card">
+      <p style="margin-top:0">as if 意為「彷彿、好像」。當後面描述的情況<b>不是真的</b>時，要用假設語氣，動詞往過去推一格。</p>
+      <table class="tbl"><tr><th>形式</th><th>用法</th><th>例句</th></tr>
+      ${G.rows.map(r => `<tr><td>${esc(r[0])}</td><td>${r[1]}</td><td><div class="row" style="flex-wrap:nowrap">${spk(r[2])}<div>${esc(r[2])}<div class="g">${r[3]}</div></div></div></td></tr>`).join("")}
+      </table><div class="hintbox" style="margin-top:14px">💡 小提醒：${G.tip}</div>
+      <h3>判斷三步驟</h3><ol style="margin:0;padding-left:22px">
+      <li>這件事是<b>真的</b>或<b>可能是真的</b>？→ 用一般時態</li>
+      <li>不是真的，而且和主要動作<b>同時</b>？→ were / 過去式</li>
+      <li>不是真的，而且比主要動作<b>更早</b>？→ had + p.p.</li></ol>
+      <div class="row" style="margin-top:18px"><button class="btn" onclick="go('grammar',{tab:'mcq'})">開始練習 →</button></div></div>`;
+    return;
+  }
+  if (tab === "mcq") return quiz(head, ids("gm", G.mcq.length), "gmcq", "grammar");
+  if (tab === "order") return reorder(head);
+}
+
+/* ---------- 單字卡 ---------- */
+function flashcards(head, cards) {
+  let i = view.i || 0, flip = false;
+  const draw = () => {
+    const c = cards[i];
+    app.innerHTML = head + `<div class="prog"><span>第 ${i + 1} / ${cards.length} 張</span><span>點卡片翻面</span></div>
+      <div class="pbar"><i style="width:${(i + 1) / cards.length * 100}%"></i></div>
+      <div class="card flash" id="fc">${flip ? c.back : c.front}<div class="tap">${flip ? "" : "（想一想意思，再點一下看答案）"}</div></div>
+      <div class="row" style="margin-top:14px;justify-content:space-between">
+        <button class="btn ghost" ${i ? "" : "disabled"} id="prev">← 上一張</button>
+        <div class="row">${spk(c.say)}${flip ? spk(c.sayEx).replace("🔊", "📢") : ""}</div>
+        <button class="btn ghost" ${i < cards.length - 1 ? "" : "disabled"} id="next">下一張 →</button></div>`;
+    $("#fc").onclick = () => { flip = !flip; draw(); if (flip) speak(c.say); };
+    $("#prev").onclick = () => { i--; flip = false; draw(); };
+    $("#next").onclick = () => { i++; flip = false; draw(); };
+  };
+  draw();
+}
+
+/* ---------- 通用測驗引擎（選擇題＋打字題） ---------- */
+function quiz(head, qids, bestKey, backMod, review = false) {
+  const qs = qids.map(makeQ);
+  let i = 0, score = 0, done = false, hinted = false, tries = 0;
+  const draw = () => {
+    const q = qs[i];
+    let body = "";
+    if (q.kind === "mcq") {
+      body = `<div class="row" style="flex-wrap:nowrap;align-items:flex-start">${q.say ? spk(q.say) : ""}<div class="q">${esc(q.prompt).replace(/_{3,}/g, '<span class="blank">&nbsp;</span>')}</div></div>
+        <div class="qsub">${esc(q.sub)}</div>
+        ${q.hint && !done ? `<button class="btn amber" id="hb" style="font-size:15px;padding:8px 14px" ${hinted ? "disabled" : ""}>💡 提示</button>` : ""}
+        ${hinted && !done ? `<div class="hintbox">💡 ${esc(q.hint)}</div>` : ""}
+        <div class="opts">${q.options.map((o, k) => `<button class="opt" data-k="${k}">${esc(o)}</button>`).join("")}</div>`;
+    } else {
+      const x = q.spell, a = x.a;
+      const lh = store.s.hint ? `<span class="lh">${a[0]}${"_".repeat(a.length - 2)}${a[a.length - 1]}</span>` : "";
+      body = `<div class="q" style="font-weight:500">${esc(x.pre)} <span class="blank">${lh || "&nbsp;"}</span> ${esc(x.post)}</div>
+        <div class="qsub">${x.zh}</div>
+        <div class="row"><input class="type" id="ti" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="輸入單字"><button class="btn" id="ck">確認</button></div>
+        <div class="row" style="margin-top:10px"><button class="btn amber" id="bk" style="font-size:15px;padding:8px 14px">📚 看字庫</button></div>
+        <div id="bank"></div>`;
+    }
+    app.innerHTML = head + `<div class="prog"><span>${review ? "錯題重練（" + LABEL[q.id.split(":")[0]] + "）　" : ""}第 ${i + 1} / ${qs.length} 題</span><span>答對 ${score}</span></div>
+      <div class="pbar"><i style="width:${i / qs.length * 100}%"></i></div><div class="card">${body}<div id="fb"></div></div>`;
+    if (q.kind === "mcq") {
+      const hb = $("#hb"); if (hb) hb.onclick = () => { hinted = true; draw(); };
+      app.querySelectorAll(".opt").forEach(b => b.onclick = () => pick(q, b));
+    } else {
+      const ti = $("#ti"); ti.focus();
+      $("#ck").onclick = () => check(q, ti.value);
+      ti.onkeydown = e => { if (e.key === "Enter") check(q, ti.value); };
+      $("#bk").onclick = () => { $("#bank").innerHTML = `<div class="bank">${shuffle(W.map(w => w.w)).map(w => `<span>${w}</span>`).join("")}</div><div class="muted">字庫是原形，記得看句子決定要不要加 -ed。</div>`; };
+    }
+  };
+  const after = (ok, q) => {
+    done = true;
+    if (ok) { score++; store.right(q.id, review); } else store.wrong(q.id);
+    $("#fb").innerHTML = `<div class="fb ${ok ? "ok" : "bad"}">${ok ? "✔ 答對了！" : "✘ 正確答案是：<b>" + esc(q.answer) + "</b>"}${q.ex ? `<div style="margin-top:4px">${esc(q.ex)}</div>` : ""}</div>
+      <div class="row">${q.say2 ? spk(q.say2) : ""}<button class="btn" id="nx">${i < qs.length - 1 ? "下一題 →" : "看結果"}</button></div>`;
+    $("#nx").onclick = () => { i++; done = false; hinted = false; tries = 0; i < qs.length ? draw() : finish(); };
+    $("#nx").focus();
+  };
+  const pick = (q, b) => {
+    if (done) return;
+    const ok = q.options[+b.dataset.k] === q.answer;
+    app.querySelectorAll(".opt").forEach(o => { o.disabled = true; if (q.options[+o.dataset.k] === q.answer) o.classList.add("ok"); });
+    if (!ok) b.classList.add("bad");
+    after(ok, q);
+  };
+  const check = (q, v) => {
+    if (done) return;
+    v = v.trim().toLowerCase();
+    if (!v) return;
+    if (v === q.answer.toLowerCase()) { $("#ti").disabled = true; return after(true, q); }
+    tries++;
+    const base = q.spell.base;
+    if (tries === 1) {
+      const msg = v === base && base !== q.answer ? "字對了！但看看句子的時間，要不要變化形式？" : "再試一次！看看中文句意和首尾字母。";
+      $("#fb").innerHTML = `<div class="hintbox">✎ ${msg}</div>`;
+      $("#ti").select();
+    } else { $("#ti").disabled = true; after(false, q); }
+  };
+  const finish = () => {
+    const p = Math.round(score / qs.length * 100);
+    if (!review) store.best(bestKey, p);
+    app.innerHTML = head + `<div class="card result"><div class="muted">${review ? "錯題重練" : "本回合"}完成</div><div class="big">${score} / ${qs.length}</div>
+      <p>${p === 100 ? "全對，太厲害了！" : p >= 70 ? "表現不錯，錯的題目已經放進錯題本。" : "錯的題目已經放進錯題本，再練一次會更熟。"}</p>
+      <div class="row" style="justify-content:center"><button class="btn" onclick="render()">再練一次</button>
+      <button class="btn ghost" onclick="go('wrongbook')">看錯題本</button></div></div>`;
+  };
+  draw();
+}
+
+/* ---------- 配對 ---------- */
+function matching(head, pairs, bestKey) {
+  const all = shuffle(pairs.map((p, i) => i)), R = [all.slice(0, 5), all.slice(5)];
+  let r = 0, miss = 0;
+  const draw = () => {
+    const set = R[r], left = shuffle(set), right = shuffle(set);
+    let sel = null, matched = 0;
+    app.innerHTML = head + `<div class="prog"><span>第 ${r + 1} / ${R.length} 回合</span><span>點左邊單字，再點右邊意思</span></div>
+      <div class="pbar"><i style="width:${r / R.length * 100}%"></i></div>
+      <div class="match"><div class="col">${left.map(i => `<button class="mi" data-s="L" data-i="${i}">${esc(pairs[i][0])}</button>`).join("")}</div>
+      <div class="col">${right.map(i => `<button class="mi" data-s="R" data-i="${i}">${esc(pairs[i][1])}</button>`).join("")}</div></div><div id="fb"></div>`;
+    app.querySelectorAll(".mi").forEach(b => b.onclick = () => {
+      if (b.classList.contains("done")) return;
+      if (b.dataset.s === "L") { app.querySelectorAll('.mi[data-s="L"]').forEach(x => x.classList.remove("sel")); b.classList.add("sel"); sel = b; speak(pairs[+b.dataset.i][0]); return; }
+      if (!sel) return;
+      if (sel.dataset.i === b.dataset.i) {
+        sel.classList.replace("sel", "done"); b.classList.add("done"); sel = null; matched++;
+        if (matched === set.length) {
+          $("#fb").innerHTML = `<div class="row" style="margin-top:16px;justify-content:center"><button class="btn" id="nx">${r < R.length - 1 ? "下一回合 →" : "看結果"}</button></div>`;
+          $("#nx").onclick = () => { r++; r < R.length ? draw() : finish(); };
+        }
+      } else {
+        miss++; store.wrong("we:" + sel.dataset.i);
+        b.classList.add("shake"); setTimeout(() => b.classList.remove("shake"), 400);
+      }
+    });
+  };
+  const finish = () => {
+    const p = Math.max(0, Math.round((pairs.length - miss) / pairs.length * 100));
+    store.best(bestKey, p);
+    app.innerHTML = head + `<div class="card result"><div class="muted">配對完成</div><div class="big">配錯 ${miss} 次</div>
+      <p>${miss === 0 ? "一次都沒配錯！" : "配錯的單字已經放進錯題本。"}</p>
+      <div class="row" style="justify-content:center"><button class="btn" onclick="render()">再玩一次</button></div></div>`;
+  };
+  draw();
+}
+
+/* ---------- 句子重組 ---------- */
+function reorder(head) {
+  const items = shuffle(G.order);
+  let i = 0, score = 0;
+  const draw = () => {
+    const it = items[i], words = it.s.replace(/\.$/, "").split(" ");
+    const pool = shuffle(words.map((w, k) => ({ w, k })));
+    const picked = []; let tries = 0;
+    const paint = () => {
+      app.innerHTML = head + `<div class="prog"><span>第 ${i + 1} / ${items.length} 題</span><span>答對 ${score}</span></div>
+        <div class="pbar"><i style="width:${i / items.length * 100}%"></i></div>
+        <div class="card"><div class="q">${esc(it.zh)}</div><div class="qsub">點下面的字卡排出正確句子；點上面的字卡可以放回去。</div>
+        <div class="tiles ans" id="ans">${picked.map((p, n) => `<button class="tile" data-n="${n}">${esc(p.w)}</button>`).join("")}</div>
+        <div class="tiles" id="pool">${pool.map((p, n) => `<button class="tile ${picked.includes(p) ? "used" : ""}" data-n="${n}">${esc(p.w)}</button>`).join("")}</div>
+        <div class="row" style="margin-top:10px"><button class="btn" id="ck" ${picked.length === words.length ? "" : "disabled"}>確認</button><button class="btn ghost" id="clr">全部清除</button></div><div id="fb"></div></div>`;
+      app.querySelectorAll("#pool .tile").forEach(b => b.onclick = () => { const p = pool[+b.dataset.n]; if (!picked.includes(p)) { picked.push(p); paint(); } });
+      app.querySelectorAll("#ans .tile").forEach(b => b.onclick = () => { picked.splice(+b.dataset.n, 1); paint(); });
+      $("#clr").onclick = () => { picked.length = 0; paint(); };
+      $("#ck").onclick = () => {
+        const s = picked.map(p => p.w).join(" ");
+        if (s === words.join(" ")) { score++; fin(true); }
+        else if (++tries === 1) {
+          const at = picked.findIndex((p, n) => p.w !== words[n]);
+          $("#fb").innerHTML = `<div class="hintbox">✎ 前 ${at} 個字是對的，從第 ${at + 1} 個字開始再想想。提示：as if 後面接「主詞＋動詞」。</div>`;
+        } else fin(false);
+      };
+      const fin = ok => {
+        $("#ck").disabled = true; $("#clr").disabled = true;
+        $("#fb").innerHTML = `<div class="fb ${ok ? "ok" : "bad"}">${ok ? "✔ 答對了！" : "✘ 正確句子："}<div><b>${esc(it.s)}</b></div></div>
+          <div class="row">${spk(it.s)}<button class="btn" id="nx">${i < items.length - 1 ? "下一題 →" : "看結果"}</button></div>`;
+        speak(it.s);
+        $("#nx").onclick = () => { i++; i < items.length ? draw() : done(); };
+      };
+    };
+    paint();
+  };
+  const done = () => {
+    store.best("gorder", Math.round(score / items.length * 100));
+    app.innerHTML = head + `<div class="card result"><div class="muted">句子重組完成</div><div class="big">${score} / ${items.length}</div>
+      <div class="row" style="justify-content:center"><button class="btn" onclick="render()">再練一次</button></div></div>`;
+  };
+  draw();
+}
+
+/* ---------- 錯題本 ---------- */
+function wrongbook() {
+  const head = `<h2 style="color:var(--bad);margin:0 0 12px">錯題本</h2>`;
+  const list = Object.entries(store.s.wrong).sort((a, b) => b[1] - a[1]);
+  if (view.run) return quiz(head, shuffle(list.map(x => x[0])), null, "wrongbook", true);
+  if (!list.length) { app.innerHTML = head + `<div class="card result"><div class="big">🎉</div><p>目前沒有錯題！</p></div>`; return; }
+  app.innerHTML = head + `<div class="row" style="margin-bottom:14px"><button class="btn" onclick="go('wrongbook',{run:true})">重練全部錯題（${list.length} 題）</button>
+    <button class="btn ghost" onclick="twice(this,()=>{store.clearWrong();render()})">清空</button></div>
+    <p class="muted">重練時答對的題目會自動從錯題本移除。</p>
+    <div class="wl">${list.map(([id, c]) => { const q = makeQ(id); const label = LABEL[id.split(":")[0]];
+      const txt = q.kind === "type" ? q.spell.pre + " ___ " + q.spell.post : q.prompt;
+      return `<div class="it"><div><div class="muted">${label}</div><div>${esc(txt)}</div><div style="color:var(--ok)">→ ${esc(q.answer)}</div></div><span class="cnt">錯 ${c} 次</span></div>`; }).join("")}</div>`;
+}
+
+if ("speechSynthesis" in window) speechSynthesis.onvoiceschanged = () => {};
+render();
+</script>
+</body>
+</html>
